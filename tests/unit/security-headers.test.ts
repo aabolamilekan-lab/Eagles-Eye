@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import nextConfig from "../../next.config";
 
 /**
@@ -113,6 +113,40 @@ describe("global security headers", () => {
 
   it("does not expose the framework banner", () => {
     expect(nextConfig.poweredByHeader).toBe(false);
+  });
+});
+
+describe("the eval grant is confined to development", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  /** Import the config fresh, as a server started under `nodeEnv` would. */
+  async function cspForNodeEnv(nodeEnv: string): Promise<string> {
+    vi.resetModules();
+    vi.stubEnv("NODE_ENV", nodeEnv);
+    const fresh = (await import("../../next.config")).default;
+    const rules = (await fresh.headers?.()) as HeaderEntry[] | undefined;
+    const withCsp = (rules ?? [])
+      .flatMap((rule) => rule.headers)
+      .find((header) => header.key === "Content-Security-Policy");
+    if (!withCsp) {
+      throw new Error("next.config.ts emits no Content-Security-Policy header");
+    }
+    return withCsp.value;
+  }
+
+  it("grants 'unsafe-eval' only where React's development runtime needs it", async () => {
+    // React's dev runtime calls eval() to rebuild call stacks; production
+    // states it never does. A regression here would silently hand a production
+    // response an execution primitive, so both directions are asserted.
+    const development = await cspForNodeEnv("development");
+    expect(development).toMatch(/script-src[^;]*'unsafe-eval'/);
+
+    const production = await cspForNodeEnv("production");
+    expect(production).not.toContain("unsafe-eval");
+    expect(production).toContain("script-src 'self' 'unsafe-inline'");
   });
 });
 

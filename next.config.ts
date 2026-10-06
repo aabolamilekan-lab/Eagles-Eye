@@ -21,15 +21,29 @@ import type { NextConfig } from "next";
  * drops `strict-dynamic` so this policy is not bypassable by a script URL an
  * attacker could guess.
  *
+ * `'unsafe-eval'` is granted only when Next is running in development mode.
+ * React's development runtime calls `eval()` to rebuild call stacks and the
+ * dev overlay needs it too; React states it never uses `eval()` in production,
+ * so the production policy keeps exactly the directives above and never gains
+ * an execution primitive. Verified both ways: `next dev` sends the eval grant,
+ * `next start` does not.
+ *
  * AGENTS.md section 10, "sanitize on render again as defence in depth".
  */
+const scriptSrc = [
+  "script-src 'self' 'unsafe-inline'",
+  process.env.NODE_ENV === "development" ? "'unsafe-eval'" : null,
+]
+  .filter(Boolean)
+  .join(" ");
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   // `blob:` is required by the image optimizer for the object URL it hands back.
   "img-src 'self' blob: data:",
   "font-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline'",
+  scriptSrc,
   "connect-src 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
