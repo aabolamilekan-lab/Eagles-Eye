@@ -27,7 +27,7 @@ export function SiteHeader({
   navLabel?: string;
 }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface">
+    <header className="sticky top-0 z-40 border-b border-primary-hover bg-primary">
       <div className="shell flex h-16 items-center gap-6">
         <div className="shrink-0">{brand}</div>
 
@@ -41,8 +41,8 @@ export function SiteHeader({
                   className={cn(
                     "inline-flex h-9 items-center rounded-md px-3 font-ui text-body-sm transition-colors",
                     item.current
-                      ? "bg-surface-sunken font-medium text-ink"
-                      : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
+                      ? "bg-primary-hover font-medium text-on-primary"
+                      : "text-on-primary hover:bg-primary-hover",
                   )}
                 >
                   {item.label}

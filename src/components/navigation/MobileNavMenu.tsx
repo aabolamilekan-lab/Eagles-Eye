@@ -74,7 +74,7 @@ export function MobileNavMenu({
       <summary
         ref={summaryRef}
         aria-label="Open menu"
-        className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-md text-ink transition-colors hover:bg-surface-sunken"
+        className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-md text-on-primary transition-colors hover:bg-primary-hover"
       >
         <Menu aria-hidden="true" className="size-5" />
       </summary>

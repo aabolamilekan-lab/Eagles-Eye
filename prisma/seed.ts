@@ -81,7 +81,7 @@ interface SeedStory {
   chapters: SeedChapter[];
 }
 
-const categories = [
+export const categories = [
   {
     slug: "frontier-chronicles",
     name: "Frontier Chronicles",
@@ -100,9 +100,15 @@ const categories = [
     description: "Place, memory, and the people who stay.",
     image: null,
   },
+  {
+    slug: "harbour-lights",
+    name: "Harbour Lights",
+    description: "Crossings, departures, and the people who wait for them.",
+    image: null,
+  },
 ] as const;
 
-const tags = [
+export const tags = [
   { slug: "adventure", name: "Adventure" },
   { slug: "mystery", name: "Mystery" },
   { slug: "science-fiction", name: "Science Fiction" },
@@ -110,7 +116,7 @@ const tags = [
   { slug: "short-story", name: "Short Story" },
 ] as const;
 
-const seedStories: SeedStory[] = [
+export const seedStories: SeedStory[] = [
   {
     slug: "the-cartographers-debt",
     title: "The Cartographer's Debt",
@@ -191,6 +197,16 @@ const seedStories: SeedStory[] = [
         views: 48,
         publishedAt: new Date("2026-02-10T12:00:00.000Z"),
       },
+      {
+        chapterNumber: 3,
+        slug: "the-log",
+        title: "The Log",
+        content:
+          "<p>The station log ended nine years ago. I began a new one anyway, because a relay without a log is just a light left on.</p><blockquote><p>Entry one: still here. Entry two: still here.</p></blockquote>",
+        status: ContentStatus.PUBLISHED,
+        views: 35,
+        publishedAt: new Date("2026-02-17T12:00:00.000Z"),
+      },
     ],
   },
   {
@@ -212,6 +228,26 @@ const seedStories: SeedStory[] = [
         slug: "the-ledger",
         title: "The Ledger",
         content: "<p>My father wrote down every hull he finished and every one he sold. I write down the ones we kept.</p>",
+        status: ContentStatus.DRAFT,
+        views: 0,
+        publishedAt: null,
+      },
+      {
+        chapterNumber: 2,
+        slug: "the-keel",
+        title: "The Keel",
+        content:
+          "<p>A keel is a promise you can stand on. We laid the first one the winter the yard almost closed.</p>",
+        status: ContentStatus.DRAFT,
+        views: 0,
+        publishedAt: null,
+      },
+      {
+        chapterNumber: 3,
+        slug: "the-arithmetic-of-leaving",
+        title: "The Arithmetic of Leaving",
+        content:
+          "<p>Every launch is a subtraction. I have stopped trying to make the numbers come out even.</p>",
         status: ContentStatus.DRAFT,
         views: 0,
         publishedAt: null,
@@ -246,6 +282,16 @@ const seedStories: SeedStory[] = [
         slug: "the-dark-year",
         title: "The Dark Year",
         content: "<p>Unfinished. The keeper's second year was never written down.</p>",
+        status: ContentStatus.DRAFT,
+        views: 0,
+        publishedAt: null,
+      },
+      {
+        chapterNumber: 3,
+        slug: "the-inventory",
+        title: "The Inventory",
+        content:
+          "<p>Six wicks, two lamps beyond repair, one log book with the last page torn out. She wrote the list anyway, in the back of the church register.</p>",
         status: ContentStatus.DRAFT,
         views: 0,
         publishedAt: null,
@@ -285,6 +331,16 @@ const seedStories: SeedStory[] = [
         status: ContentStatus.PUBLISHED,
         views: 30,
         publishedAt: new Date("2026-03-08T08:00:00.000Z"),
+      },
+      {
+        chapterNumber: 3,
+        slug: "the-regatta",
+        title: "The Regatta",
+        content:
+          "<p>By the third afternoon the whole street had a starting line, a finishing line, and rules nobody had agreed to out loud.</p>",
+        status: ContentStatus.PUBLISHED,
+        views: 22,
+        publishedAt: new Date("2026-03-15T08:00:00.000Z"),
       },
     ],
   },
@@ -461,13 +517,16 @@ async function seed(): Promise<void> {
   process.stderr.write("Seed complete.\n");
 }
 
-seed()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (error: unknown) => {
-    const message = error instanceof Error ? error.message : "unknown error";
-    process.stderr.write(`Seed failed: ${message}\n`);
-    await prisma.$disconnect();
-    process.exitCode = 1;
-  });
+// The contract test imports the content arrays above; it must never run the seed.
+if (process.env.VITEST !== "true") {
+  seed()
+    .then(async () => {
+      await prisma.$disconnect();
+    })
+    .catch(async (error: unknown) => {
+      const message = error instanceof Error ? error.message : "unknown error";
+      process.stderr.write(`Seed failed: ${message}\n`);
+      await prisma.$disconnect();
+      process.exitCode = 1;
+    });
+}
