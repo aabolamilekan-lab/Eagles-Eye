@@ -11,6 +11,8 @@ import { getPublishedCategoryBySlug } from "@/lib/queries/public/categories";
 import { getPublishedStoryList } from "@/lib/queries/public/stories";
 import { parseContentSlug, parseStoryListSearch } from "@/lib/validation/story";
 import { categoryStoryHref } from "@/lib/validation/taxonomy";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
 
 /**
  * Category detail.
@@ -57,6 +59,15 @@ export async function generateMetadata({
     title: category.name,
     description,
     alternates: { canonical: `/categories/${category.slug}` },
+    openGraph: buildOpenGraph({
+      title: `${category.name} | Eagles Eye`,
+      description,
+      path: `/categories/${category.slug}`,
+    }),
+    twitter: buildTwitter({
+      title: `${category.name} | Eagles Eye`,
+      description,
+    }),
   };
 }
 

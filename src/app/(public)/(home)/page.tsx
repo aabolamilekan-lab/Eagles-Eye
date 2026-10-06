@@ -16,6 +16,9 @@ import {
   getPublishedStoryCount,
   getRecentStories,
 } from "@/lib/queries/public/stories";
+import { siteDescription, siteName } from "@/lib/seo/metadata";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
 
 /**
  * Home.
@@ -28,7 +31,14 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  description: siteDescription,
   alternates: { canonical: "/" },
+  openGraph: buildOpenGraph({
+    title: siteName,
+    description: siteDescription,
+    path: "/",
+  }),
+  twitter: buildTwitter({ title: siteName, description: siteDescription }),
 };
 
 const FEATURED_LIMIT = 6;

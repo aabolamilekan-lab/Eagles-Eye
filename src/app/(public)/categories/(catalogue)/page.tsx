@@ -8,16 +8,40 @@ import {
   categoriesIndexHref,
   parseCategoryPage,
 } from "@/lib/validation/taxonomy";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
 
 interface CategoriesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export const metadata: Metadata = {
-  title: "Categories",
-  description: "Browse published stories by category.",
-  alternates: { canonical: "/categories" },
-};
+const DESCRIPTION = "Browse published stories by category.";
+
+/**
+ * Page-aware canonical: page 2 points at itself rather than at page 1, so a
+ * paginated slice is never collapsed onto the index entry.
+ */
+export async function generateMetadata({
+  searchParams,
+}: CategoriesPageProps): Promise<Metadata> {
+  const page = parseCategoryPage((await searchParams).page);
+  const path = page > 1 ? `/categories?page=${page}` : "/categories";
+
+  return {
+    title: "Categories",
+    description: DESCRIPTION,
+    alternates: { canonical: path },
+    openGraph: buildOpenGraph({
+      title: "Categories | Eagles Eye",
+      description: DESCRIPTION,
+      path,
+    }),
+    twitter: buildTwitter({
+      title: "Categories | Eagles Eye",
+      description: DESCRIPTION,
+    }),
+  };
+}
 
 /**
  * Category index.

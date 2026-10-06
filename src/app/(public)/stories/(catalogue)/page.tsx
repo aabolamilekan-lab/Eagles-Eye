@@ -9,6 +9,8 @@ import { getPublishedStoryList } from "@/lib/queries/public/stories";
 import { getPublishedCategoryOptions } from "@/lib/queries/public/categories";
 import { getPublishedTagOptions } from "@/lib/queries/public/tags";
 import { parseStoryListSearch, storyListHref } from "@/lib/validation/story";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
 
 interface StoriesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -19,15 +21,31 @@ export async function generateMetadata({
 }: StoriesPageProps): Promise<Metadata> {
   const search = parseStoryListSearch(await searchParams);
 
-  const canonicalPath = search.hasFilters
-    ? storyListHref(search, { page: search.page === 1 ? 1 : search.page })
-    : "/stories";
+  // A sorted or facet-filtered view is a different page from the default one,
+  // so it never canonicalizes onto `/stories`; page 2 likewise canonicalizes to
+  // itself rather than to page 1.
+  const canonicalPath =
+    search.hasFilters || search.page > 1 || search.sort !== "recent"
+      ? storyListHref(search, { page: search.page })
+      : "/stories";
+  const title = search.q ? `Stories matching "${search.q}"` : "Stories";
+  const description = "Every published story in the Eagles Eye catalogue.";
+
   return {
-    title: search.q ? `Stories matching "${search.q}"` : "Stories",
-    description: "Every published story in the Eagles Eye catalogue.",
+    title,
+    description,
     alternates: { canonical: canonicalPath },
     // Filtered views are useful to readers but thin and unbounded for crawlers.
-    robots: search.hasFilters ? { index: false, follow: true } : undefined,
+    robots:
+      search.hasFilters || search.sort !== "recent"
+        ? { index: false, follow: true }
+        : undefined,
+    openGraph: buildOpenGraph({
+      title: `${title} | Eagles Eye`,
+      description,
+      path: canonicalPath,
+    }),
+    twitter: buildTwitter({ title: `${title} | Eagles Eye`, description }),
   };
 }
 

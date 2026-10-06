@@ -18,6 +18,8 @@ import {
 import { clientIpFromHeaders } from "@/lib/rate-limit/sliding-window";
 import { getSearchLimiter } from "@/lib/rate-limit/search";
 import { logger } from "@/lib/logger";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
 
 /**
  * Public search page.
@@ -38,15 +40,22 @@ export async function generateMetadata({
 }: SearchPageProps): Promise<Metadata> {
   const search = parseStorySearch(await searchParams);
   const title = search.typedQuery ? `Search: ${search.typedQuery}` : "Search";
+  const description =
+    "Search published stories on Eagles Eye by title, author, category, tag, or keyword.";
 
   return {
     title,
-    description:
-      "Search published stories on Eagles Eye by title, author, category, tag, or keyword.",
+    description,
     alternates: { canonical: "/search" },
     // A result page indexed under its query string would expose thin, duplicated
     // pages. The static entry point stays reachable via the header.
     robots: { index: false, follow: true },
+    openGraph: buildOpenGraph({
+      title: `${title} | Eagles Eye`,
+      description,
+      path: "/search",
+    }),
+    twitter: buildTwitter({ title: `${title} | Eagles Eye`, description }),
   };
 }
 

@@ -1,10 +1,20 @@
 import type { Metadata } from "next";
+import { buildOpenGraph } from "@/lib/seo/open-graph";
+import { buildTwitter } from "@/lib/seo/twitter";
+
+const description =
+  "What Eagles Eye is: a quiet home for long-form stories, for readers and publishers.";
 
 export const metadata: Metadata = {
   title: "About",
-  description:
-    "What Eagles Eye is: a quiet home for long-form stories, for readers and publishers.",
+  description,
   alternates: { canonical: "/about" },
+  openGraph: buildOpenGraph({
+    title: "About Eagles Eye",
+    description,
+    path: "/about",
+  }),
+  twitter: buildTwitter({ title: "About Eagles Eye", description }),
 };
 
 export default function AboutPage() {
