@@ -9,7 +9,7 @@ export function SiteFooter({
   note?: string;
 }) {
   return (
-    <footer className="mt-(--spacing-section) border-t border-border">
+    <footer className="mt-(--spacing-section) border-t border-border bg-surface">
       <div className="shell flex flex-col gap-10 py-12 md:flex-row md:justify-between">
         <div className="flex max-w-xs flex-col gap-3">
           <Wordmark />

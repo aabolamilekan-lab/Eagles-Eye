@@ -27,7 +27,7 @@ export function SiteHeader({
   navLabel?: string;
 }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-paper">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface">
       <div className="shell flex h-16 items-center gap-6">
         <div className="shrink-0">{brand}</div>
 
