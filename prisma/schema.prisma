@@ -1,0 +1,198 @@
+// Eagles Eye data model.
+//
+// PostgreSQL is the source of truth. Schema changes ship as a migration under
+// prisma/migrations/ in the same commit as the code that depends on them.
+// See AGENTS.md section 5 for the data contract.
+
+generator client {
+  provider        = "prisma-client-js"
+  // `postgresqlExtensions` lets the datasource declare `pg_trgm`, so the
+  // extension and the trigram indexes it backs ship in one migration and
+  // Prisma stays the single source of truth for the schema.
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pg_trgm]
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum UserRole {
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(ADMIN)
+  // Deactivated users cannot sign in and have every session revoked.
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions Session[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  // Only a keyed HMAC-SHA256 hash of the raw token is stored. The raw token
+  // lives in the HttpOnly cookie and in request memory, never in the database.
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Session sweep by user and by expiry.
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Brute-force audit. The table, not process memory, is the source of truth for
+// the lockout window so restarts and multiple instances behave identically.
+model LoginAttempt {
+  id          String   @id @default(cuid())
+  identifier  String
+  ip          String
+  succeeded   Boolean
+  attemptedAt DateTime @default(now())
+
+  @@index([identifier, attemptedAt])
+  @@index([ip, attemptedAt])
+}
+
+model Story {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  author           String?
+  // shortDescription is plain text for cards, metadata and search.
+  shortDescription String?
+  // description is sanitized rich text. Never store raw HTML.
+  description      String?
+  // coverImage is a private storage key, not a public URL.
+  coverImage       String?
+  status           ContentStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  views            Int           @default(0)
+  categoryId       String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  publishedAt      DateTime?
+
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  chapters   Chapter[]
+  storyTags  StoryTag[]
+  storyViews StoryView[]
+
+  // Public listing, featured rail and sitemap ordering.
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([featured])
+  // Cover delivery looks a story up by its storage key on every image request
+  // (`/api/images/[...key]`), so the equality predicate must be indexed.
+  @@index([coverImage])
+
+  // Free-text search over the story's own fields. `ILIKE '%term%'` cannot use
+  // a btree index, so each searchable column gets a GIN trigram index instead.
+  // Prisma emits these as `USING GIN (column gin_trgm_ops)`.
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([author(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([shortDescription(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([description(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model Chapter {
+  id            String        @id @default(cuid())
+  storyId       String
+  chapterNumber Int
+  title         String
+  slug          String
+  // content is sanitized rich text (allowlist only). Never store raw HTML.
+  content       String
+  status        ContentStatus @default(DRAFT)
+  views         Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  publishedAt   DateTime?
+
+  story      Story       @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  storyViews StoryView[]
+
+  // Ordering, sibling navigation and reorder are guarded by this unique key.
+  @@unique([storyId, chapterNumber])
+  // Chapter page lookup under a story.
+  @@unique([storyId, slug])
+  // Published-chapter existence check.
+  @@index([status])
+  @@index([storyId, status])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stories Story[]
+
+  // Search matches a story by its category name.
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  storyTags StoryTag[]
+
+  // Search matches a story by one of its tag names.
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model StoryTag {
+  storyId String
+  tagId   String
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([storyId, tagId])
+  @@index([tagId])
+}
+
+model StoryView {
+  id        String   @id @default(cuid())
+  storyId   String
+  // Null when the view is of the story itself rather than a chapter.
+  chapterId String?
+  // Opaque analytics session identifier, not an auth session.
+  sessionId String?
+  viewedAt  DateTime @default(now())
+
+  story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  chapter Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@index([storyId, viewedAt])
+  // The admin dashboard's most-recent-views rail orders by `viewedAt` alone, so
+  // it needs `viewedAt` as a leading column rather than as the second one.
+  @@index([viewedAt])
+  @@index([chapterId])
+  @@index([sessionId])
+}
