@@ -14,9 +14,19 @@ const seedPassword = process.env.SEED_ADMIN_PASSWORD;
 test.describe("admin authentication", () => {
   test.skip(!baseURL, "E2E_BASE_URL is not set.");
 
-  test("a protected route redirects to sign-in when signed out", async ({ page }) => {
-    await page.goto("/admin");
-    await expect(page).toHaveURL(/\/admin\/login$/);
+  test("every protected route redirects to sign-in when signed out", async ({
+    page,
+  }) => {
+    for (const path of [
+      "/admin",
+      "/admin/stories",
+      "/admin/categories",
+      "/admin/settings",
+      "/admin/tags",
+    ]) {
+      await page.goto(path);
+      await expect(page, path).toHaveURL(/\/admin\/login$/);
+    }
   });
 
   test("signing in reaches the dashboard and signing out revokes the session", async ({

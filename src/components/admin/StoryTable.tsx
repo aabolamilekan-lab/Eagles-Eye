@@ -24,9 +24,11 @@ export function StoryTable({ stories }: { stories: AdminStoryListRow[] }) {
     <Table caption="Stories">
       <TableHead>
         <TableHeaderCell>Story</TableHeaderCell>
+        <TableHeaderCell>Author</TableHeaderCell>
         <TableHeaderCell>Status</TableHeaderCell>
         <TableHeaderCell>Category</TableHeaderCell>
         <TableHeaderCell align="right">Chapters</TableHeaderCell>
+        <TableHeaderCell align="right">Views</TableHeaderCell>
         <TableHeaderCell>Updated</TableHeaderCell>
         <TableHeaderCell align="right">Actions</TableHeaderCell>
       </TableHead>
@@ -50,6 +52,8 @@ export function StoryTable({ stories }: { stories: AdminStoryListRow[] }) {
                 </span>
               </TableCell>
 
+              <TableCell>{story.author ?? "—"}</TableCell>
+
               <TableCell>
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={story.status} />
@@ -62,6 +66,8 @@ export function StoryTable({ stories }: { stories: AdminStoryListRow[] }) {
               <TableCell align="right">
                 {story.publishedChapterCount}/{story.chapterCount}
               </TableCell>
+
+              <TableCell align="right">{story.views.toLocaleString()}</TableCell>
 
               <TableCell>{formatPublishedDate(story.updatedAt) ?? "—"}</TableCell>
 

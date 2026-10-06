@@ -5,6 +5,7 @@ import {
   FolderTree,
   Plus,
   Settings,
+  Tags,
 } from "lucide-react";
 import { DashboardPanel } from "@/components/admin/DashboardPanel";
 
@@ -12,6 +13,7 @@ const ACTIONS = [
   { label: "Create a story", href: "/admin/stories/new", icon: Plus },
   { label: "Browse stories", href: "/admin/stories", icon: BookOpen },
   { label: "Manage categories", href: "/admin/categories", icon: FolderTree },
+  { label: "Manage tags", href: "/admin/tags", icon: Tags },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

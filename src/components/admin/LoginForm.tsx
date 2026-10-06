@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
@@ -16,9 +16,14 @@ const INITIAL_STATE: LoginActionState = {};
  * the security boundary. The failure message is rendered once, never mapped to
  * a specific field, so it cannot distinguish an unknown account from a wrong
  * password.
+ *
+ * The visibility toggle changes only the input's `type`; the value is always
+ * submitted as the password field, and the control carries `aria-pressed` so its
+ * state is announced.
  */
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, INITIAL_STATE);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-4" noValidate>
@@ -40,9 +45,19 @@ export function LoginForm() {
       <TextField
         label="Password"
         name="password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         autoComplete="current-password"
         required
+        trailing={
+          <button
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            aria-pressed={showPassword}
+            className="rounded-sm px-2 py-1 font-ui text-body-xs font-medium text-ink-muted transition-colors duration-(--duration-fast) hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        }
       />
 
       <Button

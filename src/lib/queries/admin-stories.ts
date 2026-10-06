@@ -29,6 +29,7 @@ export interface AdminStoryListRow {
   title: string;
   slug: string;
   author: string | null;
+  views: number;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   featured: boolean;
   coverImage: string | null;
@@ -66,6 +67,7 @@ const ADMIN_STORY_SELECT = {
   title: true,
   slug: true,
   author: true,
+  views: true,
   status: true,
   featured: true,
   coverImage: true,
@@ -133,6 +135,7 @@ function toRow(
     title: row.title,
     slug: row.slug,
     author: row.author,
+    views: row.views,
     status: row.status,
     featured: row.featured,
     coverImage: row.coverImage,

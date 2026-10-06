@@ -81,6 +81,13 @@ export interface TextFieldProps
   hint?: string;
   /** Server-returned message for this field. Never a raw thrown error. */
   error?: string | undefined;
+  /**
+   * Optional control pinned inside the right edge of the input (for example a
+   * password visibility toggle). The input reserves space for it, so the value
+   * is never covered. Keyboard order follows the input, as a trailing control
+   * should.
+   */
+  trailing?: ReactNode;
 }
 
 export function TextField({
@@ -89,10 +96,28 @@ export function TextField({
   error,
   required,
   className,
+  trailing,
   ...rest
 }: TextFieldProps) {
   const generated = useId();
   const id = `field-${generated}`;
+
+  const input = (
+    <input
+      id={id}
+      required={required}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={describedBy(id, hint, error)}
+      className={cn(
+        CONTROL_BASE,
+        "h-11 font-ui text-body-sm",
+        trailing ? "pr-16" : undefined,
+        error && CONTROL_ERROR,
+        className,
+      )}
+      {...rest}
+    />
+  );
 
   return (
     <FieldShell
@@ -102,19 +127,16 @@ export function TextField({
       error={error}
       required={required}
     >
-      <input
-        id={id}
-        required={required}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, hint, error)}
-        className={cn(
-          CONTROL_BASE,
-          "h-11 font-ui text-body-sm",
-          error && CONTROL_ERROR,
-          className,
-        )}
-        {...rest}
-      />
+      {trailing ? (
+        <span className="relative block">
+          {input}
+          <span className="absolute inset-y-0 right-1 flex items-center">
+            {trailing}
+          </span>
+        </span>
+      ) : (
+        input
+      )}
     </FieldShell>
   );
 }
