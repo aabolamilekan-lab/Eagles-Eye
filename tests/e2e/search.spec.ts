@@ -82,7 +82,14 @@ test.describe("search", () => {
   test("keeps the term when a facet is applied", async ({ page }) => {
     await page.goto("/search?q=Vela");
 
-    await page.getByLabel("Category").selectOption("roots-and-rivers");
+    // On a small screen the facets live behind a disclosure, so open it first.
+    // The select itself is the thing under test, not the disclosure.
+    const category = page.getByLabel("Category");
+    if (!(await category.isVisible())) {
+      await page.getByText("Filters", { exact: true }).click();
+    }
+
+    await category.selectOption("roots-and-rivers");
     await page.getByRole("button", { name: "Apply filters" }).click();
 
     await expect(page).toHaveURL(/q=Vela/);
