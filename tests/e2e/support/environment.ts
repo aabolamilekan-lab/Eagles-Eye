@@ -112,6 +112,26 @@ export const E2E_ORIGIN = process.env.E2E_BASE_URL ?? `http://localhost:${E2E_PO
 export const E2E_STORAGE_DIR = path.join(PROJECT_ROOT, ".e2e-storage");
 
 /**
+ * The five S3 keys pinned to the empty string, for any harness that must own
+ * its own storage.
+ *
+ * A developer's `.env` may legitimately carry real object-storage
+ * credentials, and both Next and the integration config load that file into
+ * the process under test. An empty string counts as already set, so the file
+ * values are ignored and storage resolution sees zero S3 keys and selects the
+ * filesystem driver. Without this a suite puts covers into a real bucket
+ * instead of its throwaway directory, which is both the wrong test and a write
+ * against infrastructure the run does not own.
+ */
+export const TEST_FILESYSTEM_STORAGE_ENV = {
+  STORAGE_ENDPOINT: "",
+  STORAGE_REGION: "",
+  STORAGE_BUCKET: "",
+  STORAGE_ACCESS_KEY_ID: "",
+  STORAGE_SECRET_ACCESS_KEY: "",
+} as const;
+
+/**
  * Local-only admin credential for the seeded suite.
  *
  * Reuses the developer's `SEED_ADMIN_*` when present, otherwise a clearly
@@ -134,8 +154,11 @@ export function seedCredentials(): { email: string; password: string } {
  * `Request origin is not allowed.`
  *
  * Write and search ceilings are raised well above what the journeys need. The
- * abuse test exercises the login throttle, which is database-backed and keyed by
+ * abuse test exercises the login throttle, which is database-backed and keyed on
  * identifier and IP, so it does not depend on these being small.
+ *
+ * Storage is the throwaway directory: `TEST_FILESYSTEM_STORAGE_ENV` keeps a
+ * developer's real object-storage credentials out of the resolved config.
  */
 export function webServerEnv(): Record<string, string> {
   const files = readLocalEnvFiles();
@@ -149,6 +172,7 @@ export function webServerEnv(): Record<string, string> {
       process.env.AUTH_SECRET ?? files.AUTH_SECRET ?? "e2e-local-only-auth-secret-not-a-real-one",
     NEXT_PUBLIC_APP_URL: E2E_ORIGIN,
     STORAGE_LOCAL_DIR: E2E_STORAGE_DIR,
+    ...TEST_FILESYSTEM_STORAGE_ENV,
     SESSION_MAX_AGE_SECONDS: "3600",
     SEED_ADMIN_EMAIL: email,
     SEED_ADMIN_PASSWORD: password,

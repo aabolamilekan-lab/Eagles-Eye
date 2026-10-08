@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
-import { readLocalEnvFiles } from "./tests/e2e/support/environment";
+import { readLocalEnvFiles, TEST_FILESYSTEM_STORAGE_ENV } from "./tests/e2e/support/environment";
 
 /**
  * Integration test project.
@@ -14,12 +14,19 @@ import { readLocalEnvFiles } from "./tests/e2e/support/environment";
  * runtime, so integration files that import Prisma type-only silently skip.
  * The documented env files are loaded into the process first; a value already
  * present in the real environment (for example CI) always wins.
+ *
+ * Object storage is the exception and is forced to the filesystem driver
+ * afterwards. The upload and image suites set `STORAGE_LOCAL_DIR` and expect
+ * their writes to land there; a real bucket configured in `.env` or in the
+ * surrounding environment would otherwise receive them.
  */
 for (const [key, value] of Object.entries(readLocalEnvFiles())) {
   if (process.env[key] === undefined) {
     process.env[key] = value;
   }
 }
+
+Object.assign(process.env, TEST_FILESYSTEM_STORAGE_ENV);
 
 export default defineConfig({
   test: {
