@@ -31,9 +31,12 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
-# .env.example is committed deliberately: it is the documented contract and holds no real values.
+# The two example files are committed deliberately: they are the documented
+# contracts and hold no real values. Every other `.env*` file is a live
+# configuration and must never reach the repository.
 .env*
 !.env.example
+!.env.production.example
 
 # prisma local databases
 /prisma/*.db

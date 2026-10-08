@@ -17,15 +17,19 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 | Path | Responsibility |
 | --- | --- |
 | `.env.example` | Committed env contract. Names and shapes only. |
+| `.env.production.example` | Placeholder-where to copy for a production environment. Never real values. |
 | `src/lib/env.ts` | Zod validation at startup; fails fast with a clear message. |
 | `src/lib/logger.ts` | Request id correlation, redaction, levels. No `console.log`. |
-| `src/lib/cache/tags.ts` | Cache tag constants shared by queries and admin mutations. |
-| `src/app/api/health/route.ts` | Liveness and readiness, `no-store`, minimal payload. |
-| `middleware.ts` | Matcher only. Must not gate the health check. |
+| `src/lib/queries/public/{stories,categories,tags}.ts` | Public cache tags declared once and read by every cached public query. |
+| `src/lib/stories/revalidate.ts` | `updateTag` revalidation entry used by admin mutations. |
 | `prisma/migrations/` | Committed SQL migrations, shipped with dependent code. |
 | `prisma/seed.ts` | Local-only seed; refuses to run in production. |
-| `scripts/verify-env.ts` | Startup env validation entry used by build and boot. |
-| `.github/workflows/ci.yml` | The four-command gate plus `migrate deploy`. |
+| `scripts/create-admin.ts` | `npm run admin:create`; production first-administrator bootstrap. Env-only credentials. |
+
+Not yet implemented (do not document them as live): `/api/health` health
+endpoint, `middleware.ts`, a CI workflow under `.github/workflows/`, and
+`scripts/verify-env.ts`. Treat any instruction below that assumes they exist as
+the contract to build against, not current behaviour.
 
 ## Implementation rules
 
@@ -64,6 +68,9 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 | `UPLOAD_MAX_BYTES` | No | Where covers are used | Server-enforced cover size ceiling in bytes. |
 | `SEED_ADMIN_EMAIL` | No | Local only | Seed admin email. Absent in production. |
 | `SEED_ADMIN_PASSWORD` | No | Local only | Seed admin password. Absent in production. |
+| `ADMIN_EMAIL` | No | Bootstrap only | One-shot target for `npm run admin:create`. Not read at boot. |
+| `ADMIN_NAME` | No | Bootstrap only | Optional display name for the bootstrap account. |
+| `ADMIN_PASSWORD` | No | Bootstrap only | One-shot password for the bootstrap account, never on the command line. |
 
 - Adding a variable means updating `.env.example` and `src/lib/env.ts` together, documenting purpose, format, and public status. No server-only variable is imported into a Client Component; that is a build error to fix.
 
@@ -89,6 +96,7 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 
 - All four gate commands run on the commit that ships; a green branch that was rebuilt is not evidence. The build needs `DATABASE_URL`, `AUTH_SECRET`, and `NEXT_PUBLIC_APP_URL`, because env validation runs at build time, supplied from the CI secret store. Install Playwright browsers explicitly in the CI image, cache `node_modules` and the browser directory by lockfile hash, never cache `.next` across commits, and run `next start`, not `next dev`, never as root.
 - `prisma/seed.ts` is wired to `npm run db:seed`, manual everywhere except local development, and never a build, release, or migrate step. It refuses when `NODE_ENV === "production"` and when either seed variable is empty, naming the missing variable. Staging seeding is explicit, reversible, uses staging-only credentials, and hashes through `src/lib/auth/password.ts`.
+- The first administrator in a deployed environment is created by `npm run admin:create` (`scripts/create-admin.ts`), never the seed. Credentials come from `ADMIN_EMAIL`/`ADMIN_PASSWORD` in the environment, the target email is repeated as `--confirm=<email>`, and the password is hashed with the application's Argon2id policy and never echoed. An existing account is never touched without `--update`, which replaces the password and revokes that account's sessions. Run it from a checkout with dev dependencies (`npm ci`), not from an `--omit=dev` runtime image, because it executes under `tsx`. These variables are bootstrap-only: the application never reads them at boot, so they can be cleared after the account is verified.
 
 **Rendering and caching**
 
@@ -101,13 +109,13 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 | `/sitemap.ts`, `/robots.ts` | Regenerated | Published URLs only, never admin. |
 | `/admin/login` | Dynamic | Never cached. |
 | `/admin/**` | Dynamic, `force-dynamic` | Per-session. Never cached or shared. |
-| `/api/health` and cover image route | Dynamic, `no-store` | Never cached; reads private storage. |
+| Cover image route (`/api/images/...`) | Dynamic, `no-store` | Never cached; reads private storage. |
 
 - Public reads use the shared query layer with `unstable_cache` or `revalidate` and named tags declared once in `src/lib/cache/tags.ts`, and every admin publish, unpublish, update, or delete revalidates the affected story, its category, the list pages, and the sitemap. `dynamic`, `revalidate`, and `fetchCache` appear only beside a deliberate reason, and the cause of unexpected dynamism is fixed rather than papered over with revalidate values.
 
 **Health checks and observability**
 
-- One handler at `/api/health` runs a cheap `SELECT 1` with a short timeout and returns `{ "status": "ok" }` or `{ "status": "unavailable" }`, with `Cache-Control: no-store` and no version, hostname, DSN, bucket name, or error text in the body. A failed probe logs detail with a request id and returns a generic 503. The `middleware.ts` matcher excludes it so probes do not depend on session handling, and the probe stays fast and dependency-light: deep dependency checks belong in monitoring, and alerts fire on sustained failure, not a single miss.
+- There is no `/api/health` handler yet. When one is added it must run a cheap `SELECT 1` with a short timeout and return `{ "status": "ok" }` or `{ "status": "unavailable" }`, with `Cache-Control: no-store` and no version, hostname, DSN, bucket name, or error text in the body. A failed probe logs detail with a request id and returns a generic 503. A future `middleware.ts` matcher must exclude it so probes do not depend on session handling, and the probe stays fast and dependency-light: deep dependency checks belong in monitoring, and alerts fire on sustained failure, not a single miss.
 - Every request gets an id: reuse an inbound `x-request-id`, otherwise generate. Propagate it on the response and include it in every log line and error boundary report.
 - Log method, route template rather than raw path with ids, status, duration, user id when authenticated, and the request id, plus an error code on failure. Never log passwords, hashes, raw tokens, `tokenHash`, cookies, `Authorization`, `DATABASE_URL`, `AUTH_SECRET`, storage keys, or full bodies; redact in the logger, not at the call site.
 - Levels: `error` for unexpected failures with stack, `warn` for denied authorization and rejected origins, `info` for login, logout, publish, delete. Denials log user id, capability, and route; that signal separates an attack from a bug. Rate-limit hits, lockouts, failed logins, and CSRF rejections are logged and aggregated. No `console.log`, `console.debug`, or `debugger`.
@@ -142,7 +150,7 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 
 - `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` pass on the release commit in CI, not only on a developer machine.
 - Env validation: a missing or malformed variable fails at startup naming the variable and never its value. Migration tests: apply the full history to an empty database, then re-run to confirm the deploy path is repeatable.
-- Health check: 200 `{ "status": "ok" }` when the database is reachable, 503 with a generic body when not, `no-store` in both cases, no internal detail.
+- Health check (once `/api/health` exists): 200 `{ "status": "ok" }` when the database is reachable, 503 with a generic body when not, `no-store` in both cases, no internal detail.
 - Caching: publishing makes a story publicly visible without a rebuild, and unpublishing removes it, including from the sitemap. Backup drill performed and recorded before the release is called reliable. Log redaction: a login attempt and a rejected authorization produce lines with no password, token, cookie, or secret value.
 
 ## Common mistakes
@@ -152,7 +160,7 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 - Production secrets as build arguments, persisting in image history, a real `.env` in the image or commit, or a database, bucket, or `AUTH_SECRET` shared between staging and production.
 - Rebuilding per environment, `npm install` in CI instead of `npm ci`, or treating `next build` success as the whole gate.
 - Running the seed in the release, or shipping seed credentials to production.
-- Caching an admin route or the health check, forgetting to revalidate on publish or unpublish, logging tokens or cookies or bodies or raw paths with record ids, and returning database or storage errors from the health endpoint.
+- Caching an admin route or (once it exists) the health check, forgetting to revalidate on publish or unpublish, logging tokens or cookies or bodies or raw paths with record ids, and returning database or storage errors from the health endpoint.
 - Treating a backup as existing until a restore has been verified, restoring storage before the database, or shipping `npm audit` findings as "known" without a written reason.
 
 ## Completion checklist
@@ -163,7 +171,7 @@ AGENTS.md sections 12, 17, and 18 govern environments and the release gate. This
 - [ ] Deploy runs `prisma migrate deploy`, never `migrate dev`; migrations committed, reviewed, and backward compatible.
 - [ ] Backup taken and verified before migrating, and the four-command gate, `migrate deploy`, and `npm audit` pass on the release commit.
 - [ ] Seed never runs in production and has no production credentials.
-- [ ] Rendering mode decided per route, cache tags revalidated on every public-facing change, and the health check minimal, `no-store`, dependency-light, and excluded from the middleware matcher.
+- [ ] Rendering mode decided per route, cache tags revalidated on every public-facing change, and once the health endpoint exists it is minimal, `no-store`, dependency-light, and excluded from any middleware matcher.
 - [ ] Request id on every log line, response, and error report; redaction enforced in the logger.
 - [ ] Backups scheduled, off-site, encrypted, with a recorded restore drill.
 - [ ] Pre-release security checklist completed, accepted findings written down, rollback path identified.

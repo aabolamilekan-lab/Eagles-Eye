@@ -47,6 +47,11 @@ This document outlines the production deployment procedure for Eagles Eye. **Do 
 
 **Do NOT set:** `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `STORAGE_LOCAL_DIR`
 
+`ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD`, `DATABASE_URL` are needed once by
+the administrator bootstrap in step 7. Keep the secrets in your secret store,
+but note that after the account exists `ADMIN_EMAIL` and `ADMIN_PASSWORD` are no
+longer read at boot: they are not runtime configuration.
+
 ### 2. Take Pre-Migration Backup
 
 ```bash
@@ -99,7 +104,33 @@ NODE_ENV=production npm run start
 # or use process manager (PM2, systemd, etc.)
 ```
 
-### 7. Smoke Tests
+### 7. Create the First Administrator
+
+The seed refuses to run in production, so a deployed environment gains its
+first administrator with `npm run admin:create`. Run it from a checkout with
+full dev dependencies (`npm ci`), before pruning `--omit=dev`: it is a
+one-shot script, not a runtime dependency.
+
+```bash
+# Credentials come from the environment, never the command line.
+ADMIN_EMAIL="admin@example.com" \
+ADMIN_PASSWORD="$(openssl rand -base64 24)" \
+ADMIN_NAME="Site Admin" \
+npm run admin:create -- --confirm=admin@example.com
+```
+
+- `--confirm=<email>` must exactly match `ADMIN_EMAIL`. It forces you to state
+  which account you mean; a stale variable cannot create an account by accident.
+- If the account already exists the script refuses. Re-run with `--update` to
+  replace the password and revoke every session for that account.
+- The password is never echoed; it is hashed with the same Argon2id policy the
+  app uses. Store it in your secret manager and share it with the operator out
+  of band.
+- Once the account is verified, remove `ADMIN_EMAIL`/`ADMIN_PASSWORD` from the
+  deploy host if they must persist there at all. The application never reads
+  them.
+
+### 8. Smoke Tests
 
 Verify critical functionality immediately after deploy:
 
@@ -111,6 +142,7 @@ Verify critical functionality immediately after deploy:
 - [ ] Sample chapter reader (published) loads correctly; navigation works
 - [ ] Admin login page loads (`GET /admin/login`)
 - [ ] Admin dashboard requires auth (redirects to login if unauthenticated)
+- [ ] Admin login succeeds and the dashboard renders with the step-7 account
 - [ ] Sitemap generates (`GET /sitemap.xml`, contains only published URLs, valid XML)
 - [ ] Robots.txt (`GET /robots.txt`, disallows /admin, /api)
 - [ ] Security headers present (check CSP, HSTS, X-Frame-Options)
@@ -118,7 +150,7 @@ Verify critical functionality immediately after deploy:
 - [ ] Unpublished story URLs return 404 (not found) to anonymous users
 - [ ] Draft chapters return 404 to anonymous users
 
-### 8. Post-Deployment Verification
+### 9. Post-Deployment Verification
 
 - [ ] Check application logs for errors
 - [ ] Verify database connections healthy
@@ -132,6 +164,10 @@ Verify critical functionality immediately after deploy:
 
 - **Never run `prisma migrate dev` in production.** Always use `prisma migrate deploy`.
 - **Never seed in production.** `prisma/seed.ts` refuses when `NODE_ENV=production`.
+- **Admin bootstrap is `npm run admin:create`.** Env-only credentials, explicit
+  `--confirm=<email>`, Argon2id hashing, and `--update` to rotate an existing
+  account's password (revoking its sessions). Never pass the password on the
+  command line.
 - **Promote artifacts, not source.** Rebuilding with different env vars inlines `NEXT_PUBLIC_*` differently.
 - **Back up before every migration.** Even additive migrations can have issues.
 - **Monitor logs** for the first 30 minutes after deploy.
