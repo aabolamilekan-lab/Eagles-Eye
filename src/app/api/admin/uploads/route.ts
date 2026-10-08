@@ -68,13 +68,27 @@ function failure(status: number, code: ErrorCode, message: string, headers?: Rec
   return json(status, { ok: false, code, error: message }, headers);
 }
 
+function normalizeOrigin(urlStr: string): string {
+  try {
+    const url = new URL(urlStr);
+    return url.origin;
+  } catch {
+    const trimmed = urlStr.trim().replace(/\/+$/, "");
+    try {
+      return new URL(trimmed).origin;
+    } catch {
+      return trimmed;
+    }
+  }
+}
+
 function originIsAllowed(request: Request): boolean {
   const origin = request.headers.get("origin");
   if (!origin) {
     return false;
   }
   try {
-    return new URL(origin).origin === new URL(getEnv().NEXT_PUBLIC_APP_URL).origin;
+    return normalizeOrigin(origin) === normalizeOrigin(getEnv().NEXT_PUBLIC_APP_URL);
   } catch {
     return false;
   }
