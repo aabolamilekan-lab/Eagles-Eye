@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { coverUrl } from "@/lib/seo/cover-url";
-import { absoluteUrl } from "@/lib/seo/metadata";
+import { absoluteUrl } from "@/lib/seo/canonical";
 import { isCoverKey } from "@/lib/storage/cover-key";
 
 /**
@@ -102,8 +102,12 @@ describe("absoluteUrl", () => {
   });
 
   it("does not treat a protocol-relative path as absolute", () => {
+    // It is a path, not a host: it resolves against this origin (duplicate
+    // slashes normalized away), never against evil.example. Prefixing the
+    // base instead of resolving would leave the origin intact too, but the
+    // point of the assertion is that the origin never moves.
     expect(absoluteUrl("//evil.example/x", "https://example.com")).toBe(
-      "https://example.com//evil.example/x",
+      "https://example.com/evil.example/x",
     );
   });
 });

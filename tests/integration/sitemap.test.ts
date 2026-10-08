@@ -209,6 +209,39 @@ describe.skipIf(!hasDatabase)("sitemap (PostgreSQL)", () => {
     }
   });
 
+  it("dates content by its own published date, never the clock", async () => {
+    const entries = await querySitemap(baseUrl);
+
+    const story = entries.find(
+      (entry) => entry.url === `${baseUrl}/stories/${PREFIX}-public`,
+    );
+    expect(
+      new Date(story?.lastModified as string | Date).toISOString(),
+    ).toBe("2026-01-10T00:00:00.000Z");
+
+    const chapter = entries.find((entry) =>
+      entry.url.endsWith(`/chapter/${PREFIX}-public-3`),
+    );
+    expect(
+      new Date(chapter?.lastModified as string | Date).toISOString(),
+    ).toBe("2026-01-12T00:00:00.000Z");
+  });
+
+  it("omits search, query-string and fragment URLs", async () => {
+    const listed = urls(await querySitemap(baseUrl));
+
+    expect(listed.some((url) => url.includes("/search"))).toBe(false);
+    expect(listed.some((url) => url.includes("?"))).toBe(false);
+    expect(listed.some((url) => url.includes("#"))).toBe(false);
+  });
+
+  it("produces byte-identical output across runs", async () => {
+    const first = await querySitemap(baseUrl);
+    const second = await querySitemap(baseUrl);
+
+    expect(second).toEqual(first);
+  });
+
   it("stays under the protocol URL ceiling", async () => {
     const { SITEMAP_URL_LIMIT } = await import("@/lib/seo/sitemap");
 

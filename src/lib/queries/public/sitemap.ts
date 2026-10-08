@@ -5,6 +5,7 @@ import {
   queryPublishedStorySlugsPage,
 } from "@/lib/queries/public/stories";
 import { logger } from "@/lib/logger";
+import { absoluteUrl } from "@/lib/seo/canonical";
 import {
   buildStaticEntries,
   sitemapLastModified,
@@ -23,6 +24,11 @@ import {
  * so `DRAFT` and `ARCHIVED` content cannot reach the sitemap (AGENTS.md
  * section 6).
  *
+ * Content is assembled first and the static entries last, so the static pages
+ * can be dated by the newest published URL instead of by the wall clock — two
+ * runs over the same database now produce identical output
+ * (`.agent/skills/seo/SKILL.md`, sitemap rules).
+ *
  * Output is capped at the protocol's 50,000-URL ceiling. A catalogue large enough
  * to reach that cap is logged server-side rather than silently truncated, because
  * the correct follow-up is a sitemap index, not a shorter sitemap.
@@ -33,17 +39,20 @@ import {
 export async function querySitemap(
   baseUrl: string,
 ): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
   const categories = await queryPublishedCategories(SITEMAP_CATEGORY_LIMIT);
+  const content: MetadataRoute.Sitemap = [];
 
-  const entries: MetadataRoute.Sitemap = buildStaticEntries(
-    baseUrl,
-    now,
-    categories.map((category) => ({ slug: category.slug })),
-  );
+  const stories = await appendStoryEntries(content, baseUrl);
+  const chapters = await appendChapterEntries(content, baseUrl);
 
-  const stories = await appendStoryEntries(entries, baseUrl, now);
-  const chapters = await appendChapterEntries(entries, baseUrl, now);
+  const entries: MetadataRoute.Sitemap = [
+    ...buildStaticEntries(
+      baseUrl,
+      categories.map((category) => ({ slug: category.slug })),
+      latestContentDate(content),
+    ),
+    ...content,
+  ];
 
   if (stories.truncated || chapters.truncated) {
     logger.warn("sitemap.url_limit_reached", {
@@ -56,22 +65,43 @@ export async function querySitemap(
 }
 
 /** Remaining capacity under the protocol ceiling. */
-function room(entries: MetadataRoute.Sitemap): number {
-  return SITEMAP_URL_LIMIT - entries.length;
+function room(content: MetadataRoute.Sitemap): number {
+  return SITEMAP_URL_LIMIT - content.length;
+}
+
+/** The newest published date across the content entries, if any. */
+function latestContentDate(
+  content: MetadataRoute.Sitemap,
+): Date | undefined {
+  let latest: Date | undefined;
+
+  for (const entry of content) {
+    const value = entry.lastModified;
+    if (value === undefined) continue;
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) continue;
+    if (latest === undefined || date > latest) {
+      latest = date;
+    }
+  }
+
+  return latest;
 }
 
 /**
  * Append published story URLs until the ceiling or the catalogue runs out.
+ *
+ * `lastmod` is `Story.publishedAt`, falling back to `updatedAt` only when the
+ * publish timestamp is absent — never the current time.
  */
 async function appendStoryEntries(
-  entries: MetadataRoute.Sitemap,
+  content: MetadataRoute.Sitemap,
   baseUrl: string,
-  now: Date,
 ): Promise<{ truncated: boolean }> {
   let offset = 0;
 
-  while (entries.length < SITEMAP_URL_LIMIT) {
-    const take = Math.min(SITEMAP_PAGE_SIZE, room(entries));
+  while (content.length < SITEMAP_URL_LIMIT) {
+    const take = Math.min(SITEMAP_PAGE_SIZE, room(content));
     const rows = await queryPublishedStorySlugsPage(offset, take);
 
     if (rows.length === 0) {
@@ -79,12 +109,9 @@ async function appendStoryEntries(
     }
 
     for (const row of rows) {
-      entries.push({
-        url: `${baseUrl}/stories/${row.slug}`,
-        lastModified: sitemapLastModified(
-          row.publishedAt ?? row.updatedAt,
-          now,
-        ),
+      content.push({
+        url: absoluteUrl(`/stories/${row.slug}`, baseUrl),
+        lastModified: sitemapLastModified(row.publishedAt, row.updatedAt),
         changeFrequency: "weekly",
         priority: 0.8,
       });
@@ -105,14 +132,13 @@ async function appendStoryEntries(
  * Append published chapter URLs until the ceiling or the catalogue runs out.
  */
 async function appendChapterEntries(
-  entries: MetadataRoute.Sitemap,
+  content: MetadataRoute.Sitemap,
   baseUrl: string,
-  now: Date,
 ): Promise<{ truncated: boolean }> {
   let offset = 0;
 
-  while (entries.length < SITEMAP_URL_LIMIT) {
-    const take = Math.min(SITEMAP_PAGE_SIZE, room(entries));
+  while (content.length < SITEMAP_URL_LIMIT) {
+    const take = Math.min(SITEMAP_PAGE_SIZE, room(content));
     const rows = await queryPublishedStoryChapterPathsPage(offset, take);
 
     if (rows.length === 0) {
@@ -120,12 +146,12 @@ async function appendChapterEntries(
     }
 
     for (const row of rows) {
-      entries.push({
-        url: `${baseUrl}/stories/${row.storySlug}/chapter/${row.chapterSlug}`,
-        lastModified: sitemapLastModified(
-          row.publishedAt ?? row.updatedAt,
-          now,
+      content.push({
+        url: absoluteUrl(
+          `/stories/${row.storySlug}/chapter/${row.chapterSlug}`,
+          baseUrl,
         ),
+        lastModified: sitemapLastModified(row.publishedAt, row.updatedAt),
         changeFrequency: "weekly",
         priority: 0.7,
       });

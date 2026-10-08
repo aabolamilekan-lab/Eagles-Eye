@@ -4,7 +4,9 @@ import {
   COVER_MAX_EDGE,
   ImageProcessingError,
   isImageProcessingAvailable,
+  parseCardRenditionRequest,
   processCoverImage,
+  renderCardImage,
 } from "@/lib/storage/images";
 
 /**
@@ -66,5 +68,57 @@ describe("processCoverImage", () => {
     await expect(processCoverImage(await png(20, 1))).rejects.toMatchObject({
       code: "dimensions",
     });
+  });
+});
+
+describe("parseCardRenditionRequest", () => {
+  it("serves the stored cover untouched when no size is requested", () => {
+    expect(parseCardRenditionRequest(new URLSearchParams())).toBe("original");
+    expect(parseCardRenditionRequest(new URLSearchParams("utm_source=x"))).toBe(
+      "original",
+    );
+  });
+
+  it("accepts exactly the advertised card rendition", () => {
+    expect(parseCardRenditionRequest(new URLSearchParams("w=1200&h=630"))).toBe(
+      "card",
+    );
+  });
+
+  it("rejects every other size request", () => {
+    for (const query of [
+      "w=800&h=630",
+      "w=1200&h=631",
+      "w=1200",
+      "h=630",
+      "w=1200&h=630&w=64",
+      "w=abc&h=630",
+    ]) {
+      expect(parseCardRenditionRequest(new URLSearchParams(query))).toBe(
+        "invalid",
+      );
+    }
+  });
+});
+
+describe("renderCardImage", () => {
+  it("crops any source to the exact advertised dimensions as JPEG", async () => {
+    const card = await renderCardImage(await png(640, 480));
+    expect(card.contentType).toBe("image/jpeg");
+    expect(card.width).toBe(1200);
+    expect(card.height).toBe(630);
+    expect(card.buffer.subarray(0, 3).toString("hex")).toBe("ffd8ff");
+  });
+
+  it("crops a portrait source without letterboxing", async () => {
+    const card = await renderCardImage(await png(500, 2000));
+    expect(card.width).toBe(1200);
+    expect(card.height).toBe(630);
+  });
+
+  it("fails with a safe code on bytes that are not an image", async () => {
+    await expect(
+      renderCardImage(Buffer.from("not an image at all")),
+    ).rejects.toBeInstanceOf(ImageProcessingError);
   });
 });

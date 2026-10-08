@@ -102,6 +102,24 @@ describe("sanitizeRichText", () => {
     expect(sanitizeRichText("<h1>A</h1>")).toBe("<h1>A</h1>");
   });
 
+  it("keeps a chosen text alignment on a paragraph", () => {
+    expect(sanitizeRichText('<p style="text-align: center">x</p>')).toBe(
+      '<p style="text-align:center">x</p>',
+    );
+  });
+
+  it("keeps a chosen alignment through a heading offset", () => {
+    expect(
+      sanitizeRichText('<h1 style="text-align: right">A</h1>', {
+        headingOffset: 1,
+      }),
+    ).toBe('<h2 style="text-align:right">A</h2>');
+  });
+
+  it("writes no style attribute when no alignment was chosen", () => {
+    expect(sanitizeRichText("<p>x</p><h2>y</h2>")).toBe("<p>x</p><h2>y</h2>");
+  });
+
   it("drops an iframe and its contents entirely", () => {
     const clean = sanitizeRichText('<iframe src="https://evil.test"></iframe>');
 

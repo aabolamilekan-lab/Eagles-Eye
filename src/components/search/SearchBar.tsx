@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from "react";
 import { Search } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 
 /**
@@ -13,6 +14,10 @@ import { cn } from "@/lib/cn";
  * query so a submitted search stays in the box. `hiddenFields` lets a caller
  * preserve surrounding state (category, tags, sort) when the query is
  * re-submitted from a page that has facets.
+ *
+ * The form carries an accessible name so it is distinguishable from any other
+ * search landmark on the page. The kbd chip advertises the `/` shortcut bound
+ * by `KeyboardShortcuts`.
  */
 export function SearchBar({
   query = "",
@@ -33,6 +38,7 @@ export function SearchBar({
   return (
     <form
       role="search"
+      aria-label="Site search"
       action="/search"
       method="get"
       className={cn("flex w-full items-end gap-2", className)}
@@ -55,15 +61,22 @@ export function SearchBar({
           autoComplete="off"
           enterKeyHint="search"
           placeholder="Search stories"
-          className="h-11 w-full rounded-sm border border-border-strong bg-surface pl-10 pr-3 font-ui text-body-sm text-ink placeholder:text-ink-subtle/70 transition-colors duration-(--duration-fast) hover:border-ink-subtle"
+          aria-describedby={`${id}-hint`}
+          className="h-11 w-full rounded-sm border border-border-strong bg-surface pr-16 pl-10 font-ui text-body-sm text-ink transition-colors duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle"
         />
+        <kbd
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-sm border border-border bg-surface-sunken px-1.5 py-0.5 font-ui text-body-xs text-ink-subtle sm:inline-block"
+        >
+          /
+        </kbd>
       </div>
-      <button
-        type="submit"
-        className="inline-flex h-11 shrink-0 items-center justify-center rounded-md border border-primary bg-primary px-5 font-ui text-body-sm font-medium text-on-primary transition-colors duration-(--duration-fast) hover:bg-primary-hover hover:border-primary-hover"
-      >
+      <Button type="submit" variant="primary">
         Search
-      </button>
+      </Button>
+      <span id={`${id}-hint`} className="sr-only">
+        Press the slash key to focus this field.
+      </span>
     </form>
   );
 }

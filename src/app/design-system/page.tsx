@@ -9,6 +9,7 @@
  * composites the app renders.
  */
 import type { Metadata } from "next";
+import { robotsForNonIndexable } from "@/lib/seo/metadata";
 import { Alert } from "@/components/ui/Alert";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -80,7 +81,12 @@ import {
   SortableTableDemo,
 } from "./previews";
 
-export const metadata: Metadata = { title: "Design system" };
+// Not part of the public catalogue: a component gallery with placeholder
+// stories that must never be indexed or mistaken for real content.
+export const metadata: Metadata = {
+  title: "Design system",
+  robots: robotsForNonIndexable(),
+};
 
 const SAMPLE_STORY: StoryCardData = {
   slug: "the-salt-road",
@@ -798,7 +804,7 @@ export default function DesignSystemPage() {
               navLabel="Preview navigation"
               brand={<Wordmark href="#" tone="on-primary" />}
               nav={[
-                { label: "Stories", href: "#", current: true },
+                { label: "Stories", href: "#" },
                 { label: "Categories", href: "#" },
                 { label: "Search", href: "#" },
               ]}

@@ -16,6 +16,7 @@ export function JsonLd({ data }: { data: unknown }) {
   );
 }
 
-function serializeJsonLd(data: unknown): string {
+/** Exported for unit tests; the component above is the only render path. */
+export function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }

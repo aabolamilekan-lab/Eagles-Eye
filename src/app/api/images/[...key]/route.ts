@@ -5,6 +5,10 @@ import { logger } from "@/lib/logger";
 import { getCoverObject, isCoverKey } from "@/lib/storage/covers";
 import { StorageConfigError } from "@/lib/storage/config";
 import { StorageError, type StoredObject } from "@/lib/storage/types";
+import {
+  parseCardRenditionRequest,
+  renderCardImage,
+} from "@/lib/storage/images";
 
 /**
  * Cover image delivery.
@@ -15,6 +19,11 @@ import { StorageError, type StoredObject } from "@/lib/storage/types";
  * an authorized admin previewing a draft. Everything else — unknown key,
  * unpublished draft to an anonymous reader, storage failure — returns the same
  * `404`, so the route cannot be used to enumerate drafts.
+ *
+ * `?w=1200&h=630` (the exact size the social-card metadata advertises) serves
+ * a cropped JPEG rendition of the same key; any other size request is a `400`.
+ * The rendition shares the cover's access checks — it is derived bytes of the
+ * same object, so it cannot become a side door.
  *
  * AGENTS.md sections 6, 8, 11. `.agent/skills/media-upload/SKILL.md`.
  */
@@ -29,7 +38,7 @@ function notFound(): Response {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ key: string[] }> },
 ): Promise<Response> {
   const { key: segments } = await context.params;
@@ -37,6 +46,16 @@ export async function GET(
 
   if (!isCoverKey(key)) {
     return notFound();
+  }
+
+  const rendition = parseCardRenditionRequest(
+    new URL(request.url).searchParams,
+  );
+  if (rendition === "invalid") {
+    return new Response(null, {
+      status: 400,
+      headers: { "cache-control": "no-store" },
+    });
   }
 
   const story = await prisma.story.findFirst({
@@ -83,13 +102,28 @@ export async function GET(
     return notFound();
   }
 
-  const body = new Uint8Array(object.body);
+  let body = object.body;
+  let contentType = object.contentType;
 
-  return new Response(body, {
+  if (rendition === "card") {
+    try {
+      const card = await renderCardImage(object.body);
+      body = card.buffer;
+      contentType = card.contentType;
+    } catch {
+      // The cover itself is already validated; degrade to the stored bytes
+      // rather than leaving every social card broken over a missing binary.
+      logger.error("image.card_rendition_failed");
+    }
+  }
+
+  const bytes = new Uint8Array(body);
+
+  return new Response(bytes, {
     status: 200,
     headers: {
-      "content-type": object.contentType,
-      "content-length": String(body.byteLength),
+      "content-type": contentType,
+      "content-length": String(bytes.byteLength),
       "cache-control": isPublic
         ? "public, max-age=31536000, immutable"
         : "private, no-store",

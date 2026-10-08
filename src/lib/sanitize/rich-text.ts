@@ -60,6 +60,29 @@ const ALLOWED_TAGS = [
 const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   a: ["href", "title", "rel"],
   img: ["src", "alt", "title", "width", "height"],
+  // `style` is offered only where alignment lives, and `ALLOWED_STYLES` below
+  // decides which declaration may survive inside it. Every other tag is
+  // refused a style attribute outright by this allowlist.
+  p: ["style"],
+  h1: ["style"],
+  h2: ["style"],
+  h3: ["style"],
+  h4: ["style"],
+  h5: ["style"],
+  h6: ["style"],
+};
+
+/**
+ * The only CSS declaration that survives sanitization: `text-align`, matched
+ * against the whole value so `text-align: expression(…)` or a second
+ * declaration smuggled into the same attribute fails closed and is dropped.
+ *
+ * A tag that is not in `ALLOWED_ATTRIBUTES` never reaches this filter, so the
+ * attribute gate and this value gate have to agree — a `style` entry added
+ * anywhere else is inert until a value is allowlisted here too.
+ */
+const ALLOWED_STYLES: Record<string, Record<string, RegExp[]>> = {
+  "*": { "text-align": [/^(?:left|center|right|justify)$/] },
 };
 
 /** No `data:` or `javascript:`; protocol-relative URLs are rejected too. */
@@ -131,6 +154,7 @@ export function sanitizeRichText(
   const config: sanitizeHtml.IOptions = {
     allowedTags: ALLOWED_TAGS,
     allowedAttributes: ALLOWED_ATTRIBUTES,
+    allowedStyles: ALLOWED_STYLES,
     allowedSchemes: ALLOWED_SCHEMES,
     allowedSchemesByTag: ALLOWED_SCHEMES_BY_TAG,
     allowProtocolRelative: false,

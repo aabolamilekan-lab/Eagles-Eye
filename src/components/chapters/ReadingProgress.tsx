@@ -37,6 +37,7 @@ export function ReadingProgress() {
     }
 
     const frame = { current: 0 };
+    let announced = -1;
 
     const compute = () => {
       const scrollable = element.scrollHeight - element.clientHeight;
@@ -47,8 +48,16 @@ export function ReadingProgress() {
 
       const percent = Math.round(value * 100);
       fill.style.width = `${percent}%`;
-      label.textContent = `${percent}% read`;
       fill.setAttribute("data-reading-percent", String(percent));
+
+      // The status text moves in whole deciles only. A flick crosses dozens of
+      // percentages per frame, and announcing every one would flood a screen
+      // reader; ten steps through the document is the useful granularity.
+      const decile = Math.floor(percent / 10) * 10;
+      if (decile !== announced) {
+        announced = decile;
+        label.textContent = `${decile}% read`;
+      }
     };
 
     const schedule = () => {
@@ -85,7 +94,7 @@ export function ReadingProgress() {
           style={{ width: "0%" }}
         />
       </div>
-      <span ref={labelRef} className="sr-only">
+      <span ref={labelRef} role="status" className="sr-only">
         0% read
       </span>
     </>

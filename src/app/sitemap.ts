@@ -2,8 +2,11 @@ import { unstable_cache } from "next/cache";
 import { querySitemap } from "@/lib/queries/public/sitemap";
 import { PUBLIC_CATEGORIES_TAG } from "@/lib/queries/public/categories";
 import { PUBLIC_STORIES_TAG } from "@/lib/queries/public/stories";
+import { siteBaseUrl } from "@/lib/seo/canonical";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+// Validated once: a missing or malformed NEXT_PUBLIC_APP_URL fails the build
+// rather than emitting a sitemap full of wrong origins.
+const baseUrl = siteBaseUrl();
 
 export const revalidate = 300;
 

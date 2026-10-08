@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { KeyboardShortcuts } from "@/components/navigation/KeyboardShortcuts";
 import { SiteFooter } from "@/components/navigation/SiteFooter";
 import { SiteHeader } from "@/components/navigation/SiteHeader";
 import { Wordmark } from "@/components/navigation/Wordmark";
@@ -35,6 +36,7 @@ const FOOTER_SECTIONS = [
 export function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
+      <KeyboardShortcuts />
       <SiteHeader brand={<Wordmark tone="on-primary" />} nav={NAV} />
       <main id="main" className="flex-1">
         {children}

@@ -11,7 +11,13 @@ export function Wordmark({
   tone?: "ink" | "on-primary";
 }) {
   return (
-    <Link href={href} className="inline-flex items-baseline gap-1.5 rounded-md">
+    <Link
+      href={href}
+      className={cn(
+        "inline-flex items-baseline gap-1.5 rounded-md",
+        tone === "on-primary" && "inverted-focus",
+      )}
+    >
       <span
         className={cn(
           "font-display text-heading-lg font-semibold tracking-[-0.02em]",

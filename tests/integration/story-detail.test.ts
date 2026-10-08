@@ -1,5 +1,15 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { ContentStatus, type PrismaClient } from "@prisma/client";
+import { buildStoryPageMetadata } from "@/lib/seo/metadata";
 
 /**
  * Story detail against a real PostgreSQL database.
@@ -160,6 +170,58 @@ describe.skipIf(!hasDatabase)("story detail (PostgreSQL)", () => {
         },
       },
     });
+
+    // Thin stored line, substantial published opening: metadata falls back.
+    await prisma.story.create({
+      data: {
+        title: "Detail Excerpt Source",
+        slug: `${PREFIX}-excerpts`,
+        shortDescription: null,
+        status: ContentStatus.PUBLISHED,
+        publishedAt: new Date("2026-04-01T00:00:00.000Z"),
+        categoryId,
+        chapters: {
+          create: [
+            {
+              chapterNumber: 1,
+              title: "Opening",
+              slug: `${PREFIX}-excerpts-1`,
+              content:
+                "<p>The survey arrived with the morning tide, sealed in wax the harbour had not seen used for thirty years, and the clerk read it twice before handing it over.</p>",
+              status: ContentStatus.PUBLISHED,
+              publishedAt: new Date("2026-04-01T00:00:00.000Z"),
+            },
+          ],
+        },
+      },
+    });
+
+    // Substantial authored line: returned untouched, never replaced by a body
+    // excerpt, however readable that excerpt might be.
+    await prisma.story.create({
+      data: {
+        title: "Detail Authored Line",
+        slug: `${PREFIX}-authored`,
+        shortDescription:
+          "An authored line that runs well past the seventy character floor, so it is returned untouched rather than replaced with a chapter excerpt.",
+        status: ContentStatus.PUBLISHED,
+        publishedAt: new Date("2026-04-02T00:00:00.000Z"),
+        categoryId,
+        chapters: {
+          create: [
+            {
+              chapterNumber: 1,
+              title: "Body",
+              slug: `${PREFIX}-authored-1`,
+              content:
+                "<p>A different sentence entirely, long enough to have been chosen had the stored line not been there first.</p>",
+              status: ContentStatus.PUBLISHED,
+              publishedAt: new Date("2026-04-02T00:00:00.000Z"),
+            },
+          ],
+        },
+      },
+    });
   });
 
   afterAll(async () => {
@@ -212,5 +274,56 @@ describe.skipIf(!hasDatabase)("story detail (PostgreSQL)", () => {
     // Draft and chapter-less stories are excluded by the public predicate.
     expect(slugs).not.toContain(`${PREFIX}-draft`);
     expect(slugs).not.toContain(`${PREFIX}-nochapters`);
+  });
+
+  it("keeps a substantial authored line as the metadata description", async () => {
+    const { story } = await load(`${PREFIX}-authored`);
+
+    expect(story.seoDescription).toBe(
+      "An authored line that runs well past the seventy character floor, so it is returned untouched rather than replaced with a chapter excerpt.",
+    );
+  });
+
+  it("falls back to the first published chapter opening when the stored line is thin", async () => {
+    const { story } = await load(`${PREFIX}-excerpts`);
+
+    expect(story.seoDescription.startsWith("The survey arrived")).toBe(true);
+    expect(story.seoDescription.length).toBeLessThanOrEqual(155);
+    expect(story.seoDescription).not.toContain("<");
+  });
+
+  it("keeps a thin stored line when no chapter excerpt is longer", async () => {
+    const { story } = await load(`${PREFIX}-primary`);
+
+    expect(story.seoDescription).toBe("The primary fixture.");
+  });
+
+  describe("buildStoryPageMetadata", () => {
+    beforeEach(() => {
+      vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://detail.test");
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("claims an absolute canonical for a story with published chapters", async () => {
+      const { story } = await load(`${PREFIX}-primary`);
+      const metadata = buildStoryPageMetadata(story);
+
+      expect(metadata.alternates?.canonical).toBe(
+        `https://detail.test/stories/${PREFIX}-primary`,
+      );
+      expect(metadata).not.toHaveProperty("robots");
+      expect(metadata.description).toBe(story.seoDescription);
+    });
+
+    it("noindexes a story with no published chapter and claims no canonical", async () => {
+      const { story } = await load(`${PREFIX}-nochapters`);
+      const metadata = buildStoryPageMetadata(story);
+
+      expect(metadata.robots).toEqual({ index: false, follow: true });
+      expect(metadata).not.toHaveProperty("alternates");
+    });
   });
 });

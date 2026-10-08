@@ -151,6 +151,15 @@
     border-radius: 1px;
   }
 
+  /* On oxblood surfaces (header bar, footer bands) the primary-coloured ring
+     would match the background and focus would be invisible. Elements sitting
+     directly on those bands invert the ring to the light token. Applied per
+     element, never to a container, so panels floating over the band (the
+     mobile menu) keep the default ring. */
+  .inverted-focus:focus-visible {
+    outline-color: var(--color-on-primary);
+  }
+
   /* Inputs inherit the reading serif. UI chrome stays sans. */
   input,
   textarea,
@@ -193,7 +202,6 @@
 
 @utility font-ui {
   font-family: var(--font-sans);
-  letter-spacing: -0.005em;
 }
 
 /* Uppercase micro-label. The only place positive tracking is allowed. */

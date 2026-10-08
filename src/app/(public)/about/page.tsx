@@ -1,25 +1,28 @@
 import type { Metadata } from "next";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 const description =
   "What Eagles Eye is: a quiet home for long-form stories, for readers and publishers.";
 
-export const metadata: Metadata = {
-  title: "About",
-  description,
-  alternates: { canonical: "/about" },
-  openGraph: buildOpenGraph({
-    title: "About Eagles Eye",
+export function generateMetadata(): Metadata {
+  return buildPageMetadata({
+    title: "About",
     description,
     path: "/about",
-  }),
-  twitter: buildTwitter({ title: "About Eagles Eye", description }),
-};
+  });
+}
 
 export default function AboutPage() {
   return (
     <div className="shell py-(--spacing-section)">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", url: "/" },
+          { name: "About" },
+        ])}
+      />
       <div className="reading-column">
         <p className="label-micro text-primary">About</p>
         <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
@@ -52,9 +55,10 @@ export default function AboutPage() {
 
           <h2>Where it is going</h2>
           <p>
-            This build establishes the reading and administration structure. The
-            data layer, accounts, and the publisher tooling are the next
-            milestones.
+            Eagles Eye is in an early build. The next steps focus on
+            reliability, accessibility, and small quality-of-life improvements
+            without adding the multi-tenant or social features that would
+            compromise its quiet reading surface.
           </p>
         </div>
       </div>

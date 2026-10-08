@@ -6,6 +6,7 @@ import {
   type ChapterNeighbours,
 } from "@/lib/queries/public/chapter-order";
 import { PUBLIC_STORY_WHERE } from "@/lib/queries/public/story-filter";
+import { coverUrl } from "@/lib/seo/cover-url";
 
 /**
  * Published chapter reader read.
@@ -30,6 +31,7 @@ const READER_STORY_SELECT = {
   slug: true,
   title: true,
   author: true,
+  coverImage: true,
   chapters: {
     where: { status: ContentStatus.PUBLISHED },
     orderBy: { chapterNumber: "asc" },
@@ -50,6 +52,8 @@ export interface PublishedChapterReader {
     slug: string;
     title: string;
     author: string | null;
+    /** Resolved cover path; null when the story has no usable cover. */
+    coverImageUrl: string | null;
   };
   chapter: {
     slug: string;
@@ -57,6 +61,8 @@ export interface PublishedChapterReader {
     content: string;
     /** ISO 8601, or null when the chapter has none. */
     publishedAt: string | null;
+    /** ISO 8601; drives `dateModified` in the chapter's JSON-LD. */
+    updatedAt: string;
   };
   /** Every published chapter, in reading order, with the current one flagged. */
   chapters: ChapterListItem[];
@@ -95,6 +101,7 @@ const READER_CHAPTER_SELECT = {
   title: true,
   content: true,
   publishedAt: true,
+  updatedAt: true,
 } satisfies Prisma.ChapterSelect;
 
 export async function queryPublishedChapterReader(
@@ -136,12 +143,14 @@ export async function queryPublishedChapterReader(
       slug: story.slug,
       title: story.title,
       author: story.author,
+      coverImageUrl: coverUrl(story.coverImage),
     },
     chapter: {
       slug: current.slug,
       title: current.title,
       content: current.content,
       publishedAt: current.publishedAt ? current.publishedAt.toISOString() : null,
+      updatedAt: current.updatedAt.toISOString(),
     },
     chapters: toChapterListItems(story, chapterSlug),
     previous: neighbours.previous,

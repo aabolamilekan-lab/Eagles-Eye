@@ -18,8 +18,7 @@ import {
 import { clientIpFromHeaders } from "@/lib/rate-limit/sliding-window";
 import { getSearchLimiter } from "@/lib/rate-limit/search";
 import { logger } from "@/lib/logger";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 /**
  * Public search page.
@@ -40,23 +39,18 @@ export async function generateMetadata({
 }: SearchPageProps): Promise<Metadata> {
   const search = parseStorySearch(await searchParams);
   const title = search.typedQuery ? `Search: ${search.typedQuery}` : "Search";
-  const description =
-    "Search published stories on Eagles Eye by title, author, category, tag, or keyword.";
 
-  return {
+  // A result page indexed under its query string would expose thin, duplicated
+  // pages. The static entry point stays reachable via the header: noindex,
+  // but still canonical — `/search` is the one noindex route that names a
+  // preferred URL (`.agent/skills/seo/SKILL.md`, route table and verification).
+  return buildPageMetadata({
     title,
-    description,
-    alternates: { canonical: "/search" },
-    // A result page indexed under its query string would expose thin, duplicated
-    // pages. The static entry point stays reachable via the header.
-    robots: { index: false, follow: true },
-    openGraph: buildOpenGraph({
-      title: `${title} | Eagles Eye`,
-      description,
-      path: "/search",
-    }),
-    twitter: buildTwitter({ title: `${title} | Eagles Eye`, description }),
-  };
+    description:
+      "Search published stories on Eagles Eye by title, author, category, tag, or keyword.",
+    path: "/search",
+    noindex: true,
+  });
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {

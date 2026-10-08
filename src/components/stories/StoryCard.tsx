@@ -72,7 +72,9 @@ export function StoryCard({
               sizes="96px"
               className="object-cover"
             />
-          ) : null}
+          ) : (
+            <StoryCoverFallback title={story.title} />
+          )}
         </div>
 
         <div className="flex min-w-0 flex-col gap-1.5">
@@ -83,7 +85,7 @@ export function StoryCard({
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-[''] group-hover:underline focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+              className="after:absolute after:inset-0 after:content-[''] group-hover:underline"
             >
               {story.title}
             </Link>
@@ -119,7 +121,8 @@ export function StoryCard({
             alt={story.coverAlt ?? ""}
             fill
             // Explicit sizes keep the browser from downloading a desktop image
-            // for a 375px card.
+            // for a 375px card. The aspect-ratio container is what guarantees
+            // no layout shift; `fill` forbids width/height props outright.
             sizes={
               size === "compact"
                 ? "(max-width: 640px) 100vw, 320px"
@@ -156,7 +159,7 @@ export function StoryCard({
           <Link
             href={href}
             prefetch={false}
-            className="after:absolute after:inset-0 after:content-[''] focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+            className="after:absolute after:inset-0 after:content-['']"
           >
             {story.title}
           </Link>
@@ -258,15 +261,15 @@ export function FeaturedStory({
             <p className="label-micro text-primary">{eyebrow}</p>
           ) : null}
 
-          <h2 className="font-display text-display-md text-ink text-balance">
+          <h3 className="font-display text-display-md text-ink text-balance">
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-[''] focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+              className="after:absolute after:inset-0 after:content-['']"
             >
               {story.title}
             </Link>
-          </h2>
+          </h3>
 
           <p className="font-ui text-body text-ink-muted text-pretty">
             {story.shortDescription}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -16,17 +17,22 @@ export interface MobileNavItem {
  *
  * The expanded state still comes from the platform: this is a native
  * `<details>`, so it opens on click and on Enter/Space without script, and it
- * keeps working if hydration is delayed. Script only adds the three behaviours
- * a `<details>` does not give for free:
+ * keeps working if hydration is delayed. Script adds the behaviours a
+ * `<details>` does not give for free:
  *
- *   - Escape closes it and returns focus to the summary, so a keyboard user is
- *     never stranded with the panel open
- *   - choosing a destination closes it
+ *   - `aria-expanded` / `aria-controls` on the summary, and a label that
+ *     flips between "Open menu" and "Close menu"
+ *   - Escape closes it and returns focus to the summary
+ *   - choosing a destination, or navigating to any route, closes it
  *   - clicking outside closes it
+ *   - Tab is trapped between the summary and the panel links while open
+ *   - background scroll is locked while open
  *
  * Escape is handled at the document level rather than only on the panel, so it
  * works after focus moves into the menu itself.
  */
+const PANEL_ID = "mobile-nav-panel";
+
 export function MobileNavMenu({
   nav,
   navLabel,
@@ -35,7 +41,29 @@ export function MobileNavMenu({
   navLabel: string;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
-  const summaryRef = useRef<HTMLDetailsElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Keep the React state (and therefore aria-expanded) in step with the
+  // platform attribute, however it was toggled.
+  useEffect(() => {
+    const details = detailsRef.current;
+    if (!details) return;
+    const onToggle = () => setOpen(details.open);
+    details.addEventListener("toggle", onToggle);
+    return () => details.removeEventListener("toggle", onToggle);
+  }, []);
+
+  useEffect(() => {
+    const details = detailsRef.current;
+    if (!details?.open) return;
+
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   useEffect(() => {
     const details = detailsRef.current;
@@ -48,9 +76,36 @@ export function MobileNavMenu({
     }
 
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape" || !details?.open) return;
-      event.preventDefault();
-      close(true);
+      if (!details?.open) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(true);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      // Trap: cycle between the summary and the panel's links only.
+      const focusables = [
+        ...(summaryRef.current ? [summaryRef.current] : []),
+        ...details.querySelectorAll<HTMLElement>("nav a"),
+      ];
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement;
+
+      if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!details.contains(active)) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     function onPointerDown(event: PointerEvent) {
@@ -69,16 +124,27 @@ export function MobileNavMenu({
     };
   }, []);
 
+  // A route change dismisses the panel even when navigation did not come from
+  // one of its own links.
+  useEffect(() => {
+    const details = detailsRef.current;
+    if (details?.open) details.open = false;
+  }, [pathname]);
+
   return (
     <details ref={detailsRef} className="group relative lg:hidden">
       <summary
         ref={summaryRef}
-        aria-label="Open menu"
-        className="inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-md text-on-primary transition-colors hover:bg-primary-hover"
+        id="mobile-nav-trigger"
+        aria-controls={PANEL_ID}
+        aria-expanded={open}
+        aria-label={open ? "Close menu" : "Open menu"}
+        className="inverted-focus inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-md text-on-primary transition-colors hover:bg-primary-hover"
       >
         <Menu aria-hidden="true" className="size-5" />
       </summary>
       <nav
+        id={PANEL_ID}
         aria-label={navLabel}
         className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-border bg-surface p-1.5 shadow-lg"
         onClick={(event) => {

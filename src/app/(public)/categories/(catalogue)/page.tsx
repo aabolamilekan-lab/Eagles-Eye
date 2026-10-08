@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { CategoryCard } from "@/components/stories/CategoryCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -8,8 +9,8 @@ import {
   categoriesIndexHref,
   parseCategoryPage,
 } from "@/lib/validation/taxonomy";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface CategoriesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -25,22 +26,12 @@ export async function generateMetadata({
   searchParams,
 }: CategoriesPageProps): Promise<Metadata> {
   const page = parseCategoryPage((await searchParams).page);
-  const path = page > 1 ? `/categories?page=${page}` : "/categories";
 
-  return {
+  return buildPageMetadata({
     title: "Categories",
     description: DESCRIPTION,
-    alternates: { canonical: path },
-    openGraph: buildOpenGraph({
-      title: "Categories | Eagles Eye",
-      description: DESCRIPTION,
-      path,
-    }),
-    twitter: buildTwitter({
-      title: "Categories | Eagles Eye",
-      description: DESCRIPTION,
-    }),
-  };
+    path: page > 1 ? categoriesIndexHref(page) : "/categories",
+  });
 }
 
 /**
@@ -58,6 +49,12 @@ export default async function CategoriesPage({
 
   return (
     <div className="shell py-(--spacing-section)">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", url: "/" },
+          { name: "Categories" },
+        ])}
+      />
       <header className="max-w-2xl">
         <p className="label-micro text-primary">Browse</p>
         <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
@@ -82,6 +79,7 @@ export default async function CategoriesPage({
         </div>
       ) : (
         <div className="mt-12">
+          <h2 className="sr-only">All categories</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {result.categories.map((category) => (
               <CategoryCard

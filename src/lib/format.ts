@@ -36,6 +36,25 @@ const TAG = /<[^>]*>/g;
 const WHITESPACE = /\s+/g;
 
 /**
+ * Full plain text from sanitized rich text, without truncation.
+ *
+ * For callers that clamp themselves (metadata through the shared builders)
+ * or count the body (JSON-LD `wordCount`), where a 160-character cut would
+ * distort the result. Same contract as {@link toPlainTextExcerpt}: display
+ * text derived from already-sanitized input, never re-inserted as markup.
+ */
+export function toPlainText(html: string | null | undefined): string {
+  if (!html) return "";
+  return html.replace(TAG, " ").replace(WHITESPACE, " ").trim();
+}
+
+/** Whole-word count of plain text; empty input counts as zero words. */
+export function countWords(plain: string): number {
+  const trimmed = plain.trim();
+  return trimmed === "" ? 0 : trimmed.split(/\s+/).length;
+}
+
+/**
  * Derive plain text from sanitized rich text for metadata and search.
  *
  * Drops tags and collapses whitespace. This is display text, not a security

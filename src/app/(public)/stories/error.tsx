@@ -7,6 +7,7 @@ export default function StoriesError({ reset }: { reset: () => void }) {
   return (
     <div className="shell py-(--spacing-section)">
       <ErrorState
+        headingLevel="h1"
         title="We could not load the stories"
         description="Something went wrong while loading the catalogue. Try again, or return to the home page."
         action={

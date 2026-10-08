@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPublishedDate } from "@/lib/format";
+import { countWords, formatPublishedDate, toPlainText } from "@/lib/format";
 
 describe("formatPublishedDate", () => {
   it("formats an ISO string as a long date in UTC", () => {
@@ -30,5 +30,36 @@ describe("formatPublishedDate", () => {
 
   it("returns null for an unparseable date", () => {
     expect(formatPublishedDate("not-a-date")).toBeNull();
+  });
+});
+
+describe("toPlainText", () => {
+  it("drops tags and collapses whitespace without truncating", () => {
+    expect(
+      toPlainText("<p>The wind  came off\nthe plateau.</p>"),
+    ).toBe("The wind came off the plateau.");
+  });
+
+  it("returns an empty string for absent input", () => {
+    expect(toPlainText(null)).toBe("");
+    expect(toPlainText(undefined)).toBe("");
+    expect(toPlainText("")).toBe("");
+  });
+
+  it("keeps the full body even past any excerpt length", () => {
+    const long = `<p>${"word ".repeat(200).trim()}</p>`;
+    expect(toPlainText(long).split(/\s+/)).toHaveLength(200);
+  });
+});
+
+describe("countWords", () => {
+  it("counts whole words in plain text", () => {
+    expect(countWords("One two three")).toBe(3);
+    expect(countWords("  spaced   out  ")).toBe(2);
+  });
+
+  it("counts nothing for empty input", () => {
+    expect(countWords("")).toBe(0);
+    expect(countWords("   ")).toBe(0);
   });
 });

@@ -97,6 +97,31 @@ describe("sanitizeRichText — malicious content", () => {
     );
   });
 
+  it("keeps only the alignment declaration when a style carries others", () => {
+    const clean = sanitizeRichText(
+      '<p style="color:red;text-align:center;background-image:url(https://evil.test/a)">x</p>',
+    );
+
+    expect(clean).toBe('<p style="text-align:center">x</p>');
+  });
+
+  it("drops a text-align value that is not on the allowlist", () => {
+    expect(sanitizeRichText('<p style="text-align: expression(alert(1))">x</p>')).toBe(
+      "<p>x</p>",
+    );
+    expect(sanitizeRichText('<p style="text-align: url(#x)">x</p>')).toBe("<p>x</p>");
+    expect(sanitizeRichText('<p style="text-align: CENTER">x</p>')).toBe("<p>x</p>");
+  });
+
+  it("refuses a style attribute on a tag outside the style allowlist", () => {
+    const clean = sanitizeRichText(
+      '<a href="https://example.test" style="text-align: center">x</a>',
+    );
+
+    expect(clean).not.toContain("style");
+    expect(clean).toContain('href="https://example.test"');
+  });
+
   it("strips an srcdoc breakout attempt", () => {
     const clean = sanitizeRichText(
       '<iframe srcdoc="<script>alert(1)</script>"></iframe>',
@@ -133,5 +158,45 @@ describe("sanitizeRichText — malicious content", () => {
 
     expect(clean).toContain('src="https://cdn.example.com/a.png"');
     expect(clean).toContain('alt="a"');
+  });
+});
+
+/**
+ * The other half of the contract: everything an editor session legitimately
+ * produces must survive untouched, and sanitizing already-clean markup must
+ * never drift. A sanitizer that is only proven to refuse is one rewrite away
+ * from refusing the wrong thing.
+ */
+describe("sanitizeRichText — normal formatted content", () => {
+  const chapter = [
+    "<h2>The crossing</h2>",
+    "<p><strong>Night fell</strong> and the <em>lamp</em> went out.</p>",
+    '<p style="text-align:center">Meanwhile</p>',
+    "<ul><li>First watch</li><li>Second watch</li></ul>",
+    "<ol><li>Row</li><li>Rest</li></ol>",
+    "<blockquote>Hold fast.</blockquote>",
+    '<p><a href="https://example.test/log" rel="noopener noreferrer">the log</a></p>',
+    "<hr />",
+    "<p>After the storm.</p>",
+  ].join("");
+
+  it("preserves the whole formatted document unchanged", () => {
+    expect(sanitizeRichText(chapter)).toBe(chapter);
+  });
+
+  it("is idempotent: sanitizing twice matches sanitizing once", () => {
+    const once = sanitizeRichText(chapter);
+
+    expect(sanitizeRichText(once)).toBe(once);
+  });
+
+  it("shifts only the headings when the reader view renders it", () => {
+    const rendered = sanitizeRichText(chapter, { headingOffset: 1 });
+
+    expect(rendered).toContain("<h3>The crossing</h3>");
+    expect(rendered).toContain('<p style="text-align:center">Meanwhile</p>');
+    expect(rendered).toContain("<strong>Night fell</strong>");
+    expect(rendered).toContain("<blockquote>Hold fast.</blockquote>");
+    expect(rendered).toContain("<hr />");
   });
 });

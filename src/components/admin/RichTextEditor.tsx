@@ -11,7 +11,12 @@ import {
 } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import TextAlign from "@tiptap/extension-text-align";
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
   Heading2,
   Heading3,
@@ -35,11 +40,15 @@ import { isAllowedLinkHref, normalizeLinkHref } from "@/lib/rich-text/link";
  *
  * Scope is deliberate: the formatting an author of prose needs and nothing
  * more — headings, paragraphs, bold, italic, links, bulleted and numbered
- * lists, blockquotes and horizontal rules, plus undo/redo. Strikethrough,
- * inline code and code blocks are switched off because they pull the editor
- * away from storytelling. Text alignment is deliberately not offered: ragged
- * right edges are the accessible default for long-form reading and justified
- * text creates uneven spacing. The `prose` stylesheet owns all appearance.
+ * lists, blockquotes, horizontal rules, text alignment, plus undo/redo.
+ * Strikethrough, inline code and code blocks are switched off because they
+ * pull the editor away from storytelling. Alignment covers paragraphs and
+ * headings only: left (the default for prose), centre, right and justify,
+ * where a passage genuinely calls for it. `text-align` is also the single
+ * declaration the server sanitizer keeps inside a `style` attribute, so an
+ * alignment chosen here survives the round trip through storage and no other
+ * inline style can follow it in. The `prose` stylesheet owns all other
+ * appearance.
  *
  * This component is a UX surface, not a trust boundary. It refuses to create an
  * unsafe link and normalises what the operator types, but the server sanitizer
@@ -77,6 +86,14 @@ function buildExtensions() {
         shouldAutoLink: (url: string) => isAllowedLinkHref(url),
         HTMLAttributes: { rel: "noopener noreferrer" },
       },
+    }),
+    // Alignment applies to paragraphs and headings only. The default stays
+    // `null`, so an untouched paragraph carries no `style` attribute at all:
+    // stored HTML records an alignment only when the operator chose one.
+    TextAlign.configure({
+      types: ["heading", "paragraph"],
+      alignments: ["left", "center", "right", "justify"],
+      defaultAlignment: null,
     }),
   ];
 }
@@ -205,6 +222,26 @@ function countWords(text: string): number {
   return trimmed === "" ? 0 : trimmed.split(/\s+/).length;
 }
 
+/**
+ * The alignment in force at the selection.
+ *
+ * An unset attribute means left — the reading default — so the left control
+ * reports as active for ordinary paragraphs instead of appearing to be off,
+ * whichever alignment the operator last cleared.
+ */
+function currentAlignment(editor: Editor): "left" | "center" | "right" | "justify" {
+  if (editor.isActive({ textAlign: "center" })) {
+    return "center";
+  }
+  if (editor.isActive({ textAlign: "right" })) {
+    return "right";
+  }
+  if (editor.isActive({ textAlign: "justify" })) {
+    return "justify";
+  }
+  return "left";
+}
+
 interface ToolbarItem {
   key: string;
   label: string;
@@ -287,6 +324,41 @@ function RichTextToolbar({
       label: "Divider",
       icon: <Minus className="size-4" />,
       run: () => editor.chain().focus().setHorizontalRule().run(),
+    },
+    "divider",
+    {
+      key: "alignLeft",
+      label: "Align left",
+      keyshortcuts: "Control+Shift+L Meta+Shift+L",
+      active: currentAlignment(editor) === "left",
+      icon: <AlignLeft className="size-4" />,
+      // Reset rather than set: an untouched paragraph already reads left, so
+      // this control clears an explicit alignment instead of writing one.
+      run: () => editor.chain().focus().unsetTextAlign().run(),
+    },
+    {
+      key: "alignCenter",
+      label: "Align centre",
+      keyshortcuts: "Control+Shift+E Meta+Shift+E",
+      active: currentAlignment(editor) === "center",
+      icon: <AlignCenter className="size-4" />,
+      run: () => editor.chain().focus().toggleTextAlign("center").run(),
+    },
+    {
+      key: "alignRight",
+      label: "Align right",
+      keyshortcuts: "Control+Shift+R Meta+Shift+R",
+      active: currentAlignment(editor) === "right",
+      icon: <AlignRight className="size-4" />,
+      run: () => editor.chain().focus().toggleTextAlign("right").run(),
+    },
+    {
+      key: "alignJustify",
+      label: "Justify",
+      keyshortcuts: "Control+Shift+J Meta+Shift+J",
+      active: currentAlignment(editor) === "justify",
+      icon: <AlignJustify className="size-4" />,
+      run: () => editor.chain().focus().toggleTextAlign("justify").run(),
     },
     "divider",
     {

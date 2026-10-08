@@ -3,7 +3,7 @@ import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 export default function AdminSettingsLoading() {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading settings"
       className="flex flex-col"
     >

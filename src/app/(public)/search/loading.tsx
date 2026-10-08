@@ -10,7 +10,7 @@ import { Skeleton, SkeletonText } from "@/components/ui/Skeleton";
 export default function SearchLoading() {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading search"
       className="shell py-(--spacing-section)"
     >

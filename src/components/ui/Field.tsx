@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 
 const CONTROL_BASE =
   "w-full rounded-sm border border-border-strong bg-surface px-3 text-ink " +
-  "placeholder:text-ink-subtle/70 transition-colors duration-(--duration-fast) " +
+  "placeholder:text-ink-subtle transition-colors duration-(--duration-fast) " +
   "hover:border-ink-subtle disabled:cursor-not-allowed disabled:bg-surface-sunken " +
   "disabled:text-ink-subtle";
 

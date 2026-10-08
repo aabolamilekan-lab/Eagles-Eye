@@ -10,7 +10,11 @@ import { Skeleton, SkeletonStoryGrid, SkeletonText } from "@/components/ui/Skele
  */
 export default function PublicLoading() {
   return (
-    <div aria-busy="true" aria-label="Loading the catalogue" className="flex flex-col">
+    <div
+      role="status"
+      aria-label="Loading the catalogue"
+      className="flex flex-col"
+    >
       <section className="shell grid gap-12 pt-(--spacing-section) pb-(--spacing-section-sm) lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
         <div className="flex flex-col justify-center">
           <Skeleton className="h-3 w-24" />

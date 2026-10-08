@@ -86,10 +86,10 @@ describe("sitemapLastModified", () => {
 
 describe("buildStaticEntries", () => {
   const baseUrl = "https://stories.example";
-  const now = new Date("2025-01-01T00:00:00.000Z");
+  const latest = new Date("2025-01-01T00:00:00.000Z");
 
   it("emits only public, non-admin surfaces", () => {
-    const entries = buildStaticEntries(baseUrl, now, [{ slug: "romance" }]);
+    const entries = buildStaticEntries(baseUrl, [{ slug: "romance" }], latest);
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).toEqual([
@@ -103,8 +103,20 @@ describe("buildStaticEntries", () => {
   });
 
   it("emits no entry without a URL", () => {
-    for (const entry of buildStaticEntries(baseUrl, now, [])) {
+    for (const entry of buildStaticEntries(baseUrl, [], latest)) {
       expect(entry.url.startsWith(baseUrl)).toBe(true);
+    }
+  });
+
+  it("dates every entry with the newest content date, never the clock", () => {
+    for (const entry of buildStaticEntries(baseUrl, [{ slug: "romance" }], latest)) {
+      expect(entry.lastModified).toEqual(latest);
+    }
+  });
+
+  it("omits lastmod entirely when there is no content to date it by", () => {
+    for (const entry of buildStaticEntries(baseUrl, [])) {
+      expect(entry).not.toHaveProperty("lastModified");
     }
   });
 });

@@ -59,17 +59,6 @@ export function ChapterNav({
           />
         ) : null}
       </div>
-
-      {next ? (
-        <div className="mt-6 sm:hidden">
-          <Link
-            href={`/stories/${storySlug}/chapter/${next.slug}`}
-            className="flex h-11 items-center justify-center rounded-md bg-primary px-5 font-ui text-body-sm font-medium text-on-primary"
-          >
-            Next chapter
-          </Link>
-        </div>
-      ) : null}
     </nav>
   );
 }

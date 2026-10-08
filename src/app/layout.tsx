@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import { Newsreader, Archivo } from "next/font/google";
+import { absoluteUrl, siteBaseUrl } from "@/lib/seo/canonical";
+import { siteDescription, siteName } from "@/lib/seo/metadata";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/open-graph";
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_WIDTH,
+} from "@/lib/seo/cover-url";
 import "./globals.css";
 
 /*
@@ -26,16 +33,39 @@ const archivo = Archivo({
 });
 
 export const metadata: Metadata = {
-  // Absolute base for canonical URLs, Open Graph, and the sitemap. Public and
-  // safe to default when unset; it is not a secret.
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-  ),
+  // Validated once, here. In production a missing or malformed
+  // NEXT_PUBLIC_APP_URL throws at build/boot rather than letting every
+  // canonical, sitemap entry and social URL come out wrong.
+  metadataBase: new URL(siteBaseUrl()),
   title: {
-    default: "Eagles Eye",
-    template: "%s | Eagles Eye",
+    default: siteName,
+    template: `%s | ${siteName}`,
   },
-  description: "Read and publish stories.",
+  description: siteDescription,
+  // Site-wide fallbacks. A route that builds its own metadata replaces these
+  // wholesale; routes without one (admin, design-system) still emit a valid,
+  // absolute card instead of nothing.
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName,
+    title: siteName,
+    description: siteDescription,
+    images: [
+      {
+        url: absoluteUrl(DEFAULT_OG_IMAGE),
+        width: OG_IMAGE_WIDTH,
+        height: OG_IMAGE_HEIGHT,
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: siteName,
+    description: siteDescription,
+    images: [{ url: absoluteUrl(DEFAULT_OG_IMAGE), alt: siteName }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

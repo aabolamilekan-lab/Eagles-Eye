@@ -72,18 +72,25 @@ export function EmptyState({
  *
  * The message is safe by construction: it is a prop chosen by the caller, not
  * an error string. Never render a caught error's `message` here.
+ *
+ * `headingLevel` defaults to `h2` for inline use under an existing page `h1`.
+ * Route-segment error boundaries render it as the only content on the page and
+ * must pass `"h1"` so the page still has a top-level heading.
  */
 export function ErrorState({
   title = "Something went wrong",
   description = "We could not load this content. Please try again in a moment.",
   action,
+  headingLevel = "h2",
   className,
 }: {
   title?: string;
   description?: string;
   action?: ReactNode;
+  headingLevel?: "h1" | "h2";
   className?: string;
 }) {
+  const Heading = headingLevel;
   return (
     <div
       role="alert"
@@ -94,7 +101,9 @@ export function ErrorState({
     >
       <ErrorGlyph />
       <div className="flex max-w-md flex-col gap-2">
-        <h2 className="font-display text-heading-md text-ink">{title}</h2>
+        <Heading className="font-display text-heading-md text-ink">
+          {title}
+        </Heading>
         <p className="font-ui text-body-sm text-ink-muted text-pretty">
           {description}
         </p>

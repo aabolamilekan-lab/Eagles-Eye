@@ -199,6 +199,44 @@ test.describe("input validation", () => {
     await expect(page.getByText("That web address is already in use.")).toBeVisible();
     await expect(page).toHaveURL(/\/admin\/categories\/new$/);
   });
+
+  test("a story cannot take another story's web address", async ({ page }) => {
+    await createStoryDraft(page, {
+      title: "First Signal",
+      shortDescription: "The first owner of the address first-signal.",
+    });
+
+    await page.goto("/admin/stories/new");
+    await page.getByLabel("Title").fill("Second Signal");
+    await page.getByLabel("Web address").fill("first-signal");
+    await page
+      .getByLabel("Short description")
+      .fill("The second attempt must be refused.");
+    await page.getByRole("button", { name: "Save draft" }).click();
+
+    await expect(
+      page.getByText("That web address is already in use.").first(),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/admin\/stories\/new$/);
+  });
+
+  test("a chapter cannot be created without a title", async ({ page }) => {
+    const storyId = await createStoryDraft(page, {
+      title: "Titleless Hours",
+      shortDescription: "A story whose chapter needs a name of its own.",
+    });
+
+    // A whitespace value satisfies the browser's `required` attribute, so the
+    // server-side rule is the one under test.
+    await page.goto(`/admin/stories/${storyId}/chapters/new`);
+    await page.getByLabel("Title").fill("   ");
+    await page.getByRole("button", { name: "Create draft" }).click();
+
+    await expect(page.getByText("A title is required.").first()).toBeVisible();
+    await expect(
+      page,
+    ).toHaveURL(new RegExp(`/admin/stories/${storyId}/chapters/new$`));
+  });
 });
 
 test.describe("upload boundaries", () => {

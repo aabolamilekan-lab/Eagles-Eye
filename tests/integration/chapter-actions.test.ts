@@ -279,6 +279,84 @@ describe.skipIf(!hasDatabase)("chapter actions (PostgreSQL)", () => {
     expect(after?.content).not.toContain("onerror");
   });
 
+  it("preserves formatting when editing an existing chapter", async () => {
+    const story = await makeStory("edit-formatting");
+    const chapter = await makeChapter(story.id, 1, {
+      title: "First",
+      content: "<p>Opening line.</p>",
+    });
+
+    const formatted =
+      "<h2>The crossing</h2>" +
+      "<p><strong>Night fell</strong> and the <em>lamp</em> went out.</p>" +
+      '<p style="text-align:center">Meanwhile</p>' +
+      "<ul><li>First watch</li><li>Second watch</li></ul>" +
+      "<ol><li>Row</li><li>Rest</li></ol>" +
+      "<blockquote>Hold fast.</blockquote>" +
+      '<p><a href="https://example.test/log" rel="noopener noreferrer">the log</a></p>' +
+      "<hr>" +
+      '<script>alert(1)</script>' +
+      '<a href="javascript:alert(1)">bad link</a>';
+
+    const url = await expectRedirect(() =>
+      actions.updateChapterAction(
+        INITIAL,
+        form({
+          storyId: story.id,
+          id: chapter.id,
+          title: "First",
+          content: formatted,
+        }),
+      ),
+    );
+    expect(url).toContain("notice=saved");
+
+    const after = await prisma.chapter.findUnique({
+      where: { id: chapter.id },
+      select: { content: true },
+    });
+    const stored = after?.content ?? "";
+
+    // Every block the editor produced round-trips intact…
+    expect(stored).toContain("<h2>The crossing</h2>");
+    expect(stored).toContain("<strong>Night fell</strong>");
+    expect(stored).toContain("<em>lamp</em>");
+    expect(stored).toContain('<p style="text-align:center">Meanwhile</p>');
+    expect(stored).toContain(
+      "<ul><li>First watch</li><li>Second watch</li></ul>",
+    );
+    expect(stored).toContain("<ol><li>Row</li><li>Rest</li></ol>");
+    expect(stored).toContain("<blockquote>Hold fast.</blockquote>");
+    expect(stored).toContain('<a href="https://example.test/log"');
+    expect(stored).toContain('rel="noopener noreferrer"');
+    expect(stored).toContain("<hr");
+
+    // …and the hostile payloads injected alongside it do not.
+    expect(stored).not.toContain("<script");
+    expect(stored).not.toContain("alert(1)");
+    expect(stored).not.toContain("javascript:");
+
+    // Re-saving the stored markup is a no-op: the sanitizer is idempotent, so
+    // opening an already-published chapter and saving it unchanged cannot
+    // gradually rewrite the document.
+    await expectRedirect(() =>
+      actions.updateChapterAction(
+        INITIAL,
+        form({
+          storyId: story.id,
+          id: chapter.id,
+          title: "First",
+          content: stored,
+        }),
+      ),
+    );
+    const resaved = await prisma.chapter.findUnique({
+      where: { id: chapter.id },
+      select: { content: true },
+    });
+    expect(resaved?.content).toBe(stored);
+  });
+
   it("rejects a publish intent on empty content", async () => {
     const story = await makeStory("empty-publish");
     const chapter = await makeChapter(story.id, 1, { content: "<p></p>" });

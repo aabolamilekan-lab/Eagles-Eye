@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SearchX } from "lucide-react";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { StoryGrid } from "@/components/stories/StoryCard";
 import { StoryFilters } from "@/components/stories/StoryFilters";
 import { ButtonLink } from "@/components/ui/Button";
@@ -9,8 +10,8 @@ import { getPublishedStoryList } from "@/lib/queries/public/stories";
 import { getPublishedCategoryOptions } from "@/lib/queries/public/categories";
 import { getPublishedTagOptions } from "@/lib/queries/public/tags";
 import { parseStoryListSearch, storyListHref } from "@/lib/validation/story";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/jsonld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface StoriesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -23,30 +24,26 @@ export async function generateMetadata({
 
   // A sorted or facet-filtered view is a different page from the default one,
   // so it never canonicalizes onto `/stories`; page 2 likewise canonicalizes to
-  // itself rather than to page 1.
+  // itself rather than to page 1, and `?page=1` is never emitted at all.
   const canonicalPath =
     search.hasFilters || search.page > 1 || search.sort !== "recent"
       ? storyListHref(search, { page: search.page })
       : "/stories";
-  const title = search.q ? `Stories matching "${search.q}"` : "Stories";
-  const description = "Every published story in the Eagles Eye catalogue.";
+  const leaf = search.q ? `Stories matching "${search.q}"` : "Stories";
+  const title =
+    search.page > 1 ? `${leaf} – page ${search.page}` : leaf;
 
-  return {
+  // A facet-filtered or sorted view is useful to readers but thin and
+  // unbounded for crawlers: noindex, and no canonical claim to make for it.
+  const filtered = search.hasFilters || search.sort !== "recent";
+
+  return buildPageMetadata({
     title,
-    description,
-    alternates: { canonical: canonicalPath },
-    // Filtered views are useful to readers but thin and unbounded for crawlers.
-    robots:
-      search.hasFilters || search.sort !== "recent"
-        ? { index: false, follow: true }
-        : undefined,
-    openGraph: buildOpenGraph({
-      title: `${title} | Eagles Eye`,
-      description,
-      path: canonicalPath,
-    }),
-    twitter: buildTwitter({ title: `${title} | Eagles Eye`, description }),
-  };
+    description: "Every published story in the Eagles Eye catalogue.",
+    path: canonicalPath,
+    canonical: filtered ? false : canonicalPath,
+    noindex: filtered,
+  });
 }
 
 export default async function StoriesPage({ searchParams }: StoriesPageProps) {
@@ -66,6 +63,12 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
 
   return (
     <div className="shell py-(--spacing-section)">
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", url: "/" },
+          { name: "Stories" },
+        ])}
+      />
       <header className="max-w-2xl">
         <p className="label-micro text-primary">Read</p>
         <h1 className="mt-3 font-display text-display-lg text-ink text-balance">

@@ -8,9 +8,15 @@ import { ReadingProgress } from "@/components/chapters/ReadingProgress";
 import { RichText } from "@/components/chapters/RichText";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ButtonLink } from "@/components/ui/Button";
-import { formatPublishedDate, toPlainTextExcerpt } from "@/lib/format";
+import {
+  countWords,
+  formatPublishedDate,
+  toPlainText,
+} from "@/lib/format";
 import { getPublishedChapterReader } from "@/lib/queries/public/stories";
 import { parseContentSlug } from "@/lib/validation/story";
+import { buildBreadcrumbJsonLd, buildChapterJsonLd } from "@/lib/seo/jsonld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 /**
  * Chapter reader.
@@ -23,8 +29,6 @@ import { parseContentSlug } from "@/lib/validation/story";
  * page keeps exactly one `<h1>`.
  */
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 interface ChapterReaderProps {
   params: Promise<{ slug: string; chapterSlug: string }>;
@@ -52,29 +56,19 @@ export async function generateMetadata({
   // Resolve existence before the route's shell is flushed, so a missing or
   // non-published chapter returns a real 404 instead of a streamed 200.
   const { story, chapter } = await resolveReader(params);
-  const description =
-    toPlainTextExcerpt(chapter.content) ||
-    `Read “${chapter.title}” from ${story.title} on Eagles Eye.`;
 
-  return {
-    title: `${chapter.title} — ${story.title}`,
-    description,
-    alternates: {
-      canonical: `/stories/${story.slug}/chapter/${chapter.slug}`,
-    },
-    openGraph: {
-      type: "article",
-      title: chapter.title,
-      description,
-      url: `/stories/${story.slug}/chapter/${chapter.slug}`,
-      publishedTime: chapter.publishedAt ?? undefined,
-    },
-    twitter: {
-      card: "summary",
-      title: chapter.title,
-      description,
-    },
-  };
+  return buildPageMetadata({
+    // One title for the tag, both cards, and the browser tab — clamped on a
+    // word boundary so a long pair never ends mid-word.
+    title: `${chapter.title} – ${story.title}`,
+    description: toPlainText(chapter.content),
+    path: `/stories/${story.slug}/chapter/${chapter.slug}`,
+    type: "article",
+    image: story.coverImageUrl,
+    imageAlt: story.title,
+    publishedTime: chapter.publishedAt,
+    modifiedTime: chapter.updatedAt,
+  });
 }
 
 export default async function ChapterReaderPage({
@@ -91,38 +85,35 @@ export default async function ChapterReaderPage({
     { label: chapter.title },
   ];
 
-  const chapterUrl = new URL(
-    `/stories/${story.slug}/chapter/${chapter.slug}`,
-    BASE_URL,
-  ).toString();
-  const storyUrl = new URL(`/stories/${story.slug}`, BASE_URL).toString();
+  const plainText = toPlainText(chapter.content);
 
-  const chapterJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Chapter",
-    name: chapter.title,
-    headline: chapter.title,
-    datePublished: chapter.publishedAt ?? undefined,
-    position: reader.currentNumber,
-    url: chapterUrl,
-    isPartOf: { "@type": "Book", name: story.title, url: storyUrl },
-    inLanguage: "en",
-  };
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: crumb.label,
-      item: crumb.href ? new URL(crumb.href, BASE_URL).toString() : undefined,
-    })),
-  };
+  // An Article node with a Story parent — not a bare `Chapter` node, which
+  // implies a book structure this platform does not model. Returns null when
+  // the body yields no description, and the breadcrumb trail still renders.
+  const chapterJsonLd = buildChapterJsonLd({
+    story: {
+      title: story.title,
+      slug: story.slug,
+      coverImageUrl: story.coverImageUrl,
+    },
+    chapter: {
+      title: chapter.title,
+      slug: chapter.slug,
+      publishedAt: chapter.publishedAt,
+      updatedAt: chapter.updatedAt,
+    },
+    description: plainText,
+    wordCount: countWords(plainText),
+  });
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", url: "/" },
+    { name: story.title, url: `/stories/${story.slug}` },
+    { name: chapter.title },
+  ]);
 
   return (
     <>
-      <JsonLd data={chapterJsonLd} />
+      {chapterJsonLd ? <JsonLd data={chapterJsonLd} /> : null}
       <JsonLd data={breadcrumbJsonLd} />
 
       <ReadingLayout

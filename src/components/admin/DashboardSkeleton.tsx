@@ -7,7 +7,7 @@ import { Skeleton, SkeletonTable } from "@/components/ui/Skeleton";
 export function DashboardSkeleton() {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading dashboard"
       className="flex flex-col gap-10"
     >

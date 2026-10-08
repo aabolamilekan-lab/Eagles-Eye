@@ -10,6 +10,8 @@
  * "unavailable" error instead of crashing module evaluation, and so this stays
  * out of any client bundle. `.agent/skills/media-upload/SKILL.md`.
  */
+import { OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH } from "@/lib/seo/cover-url";
+
 export type ImageProcessingFailure = "unavailable" | "decode" | "dimensions";
 
 const FAILURE_MESSAGES: Record<ImageProcessingFailure, string> = {
@@ -132,6 +134,96 @@ export async function processCoverImage(input: Buffer): Promise<ProcessedCover> 
       height: info.height,
     };
   } catch {
+    throw new ImageProcessingError("decode");
+  }
+}
+
+/* ------------------------------------------------------------------------- *
+ * Social-card rendition
+ * ------------------------------------------------------------------------- */
+
+/** JPEG carries `og:image` everywhere; the stored WebP cover does not. */
+export const CARD_JPEG_QUALITY = 84;
+
+export type CardRenditionRequest = "original" | "card" | "invalid";
+
+/**
+ * The one size request this route honours: `?w=1200&h=630`, the exact
+ * dimensions `og:image` advertises. Any other combination is rejected rather
+ * than honoured, so the route can never become an arbitrary-size image
+ * factory. No size params at all means "serve the stored cover untouched".
+ */
+export function parseCardRenditionRequest(
+  params: URLSearchParams,
+): CardRenditionRequest {
+  const widths = params.getAll("w");
+  const heights = params.getAll("h");
+
+  if (widths.length === 0 && heights.length === 0) {
+    return "original";
+  }
+  if (
+    widths.length === 1 &&
+    heights.length === 1 &&
+    widths[0] === String(OG_IMAGE_WIDTH) &&
+    heights[0] === String(OG_IMAGE_HEIGHT)
+  ) {
+    return "card";
+  }
+  return "invalid";
+}
+
+export interface RenderedCard {
+  buffer: Buffer;
+  contentType: "image/jpeg";
+  width: number;
+  height: number;
+}
+
+/**
+ * Crop a stored cover to the exact social-card rendition.
+ *
+ * Always produces `OG_IMAGE_WIDTH` × `OG_IMAGE_HEIGHT` — the metadata that was
+ * advertised alongside this URL — by cropping to cover, upscaling only when
+ * the source is smaller. Throws `ImageProcessingError` with a safe code, the
+ * same contract as {@link processCoverImage}.
+ */
+export async function renderCardImage(input: Buffer): Promise<RenderedCard> {
+  let sharp: typeof import("sharp");
+  try {
+    sharp = await loadSharp();
+  } catch {
+    throw new ImageProcessingError("unavailable");
+  }
+
+  const options = { limitInputPixels: MAX_INPUT_PIXELS, failOn: "error" } as const;
+
+  try {
+    const { data, info } = await sharp
+      .default(input, options)
+      .rotate()
+      .resize({
+        width: OG_IMAGE_WIDTH,
+        height: OG_IMAGE_HEIGHT,
+        fit: "cover",
+      })
+      .jpeg({ quality: CARD_JPEG_QUALITY })
+      .toBuffer({ resolveWithObject: true });
+
+    if (info.width !== OG_IMAGE_WIDTH || info.height !== OG_IMAGE_HEIGHT) {
+      throw new ImageProcessingError("dimensions");
+    }
+
+    return {
+      buffer: data,
+      contentType: "image/jpeg",
+      width: info.width,
+      height: info.height,
+    };
+  } catch (error) {
+    if (error instanceof ImageProcessingError) {
+      throw error;
+    }
     throw new ImageProcessingError("decode");
   }
 }

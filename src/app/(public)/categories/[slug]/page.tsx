@@ -11,8 +11,11 @@ import { getPublishedCategoryBySlug } from "@/lib/queries/public/categories";
 import { getPublishedStoryList } from "@/lib/queries/public/stories";
 import { parseContentSlug, parseStoryListSearch } from "@/lib/validation/story";
 import { categoryStoryHref } from "@/lib/validation/taxonomy";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import {
+  buildBreadcrumbJsonLd,
+  buildCollectionPageJsonLd,
+} from "@/lib/seo/jsonld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 /**
  * Category detail.
@@ -23,8 +26,6 @@ import { buildTwitter } from "@/lib/seo/twitter";
  * a story with no published chapter can never appear (AGENTS.md section 6).
  */
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 const SORT_OPTIONS = [
   { value: "recent", label: "Newest first" },
@@ -51,24 +52,13 @@ export async function generateMetadata({
     notFound();
   }
 
-  const description =
-    category.description ||
-    `Published stories in the ${category.name} category on Eagles Eye.`;
-
-  return {
+  return buildPageMetadata({
     title: category.name,
-    description,
-    alternates: { canonical: `/categories/${category.slug}` },
-    openGraph: buildOpenGraph({
-      title: `${category.name} | Eagles Eye`,
-      description,
-      path: `/categories/${category.slug}`,
-    }),
-    twitter: buildTwitter({
-      title: `${category.name} | Eagles Eye`,
-      description,
-    }),
-  };
+    description:
+      category.description ||
+      `Published stories in the ${category.name} category on Eagles Eye.`,
+    path: `/categories/${category.slug}`,
+  });
 }
 
 export default async function CategoryPage({
@@ -102,20 +92,22 @@ export default async function CategoryPage({
     { label: category.name },
   ];
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: crumb.label,
-      item: crumb.href ? new URL(crumb.href, BASE_URL).toString() : undefined,
-    })),
-  };
-
   return (
     <div className="shell py-(--spacing-section)">
-      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd
+        data={buildCollectionPageJsonLd({
+          name: category.name,
+          slug: category.slug,
+          description: category.description,
+        })}
+      />
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: "Home", url: "/" },
+          { name: "Categories", url: "/categories" },
+          { name: category.name },
+        ])}
+      />
 
       <Breadcrumbs items={breadcrumbs} />
 

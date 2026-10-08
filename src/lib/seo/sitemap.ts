@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "./canonical";
 
 /**
  * Sitemap sizing.
@@ -27,40 +28,54 @@ export function sitemapLastModified(
   return Number.isNaN(date.getTime()) ? fallback : date;
 }
 
-/** Static entries: home, catalogue, categories index, and about. */
+/**
+ * Static entries: home, catalogue, categories index, and about.
+ *
+ * `lastmod` is the newest published content date the caller saw — never the
+ * wall clock. Two builds over the same database produce byte-identical output,
+ * because a `new Date()` here would claim every static page changed on every
+ * request, a signal crawlers learn to discount (`.agent/skills/seo/SKILL.md`).
+ * With no content yet there is nothing to date, and the field is omitted
+ * rather than filled with a lie; `lastmod` is optional in the protocol.
+ *
+ * Every URL resolves through the canonical builder: no page — and no
+ * sitemap — concatenates a base URL by hand.
+ */
 export function buildStaticEntries(
   baseUrl: string,
-  now: Date,
   categories: Array<{ slug: string }>,
+  latest?: Date,
 ): MetadataRoute.Sitemap {
+  const lastModified = latest ? { lastModified: latest } : {};
+
   return [
     {
-      url: `${baseUrl}/`,
-      lastModified: now,
+      url: absoluteUrl("/", baseUrl),
+      ...lastModified,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${baseUrl}/stories`,
-      lastModified: now,
+      url: absoluteUrl("/stories", baseUrl),
+      ...lastModified,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/categories`,
-      lastModified: now,
+      url: absoluteUrl("/categories", baseUrl),
+      ...lastModified,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     ...categories.map((category) => ({
-      url: `${baseUrl}/categories/${category.slug}`,
-      lastModified: now,
+      url: absoluteUrl(`/categories/${category.slug}`, baseUrl),
+      ...lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.6,
     })),
     {
-      url: `${baseUrl}/about`,
-      lastModified: now,
+      url: absoluteUrl("/about", baseUrl),
+      ...lastModified,
       changeFrequency: "yearly",
       priority: 0.3,
     },

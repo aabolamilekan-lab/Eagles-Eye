@@ -4,8 +4,10 @@ import { cn } from "@/lib/cn";
  * Skeleton placeholder.
  *
  * The shape mirrors the content it stands in for, so the layout does not jump
- * when real data arrives. `aria-hidden` plus a parent `aria-busy` means screen
- * readers are not read a wall of empty boxes.
+ * when real data arrives. `aria-hidden` plus a parent `role="status"` means
+ * screen readers hear one "Loading …" announcement instead of a wall of empty
+ * boxes. The status role, not `aria-busy`, is what carries the announcement:
+ * `aria-busy="true"` that never flips to false would suppress it.
  */
 export function Skeleton({ className }: { className?: string }) {
   return (
@@ -56,7 +58,7 @@ export function SkeletonStoryCard() {
 export function SkeletonStoryGrid({ count = 6 }: { count?: number }) {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading stories"
       className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
     >
@@ -77,7 +79,7 @@ export function SkeletonTable({
 }) {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading"
       className="overflow-hidden rounded-md border border-border"
     >
@@ -103,7 +105,7 @@ export function SkeletonTable({
 export function SkeletonChapterList({ count = 5 }: { count?: number }) {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading chapters"
       className="flex flex-col divide-y divide-(--color-border)"
     >
@@ -122,7 +124,7 @@ export function SkeletonChapterList({ count = 5 }: { count?: number }) {
 export function SkeletonProse() {
   return (
     <div
-      aria-busy="true"
+      role="status"
       aria-label="Loading chapter"
       className="reading-column flex flex-col gap-6 py-16"
     >

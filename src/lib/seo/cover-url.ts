@@ -19,3 +19,26 @@ export function coverUrl(key: string | null): string | null {
   }
   return `/api/images/${encodeURIComponent(key)}`;
 }
+
+/** Exact social-card dimensions the image route can render on request. */
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+
+const OG_TRANSFORM_QUERY = `w=${OG_IMAGE_WIDTH}&h=${OG_IMAGE_HEIGHT}`;
+
+/**
+ * The social-card rendition of an image path.
+ *
+ * Covers are arbitrary shapes; shipping a portrait original as the card makes
+ * every platform letterbox it. The image route re-encodes to an exact
+ * 1200×630 crop when asked, so the OG and Twitter URLs carry that request.
+ * The default card image is already 1200×630 and passes through untouched, as
+ * does any path that is not the cover route. Callers resolve a missing cover
+ * to the default card image first, so the result is never null.
+ */
+export function ogImageUrl(url: string): string {
+  if (!url.startsWith("/api/images/") || url.includes("?")) {
+    return url;
+  }
+  return `${url}?${OG_TRANSFORM_QUERY}`;
+}

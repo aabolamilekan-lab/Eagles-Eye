@@ -152,6 +152,44 @@ test.describe("publishing lifecycle", () => {
     expect(cookies.filter((cookie) => cookie.name.includes("session"))).toHaveLength(0);
   });
 
+  test("reordering chapters rewrites the public reading order", async ({
+    page,
+    browser,
+  }) => {
+    await signIn(page);
+    await page.goto(`/admin/stories/${storyId}/chapters`);
+
+    const rows = page.locator('form:has(input[name="order"]) > ol > li');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.nth(0)).toContainText(FIRST_CHAPTER);
+    await expect(rows.nth(1)).toContainText(SECOND_CHAPTER);
+
+    // Move the first chapter down through the real control, then commit.
+    await page
+      .getByRole("button", { name: `Move ${FIRST_CHAPTER} down` })
+      .click();
+    await expect(page.getByRole("button", { name: "Save order" })).toBeEnabled();
+    await page.getByRole("button", { name: "Save order" }).click();
+    await expect(page).toHaveURL(/\/chapters\?notice=reordered$/);
+
+    // The stored order followed the arrangement.
+    await expect(rows.nth(0)).toContainText(SECOND_CHAPTER);
+    await expect(rows.nth(1)).toContainText(FIRST_CHAPTER);
+
+    // An anonymous reader sees the same order, and the chapter numbers were
+    // rewritten rather than duplicated: the moved chapter is now 1 of 2.
+    const reader = await anonymousPage(browser);
+    await reader.goto(`/stories/${SLUG}`);
+    const chapterRows = reader.locator(`ol a[href^="/stories/${SLUG}/chapter/"]`);
+    await expect(chapterRows).toHaveCount(2);
+    await expect(chapterRows.nth(0)).toContainText(SECOND_CHAPTER);
+    await expect(chapterRows.nth(1)).toContainText(FIRST_CHAPTER);
+
+    await reader.goto(`/stories/${SLUG}/chapter/${SECOND_CHAPTER_SLUG}`);
+    await expect(reader.getByText("Chapter 1 of 2").first()).toBeVisible();
+    await reader.close();
+  });
+
   test("unpublishing removes the story from every public surface", async ({
     page,
     browser,

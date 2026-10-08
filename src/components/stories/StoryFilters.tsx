@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { X } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { CheckboxField, SelectField, TextField } from "@/components/ui/Field";
+import { ActiveFilterChips } from "@/components/search/ActiveFilterChips";
 import { storyListHref, type StoryListSearch } from "@/lib/validation/story";
+import { buildActiveFilters } from "@/lib/filters/active-filters";
 import type { CategorySummary } from "@/lib/queries/public/categories";
 import type { TagOption } from "@/lib/queries/public/tags";
 
@@ -12,12 +12,6 @@ const SORT_OPTIONS = [
   { value: "popular", label: "Most read" },
   { value: "title", label: "Title A–Z" },
 ];
-
-interface ActiveFilter {
-  key: string;
-  label: string;
-  href: string;
-}
 
 /**
  * Catalogue filters.
@@ -43,7 +37,12 @@ export function StoryFilters({
     })),
   ];
 
-  const active = buildActiveFilters(search, categories, tags);
+  const active = buildActiveFilters(
+    search,
+    categories,
+    tags,
+    (changes) => storyListHref(search, changes),
+  );
 
   return (
     <section aria-labelledby="story-filters-heading" className="mt-10">
@@ -125,62 +124,7 @@ export function StoryFilters({
         </div>
       </form>
 
-      {active.length > 0 ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="font-ui text-body-xs text-ink-muted">Active:</span>
-          {active.map((filter) => (
-            <Link
-              key={filter.key}
-              href={filter.href}
-              aria-label={`Remove ${filter.label} filter`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border-strong bg-surface px-3 py-1 font-ui text-body-xs text-ink transition-colors duration-(--duration-fast) hover:bg-surface-sunken"
-            >
-              {filter.label}
-              <X aria-hidden="true" className="size-3 text-ink-subtle" />
-            </Link>
-          ))}
-        </div>
-      ) : null}
+      <ActiveFilterChips active={active} />
     </section>
   );
-}
-
-function buildActiveFilters(
-  search: StoryListSearch,
-  categories: CategorySummary[],
-  tags: TagOption[],
-): ActiveFilter[] {
-  const active: ActiveFilter[] = [];
-
-  if (search.q) {
-    active.push({
-      key: "q",
-      label: `“${search.q}”`,
-      href: storyListHref(search, { q: "" }),
-    });
-  }
-
-  if (search.category) {
-    const name =
-      categories.find((category) => category.slug === search.category)?.name ??
-      search.category;
-    active.push({
-      key: "category",
-      label: name,
-      href: storyListHref(search, { category: null }),
-    });
-  }
-
-  for (const slug of search.tags) {
-    const name = tags.find((tag) => tag.slug === slug)?.name ?? slug;
-    active.push({
-      key: `tag-${slug}`,
-      label: name,
-      href: storyListHref(search, {
-        tags: search.tags.filter((tag) => tag !== slug),
-      }),
-    });
-  }
-
-  return active;
 }

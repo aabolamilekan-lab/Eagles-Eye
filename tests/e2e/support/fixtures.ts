@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { expect, test as base } from "@playwright/test";
 
 /**
@@ -9,16 +11,18 @@ import { expect, test as base } from "@playwright/test";
  *
  * The app trusts `x-forwarded-for` because a reverse proxy sets it in a real
  * deployment. Here it gives every test its own bucket without changing a line of
- * application code. Each address comes from the RFC 5737 documentation range and
- * is allocated per test, so no test can exhaust another's allowance.
+ * application code. The address is derived from the test's own id, so it is
+ * unique for every test in the run and survives worker restarts — no shared
+ * counter that a restart could reset into a collision with an address another
+ * test already exhausted.
  */
-let allocatedIps = 0;
-
 export const test = base.extend<{ clientIp: string }>({
   clientIp: [
-    async ({ page }, use) => {
-      allocatedIps += 1;
-      const ip = `203.0.113.${(allocatedIps % 250) + 1}`;
+    async ({ page }, use, testInfo) => {
+      const digest = createHash("sha256")
+        .update(`${testInfo.file}:${testInfo.line}:${testInfo.title}`)
+        .digest();
+      const ip = `10.${digest.subarray(0, 3).join(".")}`;
       await page.setExtraHTTPHeaders({ "x-forwarded-for": ip });
       await use(ip);
     },

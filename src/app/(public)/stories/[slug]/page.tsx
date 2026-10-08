@@ -8,13 +8,15 @@ import { RichText } from "@/components/chapters/RichText";
 import { Breadcrumbs, type Crumb } from "@/components/navigation/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { StoryCoverFallback, StoryGrid } from "@/components/stories/StoryCard";
-import { Badge, StatusBadge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatPublishedDate } from "@/lib/format";
 import { getPublishedStoryDetail } from "@/lib/queries/public/stories";
 import { parseContentSlug } from "@/lib/validation/story";
+import { buildBreadcrumbJsonLd, buildStoryJsonLd } from "@/lib/seo/jsonld";
+import { buildStoryPageMetadata } from "@/lib/seo/metadata";
 
 /**
  * Story detail.
@@ -26,8 +28,6 @@ import { parseContentSlug } from "@/lib/validation/story";
  * (AGENTS.md section 6).
  */
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 interface StoryDetailProps {
   params: Promise<{ slug: string }>;
@@ -48,31 +48,9 @@ export async function generateMetadata({
     notFound();
   }
 
-  const { story } = page;
-  const description =
-    story.shortDescription || `Read “${story.title}” on Eagles Eye.`;
-
-  return {
-    title: story.title,
-    description,
-    alternates: { canonical: `/stories/${story.slug}` },
-    openGraph: {
-      type: "article",
-      title: story.title,
-      description,
-      url: `/stories/${story.slug}`,
-      publishedTime: story.publishedAt ?? undefined,
-      images: story.coverImageUrl
-        ? [{ url: story.coverImageUrl, alt: story.coverAlt ?? story.title }]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: story.title,
-      description,
-      images: story.coverImageUrl ? [story.coverImageUrl] : undefined,
-    },
-  };
+  // noindex and no canonical while the story has no published chapter:
+  // there is nothing to index and no preferred URL to claim.
+  return buildStoryPageMetadata(page.story);
 }
 
 export default async function StoryDetailPage({ params }: StoryDetailProps) {
@@ -103,35 +81,28 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
     { label: story.title },
   ];
 
-  const articleJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: story.title,
-    description: story.shortDescription || undefined,
-    datePublished: story.publishedAt ?? undefined,
-    author: story.author ? { "@type": "Person", name: story.author } : undefined,
-    image: story.coverImageUrl
-      ? new URL(story.coverImageUrl, BASE_URL).toString()
-      : undefined,
-    publisher: { "@type": "Organization", name: "Eagles Eye" },
-    mainEntityOfPage: new URL(`/stories/${story.slug}`, BASE_URL).toString(),
-    inLanguage: "en",
-  };
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: breadcrumbs.map((crumb, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: crumb.label,
-      item: crumb.href ? new URL(crumb.href, BASE_URL).toString() : undefined,
-    })),
-  };
+  // Drops to a breadcrumb trail alone while the story has no published
+  // chapter or no description: the Story/Article nodes are not emitted for
+  // content a crawler must not read.
+  const storyJsonLd = buildStoryJsonLd(story);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", url: "/" },
+    ...(story.category
+      ? [
+          {
+            name: story.category.name,
+            url: `/categories/${story.category.slug}`,
+          },
+        ]
+      : []),
+    { name: story.title },
+  ]);
 
   return (
     <div className="pb-(--spacing-section)">
-      <JsonLd data={articleJsonLd} />
+      {storyJsonLd.map((node, index) => (
+        <JsonLd key={index} data={node} />
+      ))}
       <JsonLd data={breadcrumbJsonLd} />
 
       <div className="shell">
@@ -176,7 +147,6 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
             ) : null}
 
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-ui text-body-xs text-ink-subtle">
-              <StatusBadge status="PUBLISHED" />
               {published && story.publishedAt ? (
                 <time dateTime={story.publishedAt}>{published}</time>
               ) : null}
@@ -243,7 +213,7 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
             <RichText
               html={story.description}
               headingOffset={2}
-              className="mt-4 max-w-[70ch]"
+              className="mt-4 max-w-(--container-prose)"
             />
           </section>
         ) : null}

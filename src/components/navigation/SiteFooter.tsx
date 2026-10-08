@@ -27,7 +27,7 @@ export function SiteFooter({
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="font-ui text-body-sm text-on-primary underline-offset-2 transition-colors hover:underline"
+                      className="inverted-focus inline-flex min-h-11 items-center font-ui text-body-sm text-on-primary underline-offset-2 transition-colors hover:underline"
                     >
                       {link.label}
                     </Link>

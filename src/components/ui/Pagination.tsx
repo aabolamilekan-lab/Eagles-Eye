@@ -24,6 +24,10 @@ export interface PaginationProps {
  * Page numbers are anchors so they are crawlable, shareable and middle-click
  * -able. Driven by the query layer's page and total, never by slicing an
  * already-rendered list.
+ *
+ * Controls meet the 44px target minimum. A single-page result set still shows
+ * the "Showing 1–n of n" line so the reader knows the list is complete rather
+ * than truncated — but it renders no navigation landmark and no controls.
  */
 export function Pagination({
   page,
@@ -35,11 +39,35 @@ export function Pagination({
   itemNounPlural,
   className,
 }: PaginationProps) {
-  if (pageCount <= 1) return null;
-
   const plural = itemNounPlural ?? `${itemNoun}s`;
   const first = (page - 1) * pageSize + 1;
   const last = Math.min(page * pageSize, totalItems);
+
+  // Nothing at all: callers render an empty state instead of a range line.
+  if (totalItems === 0) return null;
+
+  const summary = (
+    <p className="font-ui text-body-xs text-ink-muted">
+      Showing <span className="tabular-nums">{first}</span>–
+      <span className="tabular-nums">{last}</span> of{" "}
+      <span className="tabular-nums">{totalItems}</span>{" "}
+      {totalItems === 1 ? itemNoun : plural}
+    </p>
+  );
+
+  if (pageCount <= 1) {
+    return (
+      <div
+        className={cn(
+          "flex items-center border-t border-border pt-6",
+          className,
+        )}
+      >
+        {summary}
+      </div>
+    );
+  }
+
   const pages = pageWindow(page, pageCount);
 
   return (
@@ -51,19 +79,13 @@ export function Pagination({
         className,
       )}
     >
-      <p className="font-ui text-body-xs text-ink-muted">
-        Showing <span className="tabular-nums">{first}</span>–
-        <span className="tabular-nums">{last}</span> of{" "}
-        <span className="tabular-nums">{totalItems}</span>{" "}
-        {totalItems === 1 ? itemNoun : plural}
-      </p>
+      {summary}
 
       <div className="flex items-center gap-1">
         <PageLink
           href={buildHref(page - 1)}
           disabled={page === 1}
           rel="prev"
-          ariaLabel="Previous page"
         >
           <ChevronLeft aria-hidden="true" className="size-4" />
         </PageLink>
@@ -84,7 +106,7 @@ export function Pagination({
               aria-current={entry === page ? "page" : undefined}
               aria-label={`Page ${entry}`}
               className={cn(
-                "inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2",
+                "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2",
                 "font-ui text-body-sm tabular-nums transition-colors",
                 entry === page
                   ? "bg-primary text-on-primary"
@@ -100,7 +122,6 @@ export function Pagination({
           href={buildHref(page + 1)}
           disabled={page === pageCount}
           rel="next"
-          ariaLabel="Next page"
         >
           <ChevronRight aria-hidden="true" className="size-4" />
         </PageLink>
@@ -113,28 +134,29 @@ function PageLink({
   href,
   disabled,
   rel,
-  ariaLabel,
   children,
 }: {
   href: string;
   disabled: boolean;
   rel: "prev" | "next";
-  ariaLabel: string;
   children: ReactNode;
 }) {
   const base =
-    "inline-flex h-9 w-9 items-center justify-center rounded-md font-ui text-body-sm transition-colors";
+    "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md font-ui text-body-sm transition-colors";
 
   if (disabled) {
+    const reason =
+      rel === "prev" ? "No previous page" : "No next page";
     return (
       <span
         aria-disabled="true"
-        // Announced as unavailable rather than simply absent.
-        title={`No ${rel === "prev" ? "previous" : "next"} page`}
-        role="link"
-        className={cn(base, "cursor-not-allowed text-ink-subtle/50")}
+        // Hover tooltip for pointer users; the sr-only span is what screen
+        // readers actually hear, since most do not announce `title`.
+        title={reason}
+        className={cn(base, "cursor-not-allowed text-ink-subtle/60")}
       >
         {children}
+        <span className="sr-only">{reason}</span>
       </span>
     );
   }
@@ -143,7 +165,7 @@ function PageLink({
     <Link
       href={href}
       rel={rel}
-      aria-label={ariaLabel}
+      aria-label={rel === "prev" ? "Previous page" : "Next page"}
       className={cn(base, "text-ink-muted hover:bg-surface-sunken hover:text-ink")}
     >
       {children}

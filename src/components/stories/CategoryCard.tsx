@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { cn } from "@/lib/cn";
 
 /**
  * Category card.
  *
  * A quiet index entry. Categories are navigation, not content, so they get a
- * count and a name, never an illustration.
+ * count and a name, never an illustration. The whole card is clickable through
+ * a stretched link on the title — the link wraps only the text, so the heading
+ * keeps a real focusable target.
  */
 export function CategoryCard({
   category,
@@ -15,19 +16,15 @@ export function CategoryCard({
   storyCount: number;
 }) {
   return (
-    <Link
-      href={`/categories/${category.slug}`}
-      prefetch={false}
-      className={cn(
-        "group relative flex flex-col gap-1.5 rounded-md border border-border bg-surface p-5",
-        "transition-[border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart)",
-        "hover:border-border-strong hover:shadow-sm",
-      )}
-    >
+    <article className="group relative flex flex-col gap-1.5 rounded-md border border-border bg-surface p-5 transition-[border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-sm">
       <h3 className="font-display text-heading-sm text-ink">
-        <span className="after:absolute after:inset-0 after:content-[''] focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2">
+        <Link
+          href={`/categories/${category.slug}`}
+          prefetch={false}
+          className="after:absolute after:inset-0 after:content-['']"
+        >
           {category.name}
-        </span>
+        </Link>
       </h3>
       {category.description ? (
         <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty">
@@ -37,6 +34,6 @@ export function CategoryCard({
       <p className="mt-2 font-ui text-body-xs text-ink-subtle tabular-nums">
         {storyCount === 1 ? "1 story" : `${storyCount} stories`}
       </p>
-    </Link>
+    </article>
   );
 }

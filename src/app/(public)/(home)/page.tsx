@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SearchBar } from "@/components/search/SearchBar";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { CategoryCard } from "@/components/stories/CategoryCard";
 import { FeaturedStory, StoryCard, StoryGrid } from "@/components/stories/StoryCard";
 import { ButtonLink } from "@/components/ui/Button";
@@ -16,9 +17,8 @@ import {
   getPublishedStoryCount,
   getRecentStories,
 } from "@/lib/queries/public/stories";
-import { siteDescription, siteName } from "@/lib/seo/metadata";
-import { buildOpenGraph } from "@/lib/seo/open-graph";
-import { buildTwitter } from "@/lib/seo/twitter";
+import { buildWebSiteJsonLd } from "@/lib/seo/jsonld";
+import { buildPageMetadata, siteDescription } from "@/lib/seo/metadata";
 
 /**
  * Home.
@@ -30,16 +30,14 @@ import { buildTwitter } from "@/lib/seo/twitter";
  */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  description: siteDescription,
-  alternates: { canonical: "/" },
-  openGraph: buildOpenGraph({
-    title: siteName,
+// The home title is the site name itself; passing no leaf title keeps the
+// layout template from rendering "Eagles Eye | Eagles Eye".
+export function generateMetadata(): Metadata {
+  return buildPageMetadata({
     description: siteDescription,
     path: "/",
-  }),
-  twitter: buildTwitter({ title: siteName, description: siteDescription }),
-};
+  });
+}
 
 const FEATURED_LIMIT = 6;
 const RECENT_LIMIT = 12;
@@ -63,6 +61,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col">
+      <JsonLd data={buildWebSiteJsonLd()} />
       <section
         aria-labelledby="home-hero-heading"
         className="shell grid gap-12 pt-(--spacing-section) pb-(--spacing-section-sm) lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16"
