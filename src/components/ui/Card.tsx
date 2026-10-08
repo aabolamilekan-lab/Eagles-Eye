@@ -144,15 +144,15 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "mb-6 flex items-end justify-between gap-6 border-b border-border pb-3",
+        "mb-6 flex items-end justify-between gap-6 border-b border-border/80 pb-3.5",
         className,
       )}
     >
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1">
         {eyebrow ? (
-          <p className="label-micro text-ink-subtle">{eyebrow}</p>
+          <p className="label-micro font-semibold tracking-wider text-primary">{eyebrow}</p>
         ) : null}
-        <h2 id={id} className="font-display text-display-sm text-ink">
+        <h2 id={id} className="font-display text-display-sm font-bold text-ink tracking-tight">
           {title}
         </h2>
       </div>

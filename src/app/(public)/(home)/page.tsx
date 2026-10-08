@@ -67,16 +67,21 @@ export default async function HomePage() {
         className="shell grid gap-12 pt-(--spacing-section) pb-(--spacing-section-sm) lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16"
       >
         <div className="flex flex-col justify-center">
-          <p className="label-micro text-primary">Eagles Eye</p>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
+              <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+              Eagles Eye Catalogue
+            </span>
+          </div>
           <h1
             id="home-hero-heading"
-            className="mt-4 max-w-2xl font-display text-display-lg text-ink text-balance"
+            className="mt-5 max-w-2xl font-display text-display-lg text-ink text-balance tracking-tight"
           >
             {hasStories
               ? "Stories, published and read without the noise."
               : "A quiet catalogue for stories worth reading."}
           </h1>
-          <p className="mt-5 max-w-xl font-ui text-body text-ink-muted text-pretty">
+          <p className="mt-5 max-w-xl font-ui text-body text-ink-muted text-pretty leading-relaxed">
             {hasStories
               ? "An independent catalogue for long-form fiction, gathered from writers around the world. Nothing stands between a story and the person reading it."
               : "The first story is on its way. Until then, browse the categories to see how the catalogue is organised."}
@@ -108,8 +113,8 @@ export default async function HomePage() {
         </div>
 
         <div className="flex flex-col gap-6 lg:pt-4">
-          <div className="rounded-md border border-border bg-surface p-5">
-            <h2 className="font-display text-heading-sm text-ink">Find a story</h2>
+          <div className="rounded-md border border-border bg-surface p-6 shadow-xs transition-shadow hover:shadow-md">
+            <h2 className="font-display text-heading-md text-ink">Find a story</h2>
             <p className="mt-1 font-ui text-body-sm text-ink-muted">
               Search published stories by title, topic, or keyword.
             </p>
@@ -119,17 +124,17 @@ export default async function HomePage() {
           </div>
 
           {hasCategories ? (
-            <nav aria-label="Popular categories" className="flex flex-col gap-2">
-              <p className="label-micro text-ink-subtle">Start here</p>
-              <ul className="flex flex-col">
+            <nav aria-label="Popular categories" className="rounded-md border border-border/80 bg-surface/60 p-5">
+              <p className="label-micro text-ink-subtle mb-2">Popular Categories</p>
+              <ul className="flex flex-col divide-y divide-border/40">
                 {categories.slice(0, 4).map((category) => (
                   <li key={category.slug}>
                     <Link
                       href={`/categories/${category.slug}`}
-                      className="flex items-center justify-between rounded-md px-3 py-2 font-ui text-body-sm text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
+                      className="flex items-center justify-between py-2.5 px-2 font-ui text-body-sm text-ink-muted transition-colors rounded-sm hover:bg-surface-sunken hover:text-ink"
                     >
-                      <span>{category.name}</span>
-                      <span className="tabular-nums text-ink-subtle">
+                      <span className="font-medium">{category.name}</span>
+                      <span className="tabular-nums rounded-full bg-surface-sunken px-2 py-0.5 text-body-xs font-semibold text-ink-subtle">
                         {category.storyCount}
                       </span>
                     </Link>
@@ -277,11 +282,11 @@ export default async function HomePage() {
 
 function Stat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col gap-1">
-      <dt className="font-display text-display-sm text-ink tabular-nums">
+    <div className="flex flex-col gap-0.5 rounded-md border border-border/60 bg-surface/50 px-4 py-2 shadow-2xs">
+      <dt className="font-display text-display-sm font-semibold text-ink tabular-nums">
         {value.toLocaleString("en-GB")}
       </dt>
-      <dd className="font-ui text-body-xs text-ink-subtle">{label}</dd>
+      <dd className="font-ui text-body-xs font-medium text-ink-subtle">{label}</dd>
     </div>
   );
 }

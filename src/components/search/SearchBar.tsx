@@ -60,13 +60,13 @@ export function SearchBar({
           maxLength={maxLength}
           autoComplete="off"
           enterKeyHint="search"
-          placeholder="Search stories"
+          placeholder="Search stories..."
           aria-describedby={`${id}-hint`}
-          className="h-11 w-full rounded-sm border border-border-strong bg-surface pr-16 pl-10 font-ui text-body-sm text-ink transition-colors duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle"
+          className="h-11 w-full rounded-md border border-border-strong bg-surface pr-16 pl-10 font-ui text-body-sm text-ink transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:ring-1 focus:ring-primary shadow-xs"
         />
         <kbd
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-sm border border-border bg-surface-sunken px-1.5 py-0.5 font-ui text-body-xs text-ink-subtle sm:inline-block"
+          className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md border border-border bg-surface-sunken px-2 py-0.5 font-ui text-[11px] font-medium text-ink-subtle shadow-2xs sm:inline-block"
         >
           /
         </kbd>

@@ -59,7 +59,7 @@ export function StoryCard({
     return (
       <article
         className={cn(
-          "group relative flex gap-4",
+          "group relative flex gap-4 rounded-md border border-transparent p-2 transition-colors hover:border-border hover:bg-surface-sunken/50",
           className,
         )}
       >
@@ -70,22 +70,24 @@ export function StoryCard({
               alt={story.coverAlt ?? ""}
               fill
               sizes="96px"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
           ) : (
             <StoryCoverFallback title={story.title} />
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5 justify-center">
           {story.category ? (
-            <Badge tone="primary">{story.category.name}</Badge>
+            <div className="flex items-center gap-2">
+              <Badge tone="primary">{story.category.name}</Badge>
+            </div>
           ) : null}
           <h3 className="font-display text-heading-sm text-ink text-balance">
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-[''] group-hover:underline"
+              className="after:absolute after:inset-0 after:content-[''] group-hover:text-primary transition-colors"
             >
               {story.title}
             </Link>
@@ -103,9 +105,9 @@ export function StoryCard({
     <article
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-md border border-border bg-surface",
-        "transition-[border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart)",
-        "hover:border-border-strong hover:shadow-md",
-        "focus-within:border-border-strong",
+        "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
+        "hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
+        "focus-within:border-border-strong focus-within:shadow-md",
         className,
       )}
     >
@@ -120,21 +122,16 @@ export function StoryCard({
             src={story.coverImageUrl}
             alt={story.coverAlt ?? ""}
             fill
-            // Explicit sizes keep the browser from downloading a desktop image
-            // for a 375px card. The aspect-ratio container is what guarantees
-            // no layout shift; `fill` forbids width/height props outright.
             sizes={
               size === "compact"
                 ? "(max-width: 640px) 100vw, 320px"
                 : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             }
             priority={priority}
-            className="object-cover"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
         ) : (
-          // A missing cover is designed, not broken. Editorial rule and the
-          // first letter of the title: a masthead placeholder.
-            <StoryCoverFallback title={story.title} />
+          <StoryCoverFallback title={story.title} />
         )}
       </div>
 
@@ -152,7 +149,7 @@ export function StoryCard({
 
         <h3
           className={cn(
-            "font-display text-ink text-balance",
+            "font-display text-ink text-balance transition-colors group-hover:text-primary",
             size === "compact" ? "text-heading-xs" : "text-heading-md",
           )}
         >
@@ -174,7 +171,7 @@ export function StoryCard({
           {story.shortDescription}
         </p>
 
-        <div className="mt-auto pt-1">
+        <div className="mt-auto pt-2 border-t border-border/50">
           <StoryMeta story={story} />
         </div>
       </div>
@@ -188,7 +185,7 @@ function StoryMeta({ story }: { story: StoryCardData }) {
 
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-body-xs text-ink-subtle">
-      {story.author ? <span className="text-ink-muted">{story.author}</span> : null}
+      {story.author ? <span className="text-ink-muted font-medium">{story.author}</span> : null}
       {published && story.publishedAt ? (
         <time dateTime={story.publishedAt}>{published}</time>
       ) : null}
@@ -208,14 +205,45 @@ function StoryMeta({ story }: { story: StoryCardData }) {
 }
 
 export function StoryCoverFallback({ title }: { title: string }) {
+  const letter = title.charAt(0).toUpperCase();
+  const hash = Array.from(title).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  // Editorial palettes using defined semantic tokens & styled layers
+  const palettes = [
+    { bg: "bg-surface-inverse text-paper", border: "border-border-strong/30" },
+    { bg: "bg-primary text-on-primary", border: "border-primary-hover" },
+    { bg: "bg-accent text-on-accent", border: "border-accent-hover" },
+    { bg: "bg-surface-sunken text-ink", border: "border-border-strong" },
+  ];
+  
+  const palette = palettes[hash % palettes.length] ?? palettes[0]!;
+
   return (
-    <div className="absolute inset-0 grid place-items-center bg-surface-sunken">
-      <span
-        aria-hidden="true"
-        className="font-display text-display-md text-border-strong select-none"
-      >
-        {title.charAt(0).toUpperCase()}
-      </span>
+    <div className={cn("absolute inset-0 flex flex-col justify-between p-4 select-none overflow-hidden transition-transform duration-500 ease-out group-hover:scale-105", palette.bg)}>
+      <div className="absolute -right-4 -bottom-4 font-display text-[7rem] font-bold leading-none opacity-10 pointer-events-none">
+        {letter}
+      </div>
+      
+      <div className="flex items-center justify-between border-b border-current/20 pb-2">
+        <span className="font-ui text-[10px] font-semibold tracking-widest uppercase opacity-75">
+          Eagles Eye
+        </span>
+        <span className="size-1.5 rounded-full bg-current opacity-60" />
+      </div>
+
+      <div className="my-auto py-2 text-center">
+        <span className="font-display text-display-md font-semibold tracking-tight block">
+          {letter}
+        </span>
+        <span className="mt-1 block font-display text-body-xs italic opacity-85 line-clamp-1">
+          {title}
+        </span>
+      </div>
+
+      <div className="border-t border-current/20 pt-2 flex justify-between items-center text-[10px] font-ui opacity-75">
+        <span>PUBLIC CATALOGUE</span>
+        <span className="h-0.5 w-4 bg-current opacity-60" />
+      </div>
     </div>
   );
 }
@@ -239,7 +267,7 @@ export function FeaturedStory({
   const href = `/stories/${story.slug}`;
 
   return (
-    <article className="group relative overflow-hidden rounded-md border border-border bg-surface">
+    <article className="group relative overflow-hidden rounded-md border border-border bg-surface transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-lg">
       <div className="grid md:grid-cols-[1.15fr_1fr]">
         <div className="relative aspect-[4/3] overflow-hidden bg-surface-sunken md:aspect-auto md:min-h-80">
           {story.coverImageUrl ? (
@@ -249,19 +277,19 @@ export function FeaturedStory({
               fill
               sizes="(max-width: 768px) 100vw, 55vw"
               priority={priority}
-              className="object-cover"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
             />
           ) : (
-          <StoryCoverFallback title={story.title} />
+            <StoryCoverFallback title={story.title} />
           )}
         </div>
 
         <div className="flex flex-col justify-center gap-4 p-6 sm:p-8 lg:p-10">
           {eyebrow ? (
-            <p className="label-micro text-primary">{eyebrow}</p>
+            <p className="label-micro text-primary font-semibold">{eyebrow}</p>
           ) : null}
 
-          <h3 className="font-display text-display-md text-ink text-balance">
+          <h3 className="font-display text-display-md text-ink text-balance transition-colors group-hover:text-primary">
             <Link
               href={href}
               prefetch={false}
@@ -282,12 +310,12 @@ export function FeaturedStory({
             <StoryMeta story={story} />
           </div>
 
-          <span className="mt-1 inline-flex items-center gap-1.5 font-ui text-body-sm font-medium text-accent">
+          <span className="mt-2 inline-flex items-center gap-1.5 font-ui text-body-sm font-medium text-accent group-hover:text-accent-hover">
             Begin reading
             <svg
               aria-hidden="true"
               viewBox="0 0 16 16"
-              className="size-3.5 transition-transform group-hover:translate-x-0.5"
+              className="size-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"

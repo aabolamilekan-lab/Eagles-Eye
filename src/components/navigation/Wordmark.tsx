@@ -14,13 +14,13 @@ export function Wordmark({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-baseline gap-1.5 rounded-md",
+        "group inline-flex items-center gap-2 rounded-md transition-opacity hover:opacity-95",
         tone === "on-primary" && "inverted-focus",
       )}
     >
       <span
         className={cn(
-          "font-display text-heading-lg font-semibold tracking-[-0.02em]",
+          "font-display text-heading-lg font-bold tracking-[-0.025em]",
           tone === "on-primary" ? "text-on-primary" : "text-ink",
         )}
       >
@@ -29,8 +29,8 @@ export function Wordmark({
       <span
         aria-hidden="true"
         className={cn(
-          "size-1.5 rounded-full",
-          tone === "on-primary" ? "bg-on-primary" : "bg-primary",
+          "size-2 rounded-full transition-transform duration-300 ease-out group-hover:scale-125",
+          tone === "on-primary" ? "bg-on-primary shadow-xs" : "bg-primary",
         )}
       />
     </Link>

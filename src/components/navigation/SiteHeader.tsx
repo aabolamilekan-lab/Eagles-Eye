@@ -42,7 +42,7 @@ export function SiteHeader({
   }));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-primary-hover bg-primary">
+    <header className="sticky top-0 z-40 border-b border-primary-hover/80 bg-primary/95 backdrop-blur-sm shadow-xs">
       <div className="shell flex h-16 items-center gap-6">
         <div className="shrink-0">{brand}</div>
 
@@ -54,10 +54,10 @@ export function SiteHeader({
                   href={item.href}
                   aria-current={item.current ? "page" : undefined}
                   className={cn(
-                    "inverted-focus inline-flex h-11 items-center rounded-md px-3 font-ui text-body-sm transition-colors",
+                    "inverted-focus inline-flex h-10 items-center rounded-md px-3.5 font-ui text-body-sm font-medium transition-all duration-(--duration-fast)",
                     item.current
-                      ? "bg-primary-hover font-medium text-on-primary"
-                      : "text-on-primary hover:bg-primary-hover",
+                      ? "bg-primary-hover text-on-primary shadow-xs"
+                      : "text-on-primary/90 hover:bg-primary-hover/75 hover:text-on-primary",
                   )}
                 >
                   {item.label}
