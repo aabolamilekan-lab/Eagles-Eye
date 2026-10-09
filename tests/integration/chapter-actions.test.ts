@@ -564,7 +564,7 @@ describe.skipIf(!hasDatabase)("chapter actions (PostgreSQL)", () => {
     expect(rows.map((row) => row.chapterNumber)).toEqual([1, 2]);
   });
 
-  it("warns when deleting the last published chapter of a published story", async () => {
+  it("deletes the last published chapter of a published story with the normal notice", async () => {
     const story = await makeStory("delete-last", ContentStatus.PUBLISHED);
     const chapter = await makeChapter(story.id, 1, {
       title: "Only Live",
@@ -581,7 +581,7 @@ describe.skipIf(!hasDatabase)("chapter actions (PostgreSQL)", () => {
         }),
       ),
     );
-    expect(url).toContain("notice=deleted-empty");
+    expect(url).toContain("notice=deleted");
   });
 
   it("requires the exact title to delete", async () => {

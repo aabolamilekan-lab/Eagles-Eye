@@ -22,12 +22,6 @@ const NOTICES: Record<string, StoryNotice> = {
   saved: { tone: "success", title: "Changes saved" },
   deleted: { tone: "success", title: "Story deleted" },
   published: { tone: "success", title: "Story published" },
-  "publish-warning": {
-    tone: "warning",
-    title: "Story published without a published chapter",
-    message:
-      "It is already visible in the catalogue. Publish a chapter so readers can start reading it.",
-  },
   unpublished: {
     tone: "info",
     title: "Story unpublished",

@@ -217,18 +217,13 @@ export async function createPublishedChapter(
 /**
  * Publish the story itself.
  *
- * A story published with no published chapter lands on `publish-warning`
- * rather than `published`; the story is still publicly visible. Callers say
- * which notice they expect.
+ * Publishing always lands on `published`, whether or not the story has a
+ * published chapter; the story is publicly visible either way.
  */
-export async function publishStory(
-  page: Page,
-  storyId: string,
-  notice: "published" | "publish-warning" = "published",
-): Promise<void> {
+export async function publishStory(page: Page, storyId: string): Promise<void> {
   await page.goto(`/admin/stories/${storyId}/edit`);
   await page.getByRole("button", { name: "Publish" }).click();
-  await expect(page).toHaveURL(new RegExp(`/edit\\?notice=${notice}$`));
+  await expect(page).toHaveURL(/\/edit\?notice=published$/);
 }
 
 /** Unpublish the story from its edit screen. */

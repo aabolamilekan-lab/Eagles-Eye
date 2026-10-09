@@ -48,7 +48,7 @@ Not for `/admin/**`, storage internals, or authentication.
 ### Public-visibility enforcement
 
 - Every reader read goes through `src/lib/queries/public/`. A page or component writing `status: "PUBLISHED"` itself is a bug: the filter then has two owners and the next caller forgets it.
-- A story is public as soon as it is `PUBLISHED`, whether or not it has a published chapter. The detail query returns `{ story, chapters, chapterCount, hasPublishedChapters }` so the page distinguishes "readable" from "published but not yet readable" instead of hiding the story.
+- A story is public as soon as it is `PUBLISHED`, whether or not it has a published chapter. The detail query returns `{ story, chapters, chapterCount, hasPublishedChapters }`; the page gates the chapter list and the "Start reading" action on `hasPublishedChapters` instead of hiding the story. It shows no chapter-related notice.
 - Chapter counts, category counts, rails, and related lists count only `PUBLISHED` chapters. A count including drafts leaks unpublished volume through arithmetic.
 - Prev/next resolve in the query layer (`chapters.ts`) over the published chapter list the by-index also needs: ordered by `chapterNumber`, `status = PUBLISHED` only, bodies not selected. Never compute neighbours in the view, and never offer an unpublished sibling.
 - Positions shown to the reader are the 1-based position in the published sequence, not the stored `chapterNumber`; a gap left by a draft cannot leak unpublished volume through arithmetic.
@@ -123,7 +123,7 @@ Not for `/admin/**`, storage internals, or authentication.
 Unit (Vitest):
 
 - Prev/next resolution against a fixture with gaps in `chapterNumber` and interleaved drafts.
-- The no-published-chapters decision: a `PUBLISHED` story with zero published chapters, and with one.
+- The no-published-chapters decision: a `PUBLISHED` story with zero published chapters still resolves, with an empty chapter list and no start action.
 - Deterministic date and short-description formatting independent of the ambient time zone.
 - Page clamping for `0`, `-1`, `abc`, `999999`, and a page beyond the last.
 - The renderer offsets heading levels, strips `<script>`, and strips a `javascript:` href.
@@ -131,7 +131,7 @@ Unit (Vitest):
 Integration (real PostgreSQL):
 
 - A `DRAFT` story holding a `PUBLISHED` chapter is absent from home, listing, category, related rails, sitemap, and every count.
-- A `PUBLISHED` story whose only chapter is `DRAFT` renders the empty state and offers no siblings.
+- A `PUBLISHED` story whose only chapter is `DRAFT` resolves with an empty chapter list, no start action, and no siblings.
 - Prev/next skip `DRAFT` and `ARCHIVED` chapters in both directions.
 - Home and category counts match seeded fixtures exactly, drafts excluded.
 
@@ -139,7 +139,7 @@ E2E (Playwright):
 
 - Browse to a story, read chapter one, follow next to the last, confirm no next at the end and no previous at the start.
 - Open by-index, jump to a middle chapter, confirm `aria-current` moved.
-- Land on a story with no published chapters and assert the explicit empty state, not a blank page.
+- Land on a story with no published chapters and assert the page renders with no chapter list and no start action, not a crash.
 - From `/stories`, search `q`, filter by category and tag, sort, paginate back and forth, and confirm every filter survives; land on a filtered view with no matches and assert the distinct "no matches" empty state.
 - Axe clean on every reader route; tab through header, chapter nav, and pager; no horizontal overflow at 375px; progress present and not overlapping the prose column.
 
@@ -152,7 +152,7 @@ E2E (Playwright):
 | Prev/next computed in the component | Offers a draft sibling, fetches every chapter | Resolve neighbours in the query layer |
 | Counts include drafts | Leaks unpublished volume | Count published rows only |
 | `findMany` then `.slice()` | Ships every row to trim it | Capped, ordered `take` in the query |
-| Empty chapter list with no explanation | Reads as a broken story | Explicit "no published chapters yet" state |
+| Chapter-related notice on an unreadable story | Nagging copy about a missing chapter | Omit the chapter list and start action silently |
 | Prose wider than 75ch | Long-form readability failure | `max-w-[70ch]` block |
 | `fixed` progress bar over the text | Covers the prose column | `sticky` inside the column, reduced-motion aware |
 | Client-rendered relative timestamps | Hydration mismatch, unstable output | Server format with fixed locale and zone |
@@ -162,8 +162,8 @@ E2E (Playwright):
 ## Completion checklist
 
 - [ ] Every reader read goes through `src/lib/queries/public/`; no call site writes the status filter.
-- [ ] Visibility requires only that the story is `PUBLISHED`; a published story with no published chapters is listed and indexable, and its page shows the empty state.
-- [ ] Zero published chapters renders a designed empty state with no chapter list and no action.
+- [ ] Visibility requires only that the story is `PUBLISHED`; a published story with no published chapters is listed and indexable, and its page omits the chapter list and start action without a chapter-related notice.
+- [ ] Zero published chapters renders no chapter list and no start action, and no chapter-related notice.
 - [ ] Prev/next and by-index offer `PUBLISHED` siblings only, resolved in the query layer.
 - [ ] All counts, rails, and related lists exclude `DRAFT` and `ARCHIVED`; non-published slugs return the same `notFound()` as unknown ones.
 - [ ] Prose measure 65–75 characters, one centred column, nothing overlaying the text.

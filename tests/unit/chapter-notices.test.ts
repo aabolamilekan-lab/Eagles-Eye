@@ -4,9 +4,13 @@ import { resolveChapterNotice } from "@/lib/chapters/notices";
 describe("resolveChapterNotice", () => {
   it("maps known keys to safe alerts", () => {
     expect(resolveChapterNotice("created")?.tone).toBe("success");
-    expect(resolveChapterNotice("deleted-empty")?.tone).toBe("warning");
+    expect(resolveChapterNotice("deleted")?.tone).toBe("success");
     expect(resolveChapterNotice("archived")?.tone).toBe("warning");
     expect(resolveChapterNotice("reordered")?.title).toMatch(/order/i);
+  });
+
+  it("no longer maps the removed delete warning", () => {
+    expect(resolveChapterNotice("deleted-empty")).toBeNull();
   });
 
   it("ignores an unknown key rather than reflecting it", () => {

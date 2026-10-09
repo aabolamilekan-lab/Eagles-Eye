@@ -342,14 +342,7 @@ export async function createStoryAction(
   logger.info("story.created", { storyId: createdId });
 
   if (publish) {
-    const publishedChapters = await prisma.chapter.count({
-      where: { storyId: createdId, status: ContentStatus.PUBLISHED },
-    });
-    redirect(
-      `/admin/stories/${createdId}/edit?notice=${
-        publishedChapters === 0 ? "publish-warning" : "published"
-      }`,
-    );
+    redirect(`/admin/stories/${createdId}/edit?notice=published`);
   }
 
   redirect(`/admin/stories/${createdId}/edit?notice=created`);
@@ -515,12 +508,7 @@ export async function updateStoryAction(
   }
 
   let notice = "saved";
-  if (statusAction === "publish") {
-    const publishedChapters = await prisma.chapter.count({
-      where: { storyId: existing.id, status: ContentStatus.PUBLISHED },
-    });
-    notice = publishedChapters === 0 ? "publish-warning" : "published";
-  } else if (statusAction) {
+  if (statusAction) {
     notice = STATUS_NOTICE[statusAction];
   } else if (feature === true) {
     notice = "featured";
@@ -641,15 +629,7 @@ async function runStatusAction(
     };
   }
 
-  let notice = STATUS_NOTICE[action];
-  if (action === "publish") {
-    const publishedChapters = await prisma.chapter.count({
-      where: { storyId: story.id, status: ContentStatus.PUBLISHED },
-    });
-    if (publishedChapters === 0) {
-      notice = "publish-warning";
-    }
-  }
+  const notice = STATUS_NOTICE[action];
 
   revalidatePublicStoryCaches();
   logger.info("story.transition.applied", {

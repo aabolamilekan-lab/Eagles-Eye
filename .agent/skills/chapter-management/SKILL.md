@@ -51,7 +51,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
   4. On a `P2002` or serialization failure, retry the transaction at most once, then return a typed error telling the admin the list changed and to reload.
 - The reorder payload is a full ordered list of chapter ids for that story. Validate that the id set exactly equals the stored id set for the story; a partial or mismatched list is a typed error, never a silent partial reorder.
 - Delete and compaction happen together. `deleteChapter` deletes the row and renumbers the remaining chapters to `1..n` in the same transaction. Gaps in `chapterNumber` are never left behind.
-- Deleting the last remaining chapter of a published story is allowed, but the action returns a warning because the story then has no published chapters and the public detail page falls back to the explicit empty state.
+- Deleting the last remaining chapter of a published story is allowed and succeeds with the normal `deleted` notice. The public detail page then omits the chapter list and the start action, with no chapter-related notice.
 - Rich text pipeline:
   - Tiptap runs client side only and its output is untrusted input. `chapter-editor.tsx` submits raw HTML as a string field.
   - The action calls `sanitizeRichText` from `src/lib/sanitize/rich-text.ts` before any write, and stores only the sanitized HTML in `content`. Never store what the editor sent.
@@ -108,7 +108,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
   - Attempt a reorder payload missing an id, and assert a typed error and unchanged data.
   - Run two concurrent reorders of the same story and assert final `chapterNumber` values are contiguous and unique.
   - Delete the middle chapter and assert the remaining `chapterNumber` is renumbered contiguously in the same transaction.
-  - Publish one chapter of a draft story and assert the public story detail query now returns it; unpublish and assert it returns the empty state again.
+  - Publish one chapter of a draft story and assert the public story detail query now returns it; unpublish and assert it returns an empty chapter list with no start action again.
   - Store `<script>alert(1)</script>` and an `onerror` attribute in `content`, then assert neither survives in the stored row.
   - Assert a `DRAFT` chapter never appears in the public chapter list, nav, or sitemap query.
 - Authorization tests: a non-admin session, and an IDOR attempt passing another story's chapter id with a valid session, must both fail.

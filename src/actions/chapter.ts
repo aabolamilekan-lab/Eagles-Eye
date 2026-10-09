@@ -550,11 +550,8 @@ export async function deleteChapterAction(
     };
   }
 
-  let remainingPublished = 0;
-  let storyStatus: ContentStatus = ContentStatus.DRAFT;
-
   try {
-    const result = await withSerializableRetry(() =>
+    await withSerializableRetry(() =>
       prisma.$transaction(
         async (tx) => {
           await tx.chapter.delete({ where: { id: chapter.id } });
@@ -562,7 +559,7 @@ export async function deleteChapterAction(
           const remaining = await tx.chapter.findMany({
             where: { storyId: input.storyId },
             orderBy: [{ chapterNumber: "asc" }, { id: "asc" }],
-            select: { id: true, status: true },
+            select: { id: true },
           });
 
           if (remaining.length > 0) {
@@ -572,25 +569,10 @@ export async function deleteChapterAction(
               remaining.map((row) => row.id),
             );
           }
-
-          const story = await tx.story.findUnique({
-            where: { id: input.storyId },
-            select: { status: true },
-          });
-
-          return {
-            publishedCount: remaining.filter(
-              (row) => row.status === ContentStatus.PUBLISHED,
-            ).length,
-            storyStatus: story?.status ?? ContentStatus.DRAFT,
-          };
         },
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       ),
     );
-
-    remainingPublished = result.publishedCount;
-    storyStatus = result.storyStatus;
   } catch (error) {
     logger.error("chapter.delete.failed", {
       chapterId: chapter.id,
@@ -608,13 +590,7 @@ export async function deleteChapterAction(
     chapterId: chapter.id,
   });
 
-  // A published story losing its last published chapter vanishes from public
-  // view; the warning names that consequence precisely.
-  const notice =
-    storyStatus === ContentStatus.PUBLISHED && remainingPublished === 0
-      ? "deleted-empty"
-      : "deleted";
-  redirect(`/admin/stories/${input.storyId}/chapters?notice=${notice}`);
+  redirect(`/admin/stories/${input.storyId}/chapters?notice=deleted`);
 }
 
 export async function reorderChaptersAction(

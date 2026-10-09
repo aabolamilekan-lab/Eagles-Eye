@@ -26,8 +26,8 @@ import { queryPublishedChapterReader } from "@/lib/queries/public/chapters";
  *
  * A story is public as soon as it is `PUBLISHED`, whether or not any chapter is
  * published yet. A published story with only drafts is still listed; its detail
- * page renders an explicit "no published chapters yet" state. Counts of
- * chapters elsewhere remain published-only, so unpublished volume never leaks.
+ * page omits the chapter list and start action. Counts of chapters elsewhere
+ * remain published-only, so unpublished volume never leaks.
  *
  * Reads are cached and tagged; admin publish/unpublish/delete actions
  * invalidate the tags via `revalidateTag` (AGENTS.md section 6).

@@ -11,7 +11,6 @@ import { StoryCoverFallback, StoryGrid } from "@/components/stories/StoryCard";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { formatPublishedDate } from "@/lib/format";
 import { getPublishedStoryDetail } from "@/lib/queries/public/stories";
 import { parseContentSlug } from "@/lib/validation/story";
@@ -24,9 +23,8 @@ import { buildStoryPageMetadata } from "@/lib/seo/metadata";
  * Rendered on demand from PostgreSQL and cached through the tagged query layer.
  * A `PUBLISHED` story resolves whether or not it has a published chapter; every
  * other slug returns the same `notFound()` as an unknown one. The chapter list
- * is published-only and the "Start reading" action is omitted when there is no
- * published chapter, in which case the page shows its explicit empty state
- * (AGENTS.md section 6).
+ * is published-only and both it and the "Start reading" action are omitted when
+ * there is no published chapter (AGENTS.md section 6).
  */
 export const dynamic = "force-dynamic";
 
@@ -217,21 +215,11 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
           </section>
         ) : null}
 
-        <div className="mt-(--spacing-section) max-w-3xl">
-          {story.hasPublishedChapters ? (
+        {story.hasPublishedChapters ? (
+          <div className="mt-(--spacing-section) max-w-3xl">
             <ChapterList storySlug={story.slug} chapters={story.chapters} />
-          ) : (
-            <EmptyState
-              title="No published chapters yet"
-              description="This story is published, but none of its chapters are. It will become readable the moment the first chapter is published."
-              action={
-                <ButtonLink href="/stories" variant="secondary">
-                  Browse other stories
-                </ButtonLink>
-              }
-            />
-          )}
-        </div>
+          </div>
+        ) : null}
       </div>
 
       {relatedStories.length > 0 ? (

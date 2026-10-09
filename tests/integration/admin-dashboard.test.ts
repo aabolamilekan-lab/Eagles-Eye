@@ -128,12 +128,6 @@ describe.skipIf(!hasDatabase)("admin dashboard (PostgreSQL)", () => {
     expect(after.chapters.published - before.chapters.published).toBe(2);
   });
 
-  it("flags a published story with no published chapter", async () => {
-    const after = await getAdminDashboard(now);
-
-    expect(after.storiesUnreadable - before.storiesUnreadable).toBe(1);
-  });
-
   it("counts the recorded view and lists the newest first", async () => {
     const after = await getAdminDashboard(now);
 

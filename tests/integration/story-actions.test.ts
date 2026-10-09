@@ -286,7 +286,7 @@ describe.skipIf(!hasDatabase)("story actions (PostgreSQL)", () => {
     expect(story?.slug).toBe(`${PREFIX}-published-rename-2`);
   });
 
-  it("publishes a draft and warns when it has no published chapter", async () => {
+  it("publishes a draft with no published chapter using the normal notice", async () => {
     const story = await prisma.story.create({
       data: { title: "Draft To Publish", slug: `${PREFIX}-publish-empty` },
       select: { id: true },
@@ -296,7 +296,7 @@ describe.skipIf(!hasDatabase)("story actions (PostgreSQL)", () => {
       actions.publishStoryAction(INITIAL, form({ id: story.id })),
     );
 
-    expect(url).toContain("notice=publish-warning");
+    expect(url).toContain("notice=published");
 
     const after = await prisma.story.findUnique({
       where: { id: story.id },
@@ -538,7 +538,7 @@ describe.skipIf(!hasDatabase)("story actions (PostgreSQL)", () => {
       ),
     );
 
-    expect(url).toContain("notice=publish-warning");
+    expect(url).toContain("notice=published");
 
     const after = await prisma.story.findUnique({
       where: { id: storyIdFromEditUrl(url) },

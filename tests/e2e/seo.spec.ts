@@ -315,7 +315,7 @@ test.describe("seo", () => {
       shortDescription:
         "Published with no chapter yet: the story is still listed and indexable.",
     });
-    await publishStory(page, storyId, "publish-warning");
+    await publishStory(page, storyId);
 
     await page.goto("/stories/seo-no-chapters");
     await expect(page).toHaveURL(/\/stories\/seo-no-chapters$/);

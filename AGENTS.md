@@ -232,8 +232,8 @@ PostgreSQL is the source of truth. Prisma owns the schema. Migrations are commit
 
 **Only `PUBLISHED` stories and `PUBLISHED` chapters are public.** A published
 story is public whether or not it has a published chapter: an unreadable story is
-still listed and indexable, and its detail page renders a proper "no published
-chapters yet" state instead of being hidden.
+still listed and indexable. Its detail page omits the chapter list and the
+"Start reading" action rather than showing a chapter-related notice.
 
 `DRAFT` and `ARCHIVED` must never appear in:
 
@@ -255,8 +255,8 @@ chapters yet" state instead of being hidden.
   internally. Public components never write that filter themselves, so it cannot be
   forgotten at a call site.
 - A published story is public regardless of whether any chapter is published. Readable
-  chapters are published-only; the story detail page renders a proper "no published
-  chapters yet" state when none is published.
+  chapters are published-only; the story detail page omits the chapter list and the
+  "Start reading" action when none is published, without any chapter-related notice.
 - Chapter navigation must only offer published siblings.
 - Sitemap is generated from the shared public query layer, never from an admin query.
 - Cache public reads (`revalidate`, `unstable_cache` or equivalent) and invalidate on

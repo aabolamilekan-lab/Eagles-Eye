@@ -127,7 +127,7 @@ Renaming the slug of a published story breaks every inbound link, bookmark, and 
 | --- | --- | --- |
 | Empty `Story.shortDescription` | Null or whitespace after trim | Derive from the first published chapter's `contentText`, clamped to 155 characters on a word boundary, server-side |
 | Excerpt under 70 characters | Length check | Treat as thin and prefer the longer, still faithful derived fallback |
-| No published chapters | `hasPublishedChapters` is false | Keep indexable: render the explicit empty state, include the story in the sitemap, emit `Article` when a description exists |
+| No published chapters | `hasPublishedChapters` is false | Keep indexable: omit the chapter list and start action, include the story in the sitemap, emit `Article` when a description exists |
 | Missing cover | `coverImage` is null | Default OG image, placeholder in the grid, `image` still a real absolute URL |
 | No tags and no category | Both null | Omit `articleSection` and `keywords` rather than emitting empty values |
 | Chapter under roughly 200 words | `wordCount` from `contentText` | Keep indexable, exclude from rails. Never pad it |
@@ -156,8 +156,8 @@ Unit (Vitest):
 
 Integration (real PostgreSQL):
 
-- The sitemap contains every published story with a published chapter plus its published chapters, and no draft, archived, `/admin`, `/admin/login`, or `/search` entry; `lastmod` equals `publishedAt`, not request time, and two builds are identical.
-- A story whose chapters are all `DRAFT` is absent from the sitemap and its detail metadata sets `noindex`. Sitemap rows match the public query layer exactly, and unpublishing removes the story after revalidation.
+- The sitemap contains every published story whether or not it has a published chapter, plus its published chapters, and no draft, archived, `/admin`, `/admin/login`, or `/search` entry; `lastmod` equals `publishedAt`, not request time, and two builds are identical.
+- A story whose chapters are all `DRAFT` is still indexable and present in the sitemap. Sitemap rows match the public query layer exactly, and unpublishing removes the story after revalidation.
 
 E2E (Playwright):
 
@@ -181,7 +181,7 @@ E2E (Playwright):
 | Sitemap built from the admin query | Publishes drafts and archived stories | Build from `src/lib/queries/public/` |
 | `robots.txt` used to protect `/admin` | A crawl hint is not access control | Server-side guards in layout and actions |
 | Renaming a published slug with no decision | Breaks inbound links silently | Redirect record, or a written trade-off |
-| No published chapters but left indexable | Indexes an empty page as thin content | `noindex`, omit from sitemap, no `Article` node |
+| Hiding a published story that has no published chapter | Contradicts the public-visibility rule | Keep it listed, indexable, and in the sitemap; omit the chapter list silently |
 | Two `h1`s, one from stored content | Breaks hierarchy and the document outline | Offset content headings in the renderer |
 | Canonical on a `noindex` page, or `?page=1` kept | Contradictory signals, duplicate URL | No canonical when `noindex`; canonical without it |
 | JSON-LD inlined in a page component | `</script>` in a title breaks out | One serialization component, `<` escaped |

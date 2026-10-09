@@ -134,7 +134,7 @@ Unit (Vitest):
 Integration (real PostgreSQL):
 
 - Every action and handler rejects an unauthenticated call and a session lacking the capability, and every illegal transition is refused with the row unchanged.
-- Publishing a story with no published chapters succeeds with a warning; the story is still publicly visible, and the detail page shows the empty state. Publish, verify public visibility, unpublish, verify removal everywhere including the sitemap, and verify revalidation ran.
+- Publishing a story with no published chapters succeeds with the normal notice; the story is still publicly visible, and the detail page omits the chapter list and start action with no chapter-related notice. Publish, verify public visibility, unpublish, verify removal everywhere including the sitemap, and verify revalidation ran.
 - Reorder succeeds under the unique constraint and leaves a dense sequence, while a failing transaction leaves the original order intact.
 - Bulk publish touches exactly the selected records and returns the real count; bulk tag replacement leaves no orphaned `StoryTag` rows; story deletion removes chapters, join rows, and the cover object.
 - Category and tag deletion is refused while referenced and names the blockers; statistics counts match seeded fixtures, including drafts and archived rows.

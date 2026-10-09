@@ -8,7 +8,6 @@ describe("resolveStoryNotice", () => {
       "saved",
       "deleted",
       "published",
-      "publish-warning",
       "unpublished",
       "archived",
       "restored",
@@ -33,7 +32,7 @@ describe("resolveStoryNotice", () => {
     expect(resolveStoryNotice(["saved", "evil"])?.title).toBe("Changes saved");
   });
 
-  it("reports the publish warning tone for an unreadable story", () => {
-    expect(resolveStoryNotice("publish-warning")?.tone).toBe("warning");
+  it("no longer maps the removed publish warning", () => {
+    expect(resolveStoryNotice("publish-warning")).toBeNull();
   });
 });

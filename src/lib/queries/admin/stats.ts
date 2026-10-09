@@ -59,8 +59,6 @@ export interface AdminDashboard {
   totalStoryViews: number;
   /** Individual anonymous view records on file. A different measure to the counter. */
   recordedViews: number;
-  /** Published stories with no published chapter: live but not yet readable. */
-  storiesUnreadable: number;
   storiesPublishedThisYear: number;
   chaptersPublishedThisYear: number;
   recentStories: RecentStory[];
@@ -126,7 +124,6 @@ export async function getAdminDashboard(
     tags,
     viewSum,
     recordedViews,
-    storiesUnreadable,
     storiesPublishedThisYear,
     chaptersPublishedThisYear,
     recentStories,
@@ -139,12 +136,6 @@ export async function getAdminDashboard(
     prisma.tag.count(),
     prisma.story.aggregate({ _sum: { views: true } }),
     prisma.storyView.count(),
-    prisma.story.count({
-      where: {
-        status: ContentStatus.PUBLISHED,
-        chapters: { none: { status: ContentStatus.PUBLISHED } },
-      },
-    }),
     prisma.story.count({ where: { publishedAt: publishedThisYear } }),
     prisma.chapter.count({ where: { publishedAt: publishedThisYear } }),
     prisma.story.findMany({
@@ -199,7 +190,6 @@ export async function getAdminDashboard(
     tags,
     totalStoryViews: viewSum._sum.views ?? 0,
     recordedViews,
-    storiesUnreadable,
     storiesPublishedThisYear,
     chaptersPublishedThisYear,
     recentStories: recentStories.map((story) => ({

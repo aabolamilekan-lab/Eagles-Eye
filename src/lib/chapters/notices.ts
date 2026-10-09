@@ -21,12 +21,6 @@ const NOTICES: Record<string, ChapterNotice> = {
   },
   saved: { tone: "success", title: "Changes saved" },
   deleted: { tone: "success", title: "Chapter deleted" },
-  "deleted-empty": {
-    tone: "warning",
-    title: "Chapter deleted — this story has no published chapters",
-    message:
-      "The story stays in the catalogue, but readers cannot read it until another chapter is published.",
-  },
   reordered: { tone: "success", title: "Chapter order saved" },
   published: { tone: "success", title: "Chapter published" },
   unpublished: {

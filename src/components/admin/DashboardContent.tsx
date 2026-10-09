@@ -61,7 +61,6 @@ export async function DashboardContent() {
           tags={data.tags}
           storiesPublishedThisYear={data.storiesPublishedThisYear}
           chaptersPublishedThisYear={data.chaptersPublishedThisYear}
-          storiesUnreadable={data.storiesUnreadable}
           year={now.getUTCFullYear()}
         />
       </div>

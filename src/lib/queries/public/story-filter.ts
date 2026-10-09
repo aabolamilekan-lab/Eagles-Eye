@@ -6,10 +6,11 @@ import type { StorySort } from "@/lib/validation/story";
  *
  * This is the single owner of the public-visibility predicate (AGENTS.md
  * section 6): a story is public as soon as it is `PUBLISHED`, whether or not any
- * chapter is published yet. An unreadable story still renders an explicit
- * "no published chapters yet" state rather than being hidden. Kept free of
- * `next/cache` and the Prisma client so the builder is unit-testable and so the
- * cached read module cannot create an import cycle with it.
+ * chapter is published yet. An unreadable story is still listed and indexable;
+ * its detail page omits the chapter list and start action rather than being
+ * hidden. Kept free of `next/cache` and the Prisma client so the builder is
+ * unit-testable and so the cached read module cannot create an import cycle
+ * with it.
  */
 
 export const PUBLIC_STORY_WHERE = {

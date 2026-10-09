@@ -66,7 +66,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
 
 - `restoreStory` must not auto-publish chapters. Republishing chapters is an explicit admin action.
 - `setFeatured` requires `status = PUBLISHED`. Featuring a `DRAFT` or `ARCHIVED` story returns a typed error, because the featured rail is a public read.
-- A story is publicly visible as soon as it is `PUBLISHED`. `publishStory` returns a warning field when it publishes a story with zero published chapters; it still succeeds, the story is listed and indexable, and the public detail page renders the "no published chapters yet" state.
+- A story is publicly visible as soon as it is `PUBLISHED`, whether or not it has a published chapter. `publishStory` always returns the normal `published` notice; the story is listed and indexable, and the public detail page simply omits the chapter list and start action when none is published. No chapter-related warning is shown.
 - Cover lifecycle in `attachCover` and `removeCover`:
   - `attachCover` writes the new key in one transaction, then deletes the previous object after the transaction commits. Never delete the old object before the new key is durable.
   - `removeCover` sets `coverImage` to `null` in a transaction, then deletes the object.
@@ -95,7 +95,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
   - The transition table, including the illegal `ARCHIVED -> PUBLISHED` direct jump and featuring a `DRAFT`.
 - Integration tests in `tests/integration/story-actions.test.ts` against a real PostgreSQL test database:
   - Create, update, and delete with tag replacement, asserting `StoryTag` rows match exactly.
-  - Publish a story with zero published chapters, then assert the public detail query hides it or returns the explicit empty state.
+  - Publish a story with zero published chapters, then assert the public detail query resolves the story with an empty chapter list and no chapter-related notice.
   - Unpublish and assert the story disappears from the public list, the sitemap query, and search.
   - Archive and assert chapters were cascaded and that restore does not republish them.
   - Delete and assert no orphaned `Chapter`, `StoryTag`, or cover object remains.
@@ -125,7 +125,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
 - [ ] Published slug changes write a redirect or require explicit acknowledgement.
 - [ ] Excerpts are server-derived plain text.
 - [ ] Category and tag writes are verified and transactional.
-- [ ] Every status transition matches the matrix; no path publishes a story without checking published chapters.
+- [ ] Every status transition matches the matrix; publishing succeeds and shows the normal notice whether or not a chapter is published.
 - [ ] Cover replace and remove delete orphaned objects after commit.
 - [ ] Admin lists paginate and use a fixed `orderBy` allowlist.
 - [ ] Cache invalidation runs on every successful mutation.

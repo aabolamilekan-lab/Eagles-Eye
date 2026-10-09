@@ -118,7 +118,7 @@ npm run build
 
 - A `DRAFT` or `ARCHIVED` story is absent from the home page, list, search, category page, tag page, sitemap, and JSON endpoints.
 - A `DRAFT` chapter is absent from sibling navigation and returns no page.
-- A published story with no published chapters renders the empty state rather than an error.
+- A published story with no published chapters renders the story page with no chapter list and no start action, rather than an error or a chapter-related notice.
 
 **E2E critical journeys (Playwright)**
 
