@@ -134,7 +134,7 @@ Unit (Vitest):
 Integration (real PostgreSQL):
 
 - Every action and handler rejects an unauthenticated call and a session lacking the capability, and every illegal transition is refused with the row unchanged.
-- Publishing with no published chapters is refused unless acknowledged. Publish, verify public visibility, unpublish, verify removal everywhere including the sitemap, and verify revalidation ran.
+- Publishing a story with no published chapters succeeds with a warning; the story is still publicly visible, and the detail page shows the empty state. Publish, verify public visibility, unpublish, verify removal everywhere including the sitemap, and verify revalidation ran.
 - Reorder succeeds under the unique constraint and leaves a dense sequence, while a failing transaction leaves the original order intact.
 - Bulk publish touches exactly the selected records and returns the real count; bulk tag replacement leaves no orphaned `StoryTag` rows; story deletion removes chapters, join rows, and the cover object.
 - Category and tag deletion is refused while referenced and names the blockers; statistics counts match seeded fixtures, including drafts and archived rows.
@@ -150,7 +150,7 @@ E2E (Playwright):
 - A permission lookup that returns `true` for an unrecognized capability.
 - Reordering chapters sequentially, which violates `("storyId", "chapterNumber")`, leaving gaps or a half-applied swap, or swapping with no transaction.
 - Editing `status` as a form field, or deleting a story without its cover object.
-- Publishing a story with no published chapters, producing an empty public page, or publishing a chapter on an archived story and leaking content.
+- Publishing a chapter on an archived story and leaking content, or a draft cover served publicly.
 - Forgetting to revalidate, so admin and public disagree. Tag replacement as upsert loops, leaving orphaned join rows.
 - An unbounded admin list, an N+1 chapter count per row, or a client sort field interpolated into `orderBy`.
 - A stale selection widening a bulk delete beyond what the admin saw.

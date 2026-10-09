@@ -67,14 +67,9 @@ describe("seed contract", () => {
     }
   });
 
-  it("publishes only stories that have at least one published chapter", () => {
+  it("keeps story status and publishedAt consistent", () => {
     for (const story of seedStories) {
-      const publishedChapters = story.chapters.filter(
-        (chapter) => chapter.status === ContentStatus.PUBLISHED,
-      );
-
       if (story.status === ContentStatus.PUBLISHED) {
-        expect(publishedChapters.length, story.slug).toBeGreaterThan(0);
         expect(story.publishedAt, story.slug).toBeInstanceOf(Date);
       }
 

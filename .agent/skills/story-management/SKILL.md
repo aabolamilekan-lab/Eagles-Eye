@@ -66,7 +66,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
 
 - `restoreStory` must not auto-publish chapters. Republishing chapters is an explicit admin action.
 - `setFeatured` requires `status = PUBLISHED`. Featuring a `DRAFT` or `ARCHIVED` story returns a typed error, because the featured rail is a public read.
-- A story is publicly visible only when at least one `PUBLISHED` chapter exists. `publishStory` returns a warning field when it publishes a story with zero published chapters; it still succeeds, and the public detail page renders the "no published chapters yet" state.
+- A story is publicly visible as soon as it is `PUBLISHED`. `publishStory` returns a warning field when it publishes a story with zero published chapters; it still succeeds, the story is listed and indexable, and the public detail page renders the "no published chapters yet" state.
 - Cover lifecycle in `attachCover` and `removeCover`:
   - `attachCover` writes the new key in one transaction, then deletes the previous object after the transaction commits. Never delete the old object before the new key is durable.
   - `removeCover` sets `coverImage` to `null` in a transaction, then deletes the object.

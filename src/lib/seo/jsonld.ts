@@ -77,18 +77,18 @@ export interface StoryJsonLdInput {
   updatedAt: string;
   category: { name: string } | null;
   tags: Array<{ name: string }>;
-  hasPublishedChapters: boolean;
 }
 
 /**
  * The story page emits two nodes: `Story` (the reading surface) and `Article`
  * (what aggregators expect for a dated work). Both carry the same core fields;
- * both are dropped when the story has no published chapter or no description,
- * because an unreadable story is not indexable content.
+ * both are dropped only when the story has no description, because an Article
+ * without a description is a thin signal. A published story is indexable even
+ * before its first chapter is published.
  */
 export function buildStoryJsonLd(story: StoryJsonLdInput): object[] {
   const description = clampDescription(story.seoDescription);
-  if (!description || !story.hasPublishedChapters) {
+  if (!description) {
     return [];
   }
 

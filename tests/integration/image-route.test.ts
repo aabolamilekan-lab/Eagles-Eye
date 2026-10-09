@@ -113,7 +113,7 @@ describe.skipIf(!hasDatabase)("cover image route", () => {
       },
     });
 
-    // Published but with no published chapter: not publicly visible.
+    // Published with no published chapter: the story is public, so the cover is.
     await prisma.story.create({
       data: {
         title: "Route Empty",
@@ -171,12 +171,10 @@ describe.skipIf(!hasDatabase)("cover image route", () => {
     expect(response.headers.get("cache-control")).toContain("private");
   });
 
-  it("hides a published story with no published chapter from readers", async () => {
-    expect((await get(noChapterKey)).status).toBe(404);
-  });
-
-  it("serves that story to an authorized admin", async () => {
-    vi.mocked(getSession).mockResolvedValue(adminSession());
-    expect((await get(noChapterKey)).status).toBe(200);
+  it("serves a published story's cover even when no chapter is published yet", async () => {
+    const response = await get(noChapterKey);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("image/webp");
+    expect(response.headers.get("cache-control")).toContain("immutable");
   });
 });

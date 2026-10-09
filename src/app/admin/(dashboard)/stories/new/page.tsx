@@ -25,7 +25,7 @@ export default async function AdminNewStoryPage() {
     <>
       <AdminPageHeader
         title="New story"
-        description="Start a draft. Nothing is visible to readers until you publish it with at least one published chapter."
+        description="Start a draft. Nothing is visible to readers until you publish it. A published story appears in the catalogue; add a chapter so readers can start reading."
       />
       <StoryEditor
         mode="create"

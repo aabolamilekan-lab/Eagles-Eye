@@ -73,12 +73,14 @@ describe.skipIf(!hasDatabase)("sitemap (PostgreSQL)", () => {
       },
     });
 
-    // Published story with only a draft chapter: nothing enumerable.
+    // Published story with only a draft chapter: the story is listed, the
+    // chapter is not enumerable.
     await prisma.story.create({
       data: {
         title: "Sitemap No Chapters",
         slug: `${PREFIX}-nochapters`,
         status: ContentStatus.PUBLISHED,
+        publishedAt: new Date("2026-02-01T00:00:00.000Z"),
         chapters: {
           create: [
             {
@@ -164,10 +166,10 @@ describe.skipIf(!hasDatabase)("sitemap (PostgreSQL)", () => {
     ).toBe(false);
   });
 
-  it("never lists a published story whose only chapter is a draft", async () => {
+  it("lists a published story that has no published chapter, but not its draft chapter", async () => {
     const listed = urls(await querySitemap(baseUrl));
 
-    expect(listed).not.toContain(`${baseUrl}/stories/${PREFIX}-nochapters`);
+    expect(listed).toContain(`${baseUrl}/stories/${PREFIX}-nochapters`);
     expect(
       listed.includes(
         `${baseUrl}/stories/${PREFIX}-nochapters/chapter/${PREFIX}-nochapters-1`,

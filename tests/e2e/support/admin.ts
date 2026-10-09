@@ -218,7 +218,8 @@ export async function createPublishedChapter(
  * Publish the story itself.
  *
  * A story published with no published chapter lands on `publish-warning`
- * rather than `published`; callers say which notice they expect.
+ * rather than `published`; the story is still publicly visible. Callers say
+ * which notice they expect.
  */
 export async function publishStory(
   page: Page,

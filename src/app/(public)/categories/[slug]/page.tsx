@@ -23,7 +23,7 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
  * Only a category holding at least one published story resolves; every other
  * slug returns the same `notFound()` as an unknown one. The story list is
  * filtered to this category inside the shared public query layer, so a draft or
- * a story with no published chapter can never appear (AGENTS.md section 6).
+ * archived story can never appear (AGENTS.md section 6).
  */
 export const dynamic = "force-dynamic";
 

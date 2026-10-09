@@ -22,9 +22,10 @@ import { buildStoryPageMetadata } from "@/lib/seo/metadata";
  * Story detail.
  *
  * Rendered on demand from PostgreSQL and cached through the tagged query layer.
- * Only a `PUBLISHED` story resolves; every other slug returns the same
- * `notFound()` as an unknown one. The chapter list is published-only and the
- * "Start reading" action is omitted when there is no published chapter
+ * A `PUBLISHED` story resolves whether or not it has a published chapter; every
+ * other slug returns the same `notFound()` as an unknown one. The chapter list
+ * is published-only and the "Start reading" action is omitted when there is no
+ * published chapter, in which case the page shows its explicit empty state
  * (AGENTS.md section 6).
  */
 export const dynamic = "force-dynamic";
@@ -48,8 +49,7 @@ export async function generateMetadata({
     notFound();
   }
 
-  // noindex and no canonical while the story has no published chapter:
-  // there is nothing to index and no preferred URL to claim.
+  // Indexable as soon as the story is published, even before its first chapter.
   return buildStoryPageMetadata(page.story);
 }
 
@@ -81,9 +81,8 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
     { label: story.title },
   ];
 
-  // Drops to a breadcrumb trail alone while the story has no published
-  // chapter or no description: the Story/Article nodes are not emitted for
-  // content a crawler must not read.
+  // The Story/Article nodes are emitted for every published story and are only
+  // dropped when there is no description to back them.
   const storyJsonLd = buildStoryJsonLd(story);
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", url: "/" },

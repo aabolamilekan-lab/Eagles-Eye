@@ -15,10 +15,10 @@ import {
  *
  * Covers live outside `public/`; this route is the only door to them. A key is
  * served only when a story references it AND either that story is publicly
- * visible (PUBLISHED with at least one PUBLISHED chapter) or the requester is
- * an authorized admin previewing a draft. Everything else — unknown key,
- * unpublished draft to an anonymous reader, storage failure — returns the same
- * `404`, so the route cannot be used to enumerate drafts.
+ * visible (PUBLISHED) or the requester is an authorized admin previewing a
+ * draft. Everything else — unknown key, unpublished draft to an anonymous
+ * reader, storage failure — returns the same `404`, so the route cannot be used
+ * to enumerate drafts.
  *
  * `?w=1200&h=630` (the exact size the social-card metadata advertises) serves
  * a cropped JPEG rendition of the same key; any other size request is a `400`.
@@ -62,11 +62,6 @@ export async function GET(
     where: { coverImage: key },
     select: {
       status: true,
-      chapters: {
-        where: { status: "PUBLISHED" },
-        select: { id: true },
-        take: 1,
-      },
     },
   });
 
@@ -74,7 +69,7 @@ export async function GET(
     return notFound();
   }
 
-  const isPublic = story.status === "PUBLISHED" && story.chapters.length > 0;
+  const isPublic = story.status === "PUBLISHED";
 
   if (!isPublic) {
     const session = await getSession();

@@ -253,12 +253,14 @@ describe("buildStoryPageMetadata", () => {
     expect(metadata.description).toBe(clampDescription(storyFixture().seoDescription));
   });
 
-  it("noindexes and claims no canonical when no chapter is published", () => {
+  it("stays indexable with a canonical even when no chapter is published", () => {
     const metadata = buildStoryPageMetadata(
       storyFixture({ hasPublishedChapters: false }),
     );
-    expect(metadata.robots).toEqual({ index: false, follow: true });
-    expect(metadata).not.toHaveProperty("alternates");
+    expect(metadata.alternates?.canonical).toBe(
+      "https://seo.test/stories/the-cartographers-debt",
+    );
+    expect(metadata).not.toHaveProperty("robots");
     expect(og(metadata).url).toBe(
       "https://seo.test/stories/the-cartographers-debt",
     );

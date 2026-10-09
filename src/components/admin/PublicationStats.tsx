@@ -61,8 +61,8 @@ export function PublicationStats({
             className="rounded-sm border border-warning/30 bg-warning-surface px-3 py-2 font-ui text-body-xs text-warning"
           >
             {storiesUnreadable === 1
-              ? "1 published story has no published chapter and cannot be read."
-              : `${storiesUnreadable} published stories have no published chapter and cannot be read.`}
+              ? "1 published story has no published chapter yet, so readers cannot start reading it."
+              : `${storiesUnreadable} published stories have no published chapter yet, so readers cannot start reading them.`}
           </p>
         ) : null}
       </div>

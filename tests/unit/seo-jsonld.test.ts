@@ -38,7 +38,6 @@ function storyFixture(
     updatedAt: "2026-02-01T12:00:00.000Z",
     category: { name: "Frontier Chronicles" },
     tags: [{ name: "maps" }, { name: "tide" }],
-    hasPublishedChapters: true,
     ...overrides,
   };
 }
@@ -130,8 +129,7 @@ describe("buildStoryJsonLd", () => {
     expect(node?.image).toBe("https://seo.test/api/images/cover.jpg?w=1200&h=630");
   });
 
-  it("drops both nodes when the story has no published chapter or no description", () => {
-    expect(buildStoryJsonLd(storyFixture({ hasPublishedChapters: false }))).toEqual([]);
+  it("drops both nodes only when the story has no description", () => {
     expect(buildStoryJsonLd(storyFixture({ seoDescription: "" }))).toEqual([]);
   });
 

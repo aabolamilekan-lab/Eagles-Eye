@@ -98,7 +98,7 @@ AGENTS.md section 16 requires metadata on every public route, JSON-LD, a sitemap
 ### Sitemap and robots
 
 - `src/app/sitemap.ts` returns `MetadataRoute.Sitemap` built exclusively from `src/lib/queries/public/`, never from `src/lib/queries/admin/`.
-- Entries: `/`, `/stories`, `/categories`, every `PUBLISHED` category holding a published story, every `PUBLISHED` story with at least one published chapter, and every `PUBLISHED` chapter of those stories.
+- Entries: `/`, `/stories`, `/categories`, every `PUBLISHED` category holding a published story, every `PUBLISHED` story (whether or not it has a published chapter), and every `PUBLISHED` chapter of those stories.
 - `lastmod` is `Story.publishedAt` for stories and `Chapter.publishedAt` for chapters. Never `new Date()`: that makes every page look freshly edited, which is a lie crawlers learn to discount. `changeFrequency` and `priority` are coarse site-wide constants; varying them per URL to game crawlers is noise.
 - No `/admin`, `/admin/login`, `/search`, query string, or `noindex` URL enters the sitemap, and every URL is absolute, built with the canonical builder. Past 50,000 URLs or 50 MB, split with `generateSitemaps` and reference the index.
 - `src/app/robots.ts` allows crawling, disallows `/admin`, `/admin/login`, and `/api/`, sets `host` to the `NEXT_PUBLIC_APP_URL` origin, and lists the sitemap. It disallows nothing else: `/search` is handled by `noindex` in metadata, and disallowing the path while leaving `?q=` links crawlable is inconsistent.
@@ -127,7 +127,7 @@ Renaming the slug of a published story breaks every inbound link, bookmark, and 
 | --- | --- | --- |
 | Empty `Story.shortDescription` | Null or whitespace after trim | Derive from the first published chapter's `contentText`, clamped to 155 characters on a word boundary, server-side |
 | Excerpt under 70 characters | Length check | Treat as thin and prefer the longer, still faithful derived fallback |
-| No published chapters | `hasPublishedChapters` is false | Render the explicit empty state, set `robots: { index: false, follow: true }`, omit from the sitemap, emit no `Article` node |
+| No published chapters | `hasPublishedChapters` is false | Keep indexable: render the explicit empty state, include the story in the sitemap, emit `Article` when a description exists |
 | Missing cover | `coverImage` is null | Default OG image, placeholder in the grid, `image` still a real absolute URL |
 | No tags and no category | Both null | Omit `articleSection` and `keywords` rather than emitting empty values |
 | Chapter under roughly 200 words | `wordCount` from `contentText` | Keep indexable, exclude from rails. Never pad it |
@@ -198,11 +198,11 @@ E2E (Playwright):
 - [ ] ISO 8601 dates, numeric `position` and `wordCount`, absolute URLs, no `null` or empty strings; `author` omitted, never invented.
 - [ ] `Story`/`Article` on story pages, `Article` plus `isPartOf` on chapters, `BreadcrumbList` on every public page, `WebSite` on the root.
 - [ ] Sitemap built only from `src/lib/queries/public/`; `lastmod` from `publishedAt`, never `new Date()`; absolute URLs only.
-- [ ] Only `PUBLISHED` stories with a published chapter, their published chapters, and non-empty categories in the sitemap.
+- [ ] Only `PUBLISHED` stories (with or without a published chapter), their published chapters, and non-empty categories in the sitemap.
 - [ ] No `/admin`, `/admin/login`, `/search`, query strings, or `noindex` URL in the sitemap; `robots.ts` sets `host`, the sitemap entry, and the three disallows.
 - [ ] Slug-change decision made explicitly; redirect record written in the same transaction, or the trade-off recorded.
 - [ ] Exactly one `<h1>` per page; content headings offset one level; no skipped levels; no orphan published stories.
-- [ ] Thin-content table handled: derived short description, `noindex` for no published chapters, default OG image, omitted empty fields.
+- [ ] Thin-content table handled: derived short description, default OG image, omitted empty fields; a story with no published chapter stays indexable.
 - [ ] No draft title, short description, cover, or count in any metadata, JSON-LD, sitemap, or robots output.
 - [ ] No env value, storage key, internal hostname, or Prisma message in any SEO output; no `console.log`.
 - [ ] `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` all pass.

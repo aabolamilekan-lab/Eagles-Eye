@@ -128,7 +128,7 @@ describe.skipIf(!hasDatabase)("story detail (PostgreSQL)", () => {
       },
     });
 
-    // Published story whose only chapter is a draft: identifiable, not readable.
+    // Published story whose only chapter is a draft: listed, not readable.
     await prisma.story.create({
       data: {
         title: "Detail No Chapters",
@@ -270,10 +270,11 @@ describe.skipIf(!hasDatabase)("story detail (PostgreSQL)", () => {
     const slugs = relatedStories.map((story) => story.slug);
 
     expect(slugs).toContain(`${PREFIX}-sibling`);
+    // A published story with no published chapter is still a valid related read.
+    expect(slugs).toContain(`${PREFIX}-nochapters`);
     expect(slugs).not.toContain(`${PREFIX}-primary`);
-    // Draft and chapter-less stories are excluded by the public predicate.
+    // Draft stories are excluded by the public predicate.
     expect(slugs).not.toContain(`${PREFIX}-draft`);
-    expect(slugs).not.toContain(`${PREFIX}-nochapters`);
   });
 
   it("keeps a substantial authored line as the metadata description", async () => {
@@ -318,12 +319,14 @@ describe.skipIf(!hasDatabase)("story detail (PostgreSQL)", () => {
       expect(metadata.description).toBe(story.seoDescription);
     });
 
-    it("noindexes a story with no published chapter and claims no canonical", async () => {
+    it("keeps an absolute canonical for a story with no published chapter", async () => {
       const { story } = await load(`${PREFIX}-nochapters`);
       const metadata = buildStoryPageMetadata(story);
 
-      expect(metadata.robots).toEqual({ index: false, follow: true });
-      expect(metadata).not.toHaveProperty("alternates");
+      expect(metadata.alternates?.canonical).toBe(
+        `https://detail.test/stories/${PREFIX}-nochapters`,
+      );
+      expect(metadata).not.toHaveProperty("robots");
     });
   });
 });

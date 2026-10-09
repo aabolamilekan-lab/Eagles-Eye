@@ -145,23 +145,18 @@ export function buildPageMetadata({
 /**
  * Metadata for a published story detail page.
  *
- * A story with no published chapter is visible in admin and nowhere else: it
- * carries `noindex` and no canonical, because there is nothing to index and no
- * preferred URL to claim for it (AGENTS.md section 6). The cover, when
- * present, is the article image on both cards; otherwise the default card
- * image applies.
+ * A published story is indexable as soon as it is `PUBLISHED`, whether or not it
+ * has a published chapter yet; it keeps a canonical URL and no `noindex`
+ * (AGENTS.md section 6). The cover, when present, is the article image on both
+ * cards; otherwise the default card image applies.
  */
 export function buildStoryPageMetadata(
   story: PublishedStoryDetail,
 ): Metadata {
-  const indexable = story.hasPublishedChapters;
-
   return buildPageMetadata({
     title: story.title,
     description: story.seoDescription,
     path: `/stories/${story.slug}`,
-    canonical: indexable ? undefined : false,
-    noindex: !indexable,
     type: "article",
     image: story.coverImageUrl,
     imageAlt: story.title,

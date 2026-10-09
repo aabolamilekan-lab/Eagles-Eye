@@ -88,7 +88,7 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
 - Serving covers:
   - Public pages reference covers through `src/app/api/images/[...key]/route.ts` or a CDN URL in front of the private bucket. Never write to `public/`, never commit an uploaded file, never serve from a filesystem path built from user input.
   - The image route validates the key against `^[a-z0-9][a-z0-9/_-]*\.(webp|png|jpe?g)$` before it touches storage, and decodes nothing further.
-  - Authorization for a public image request: the key must be the `coverImage` of a story with at least one `PUBLISHED` chapter. Anything else is 404 to an anonymous caller, not 403, so the route does not confirm that a draft key exists.
+  - Authorization for a public image request: the key must be the `coverImage` of a `PUBLISHED` story. Anything else is 404 to an anonymous caller, not 403, so the route does not confirm that a draft key exists.
   - Admins may view draft covers through that same route, authenticated separately; it still never exposes a storage credential.
   - Use `next/image` with explicit width and height in components. Set `remotePatterns` for the image route or CDN host; never mark a cover `unoptimized`.
 - Replace and remove, coordinated with `src/actions/story.ts`:

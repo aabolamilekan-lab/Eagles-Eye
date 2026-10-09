@@ -306,28 +306,28 @@ test.describe("seo", () => {
     expect(rejected.status()).toBe(400);
   });
 
-  test("a published story without chapters is noindexed and structurally silent", async ({
+  test("a published story without chapters stays indexable", async ({
     page,
   }) => {
     await signIn(page);
     const storyId = await createStoryDraft(page, {
       title: "Seo No Chapters",
       shortDescription:
-        "Published but unreadable: no chapter has been published yet, so nothing may index it.",
+        "Published with no chapter yet: the story is still listed and indexable.",
     });
     await publishStory(page, storyId, "publish-warning");
 
     await page.goto("/stories/seo-no-chapters");
     await expect(page).toHaveURL(/\/stories\/seo-no-chapters$/);
-    await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
-    expect(await headContent(page, "robots")).toBe("noindex, follow");
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+    expect(await headContent(page, "robots") ?? "").not.toContain("noindex");
 
     const nodes = await jsonLdNodes(page);
     expect(
       nodes.filter(
         (node) => node["@type"] === "Story" || node["@type"] === "Article",
       ),
-    ).toHaveLength(0);
+    ).toHaveLength(2);
     expect(
       nodes.some((node) => node["@type"] === "BreadcrumbList"),
     ).toBe(true);

@@ -48,7 +48,7 @@ Not for `/admin/**`, storage internals, or authentication.
 ### Public-visibility enforcement
 
 - Every reader read goes through `src/lib/queries/public/`. A page or component writing `status: "PUBLISHED"` itself is a bug: the filter then has two owners and the next caller forgets it.
-- A story is public only when it is `PUBLISHED` **and** at least one chapter is `PUBLISHED`. The detail query returns `{ story, publishedChapters, hasPublishedChapters }` so the page distinguishes the cases instead of rendering an empty list.
+- A story is public as soon as it is `PUBLISHED`, whether or not it has a published chapter. The detail query returns `{ story, chapters, chapterCount, hasPublishedChapters }` so the page distinguishes "readable" from "published but not yet readable" instead of hiding the story.
 - Chapter counts, category counts, rails, and related lists count only `PUBLISHED` chapters. A count including drafts leaks unpublished volume through arithmetic.
 - Prev/next resolve in the query layer (`chapters.ts`) over the published chapter list the by-index also needs: ordered by `chapterNumber`, `status = PUBLISHED` only, bodies not selected. Never compute neighbours in the view, and never offer an unpublished sibling.
 - Positions shown to the reader are the 1-based position in the published sequence, not the stored `chapterNumber`; a gap left by a draft cannot leak unpublished volume through arithmetic.
@@ -162,7 +162,7 @@ E2E (Playwright):
 ## Completion checklist
 
 - [ ] Every reader read goes through `src/lib/queries/public/`; no call site writes the status filter.
-- [ ] Visibility requires a `PUBLISHED` story with at least one `PUBLISHED` chapter.
+- [ ] Visibility requires only that the story is `PUBLISHED`; a published story with no published chapters is listed and indexable, and its page shows the empty state.
 - [ ] Zero published chapters renders a designed empty state with no chapter list and no action.
 - [ ] Prev/next and by-index offer `PUBLISHED` siblings only, resolved in the query layer.
 - [ ] All counts, rails, and related lists exclude `DRAFT` and `ARCHIVED`; non-published slugs return the same `notFound()` as unknown ones.

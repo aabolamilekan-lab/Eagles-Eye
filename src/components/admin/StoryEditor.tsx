@@ -357,9 +357,9 @@ function PublishingPanel({
 
       <p className="font-ui text-body-xs text-ink-muted text-pretty">
         {isNew
-          ? "Saved as a draft first. Publishing makes the story eligible for the public catalogue once at least one chapter is published."
+          ? "Saved as a draft first. Publishing adds the story to the public catalogue; add a published chapter so readers can start reading."
           : status === "DRAFT"
-            ? "Draft. Publish when the story is ready; it becomes visible once it has a published chapter."
+            ? "Draft. Publish when the story is ready; it becomes visible as soon as it is published."
             : status === "PUBLISHED"
               ? "Live. Unpublishing hides it from readers; archiving also archives its published chapters."
               : "Archived. It is hidden from readers until you restore it."}

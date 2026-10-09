@@ -11,13 +11,12 @@ describe("buildStorySearchWhere", () => {
   it("always applies the shared published-story visibility predicate", () => {
     const where = buildStorySearchWhere(empty);
     expect(where.status).toBe(ContentStatus.PUBLISHED);
-    expect(where.chapters).toEqual({
-      some: { status: ContentStatus.PUBLISHED },
-    });
+    expect(where).not.toHaveProperty("chapters");
     expect(where.OR).toBeUndefined();
     expect(where.AND).toBeUndefined();
     expect(where.category).toBeUndefined();
     expect(PUBLIC_STORY_WHERE.status).toBe(ContentStatus.PUBLISHED);
+    expect(PUBLIC_STORY_WHERE).not.toHaveProperty("chapters");
   });
 
   it("matches the term across the story's own text, its category and its tags", () => {

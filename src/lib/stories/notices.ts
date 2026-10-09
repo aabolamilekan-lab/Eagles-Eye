@@ -25,7 +25,8 @@ const NOTICES: Record<string, StoryNotice> = {
   "publish-warning": {
     tone: "warning",
     title: "Story published without a published chapter",
-    message: "Readers will not find it until at least one chapter is published.",
+    message:
+      "It is already visible in the catalogue. Publish a chapter so readers can start reading it.",
   },
   unpublished: {
     tone: "info",

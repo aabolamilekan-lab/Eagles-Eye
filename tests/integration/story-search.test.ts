@@ -196,7 +196,7 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
       chapterStatus: ContentStatus.PUBLISHED,
     });
 
-    // Published story with only a draft chapter: not public.
+    // Published story with only a draft chapter: listed, not readable.
     await createStory({
       suffix: "e",
       title: "Lighthouse Ghost",
@@ -275,6 +275,7 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
       `${PREFIX}-a`,
       `${PREFIX}-b`,
       `${PREFIX}-c`,
+      `${PREFIX}-e`,
       `${PREFIX}-h`,
     ]);
 
@@ -303,15 +304,21 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
     expect(slugs(byCategoryName.stories)).toEqual([`${PREFIX}-g`]);
   });
 
-  it("only returns published stories with a published chapter", async () => {
+  it("returns published stories and excludes drafts and archived", async () => {
     const result = await queryStorySearch({
       ...base,
       q: "Lighthouse",
       category: `${PREFIX}-cat`,
     });
     const returned = slugs(result.stories);
+    expect(returned).toEqual([
+      `${PREFIX}-a`,
+      `${PREFIX}-b`,
+      `${PREFIX}-c`,
+      `${PREFIX}-e`,
+      `${PREFIX}-h`,
+    ]);
     expect(returned).not.toContain(`${PREFIX}-d`);
-    expect(returned).not.toContain(`${PREFIX}-e`);
     expect(returned).not.toContain(`${PREFIX}-f`);
   });
 
@@ -325,6 +332,7 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
       `${PREFIX}-a`,
       `${PREFIX}-b`,
       `${PREFIX}-c`,
+      `${PREFIX}-e`,
       `${PREFIX}-h`,
     ]);
   });
@@ -347,6 +355,7 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
       `${PREFIX}-a`,
       `${PREFIX}-b`,
       `${PREFIX}-c`,
+      `${PREFIX}-e`,
       `${PREFIX}-h`,
     ]);
   });
@@ -382,6 +391,7 @@ describe.skipIf(!hasDatabase)("story search (PostgreSQL)", () => {
     expect(result.stories.map((story) => story.slug)).toEqual([
       `${PREFIX}-h`,
       `${PREFIX}-c`,
+      `${PREFIX}-e`,
       `${PREFIX}-b`,
       `${PREFIX}-a`,
     ]);

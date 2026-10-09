@@ -12,9 +12,7 @@ describe("buildRelatedStoryWhere", () => {
     });
 
     expect(where.status).toBe(ContentStatus.PUBLISHED);
-    expect(where.chapters).toEqual({
-      some: { status: ContentStatus.PUBLISHED },
-    });
+    expect(where).not.toHaveProperty("chapters");
     expect(where.id).toEqual({ not: "story-1" });
     // No signals means an unfiltered (but still published-only) fallback, not
     // an `OR: []` that matches nothing.

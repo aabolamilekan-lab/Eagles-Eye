@@ -89,7 +89,7 @@ AGENTS.md sections 5, 6, and 14 define the data contract. This skill supplies th
 
 - Every public read is a named function in `src/lib/queries/`. Pages, Server Components, `sitemap.ts`, and Route Handlers call those functions and never call Prisma directly.
 - `status: PUBLISHED` is applied inside the query function. The literal must not appear in a page, component, or action.
-- A public story detail function must prove at least one published chapter exists before returning. Return the story with an empty chapter list and let the page render the "no published chapters yet" state.
+- A public story detail function returns any `PUBLISHED` story, even one with no published chapters. Return the story with an empty chapter list and let the page render the "no published chapters yet" state.
 - Sibling navigation selects only `PUBLISHED` chapters, so next and previous never point at a draft. `src/lib/queries/admin.ts` is the only module allowed to omit the status filter, and nothing under `src/app/(public)/` may import it.
 - Admin previews are structurally distinct: separate query names, separate components, and a visible draft banner.
 

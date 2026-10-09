@@ -85,7 +85,7 @@ export default async function AdminStoryChaptersPage({
         <EmptyState
           tone="admin"
           title="No chapters yet"
-          description="A story needs at least one published chapter before readers can find it. Add the first chapter to begin."
+          description="The story is already visible in the catalogue. Add and publish a chapter so readers can start reading."
           action={
             <ButtonLink href={newChapterHref} variant="primary">
               New chapter

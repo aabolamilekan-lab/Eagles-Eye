@@ -63,8 +63,8 @@ AGENTS.md is the global source of truth. This skill provides specialized rules f
 
 | From | Action | To | `publishedAt` | Reader visibility | Story-level effect |
 | --- | --- | --- | --- | --- | --- |
-| `DRAFT` | `publishChapter` | `PUBLISHED` | set to now if `null` | appears in chapter list and nav | story becomes publicly visible once at least one chapter is published |
-| `PUBLISHED` | `unpublishChapter` | `DRAFT` | preserved, never nulled | disappears from list and nav | story hides if it was the only published chapter |
+| `DRAFT` | `publishChapter` | `PUBLISHED` | set to now if `null` | appears in chapter list and nav | makes the story readable (the story is already publicly visible once published) |
+| `PUBLISHED` | `unpublishChapter` | `DRAFT` | preserved, never nulled | disappears from list and nav | story stays listed but is no longer readable if it was the only published chapter |
 | `PUBLISHED` | `archiveChapter` | `ARCHIVED` | preserved | gone | none |
 | `ARCHIVED` | `publishChapter` | `PUBLISHED` | set to now | appears again | none |
 | `DRAFT` | `archiveChapter` | `ARCHIVED` | `null` | never was visible | none |

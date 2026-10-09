@@ -59,7 +59,7 @@ export interface AdminDashboard {
   totalStoryViews: number;
   /** Individual anonymous view records on file. A different measure to the counter. */
   recordedViews: number;
-  /** Published stories with no published chapter: live but unreadable. */
+  /** Published stories with no published chapter: live but not yet readable. */
   storiesUnreadable: number;
   storiesPublishedThisYear: number;
   chaptersPublishedThisYear: number;

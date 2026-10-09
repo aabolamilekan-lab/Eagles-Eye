@@ -6,9 +6,10 @@ import { ContentStatus, type PrismaClient } from "@prisma/client";
  *
  * Skipped unless `DATABASE_URL` is set. `next/cache` is stubbed so the tagged
  * `unstable_cache` wrappers run their query directly, without a request context.
- * Asserts the public-visibility guarantee: a category is public only while it
- * holds at least one published story that itself has a published chapter, and
- * its count excludes drafts and archived stories (AGENTS.md section 6).
+ * Asserts the public-visibility guarantee: a category is public as soon as it
+ * holds at least one published story, whether or not that story has a published
+ * chapter, and its count excludes drafts and archived stories (AGENTS.md
+ * section 6).
  */
 const hasDatabase = Boolean(process.env.DATABASE_URL);
 const PREFIX = `itcat-${process.pid}`;
@@ -131,7 +132,8 @@ describe.skipIf(!hasDatabase)("public categories (PostgreSQL)", () => {
       chapterStatus: ContentStatus.PUBLISHED,
     });
 
-    // Published story with a draft chapter only, so neither is public.
+    // Published story with a draft chapter only: the story is public, so the
+    // category is public too, even though nothing is readable yet.
     await createStory({
       suffix: "draft-chapter",
       title: "Draft Chapter Story",
@@ -161,10 +163,9 @@ describe.skipIf(!hasDatabase)("public categories (PostgreSQL)", () => {
     expect(await categories.getPublishedCategoryBySlug(draftOnlySlug)).toBeNull();
   });
 
-  it("hides a category whose published story has no published chapter", async () => {
-    expect(
-      await categories.getPublishedCategoryBySlug(draftChapterSlug),
-    ).toBeNull();
+  it("resolves a category whose published story has no published chapter", async () => {
+    const category = await categories.getPublishedCategoryBySlug(draftChapterSlug);
+    expect(category?.name).toBe(`${PREFIX} Draft Chapter`);
   });
 
   it("hides an empty category and an unknown slug", async () => {
@@ -179,8 +180,8 @@ describe.skipIf(!hasDatabase)("public categories (PostgreSQL)", () => {
     const slugs = page.categories.map((entry) => entry.slug);
 
     expect(slugs).toContain(publicSlug);
+    expect(slugs).toContain(draftChapterSlug);
     expect(slugs).not.toContain(draftOnlySlug);
-    expect(slugs).not.toContain(draftChapterSlug);
     expect(slugs).not.toContain(emptySlug);
     expect(page.page).toBe(1);
     expect(page.pageSize).toBe(categories.CATEGORY_PAGE_SIZE);
@@ -190,14 +191,17 @@ describe.skipIf(!hasDatabase)("public categories (PostgreSQL)", () => {
     const page = await categories.getPublishedCategoryPage(1);
     const entry = page.categories.find((row) => row.slug === publicSlug);
     expect(entry?.storyCount).toBe(1);
+
+    const chapterless = page.categories.find((row) => row.slug === draftChapterSlug);
+    expect(chapterless?.storyCount).toBe(1);
   });
 
   it("offers only published categories as filter options", async () => {
     const options = await categories.getPublishedCategoryOptions();
     const slugs = options.map((option) => option.slug);
     expect(slugs).toContain(publicSlug);
+    expect(slugs).toContain(draftChapterSlug);
     expect(slugs).not.toContain(draftOnlySlug);
-    expect(slugs).not.toContain(draftChapterSlug);
     expect(slugs).not.toContain(emptySlug);
   });
 });

@@ -134,7 +134,7 @@ describe.skipIf(!hasDatabase)("catalogue listing (PostgreSQL)", () => {
       chapterStatus: ContentStatus.PUBLISHED,
     });
 
-    // Published story whose only chapter is a draft: not public.
+    // Published story whose only chapter is a draft: still public, not readable.
     await createStory({
       suffix: "draft-chapter",
       title: "Hidden Chronicle",
@@ -199,12 +199,13 @@ describe.skipIf(!hasDatabase)("catalogue listing (PostgreSQL)", () => {
     await prisma.$disconnect();
   });
 
-  it("lists only published stories that have a published chapter", async () => {
+  it("lists published stories whether or not they have a published chapter", async () => {
     const result = await queryStoryList({ ...base, category: `${PREFIX}-a` });
-    expect(result.total).toBe(2);
+    expect(result.total).toBe(3);
     expect(result.stories.map((story) => story.slug).sort()).toEqual([
       `${PREFIX}-alpha`,
       `${PREFIX}-beta`,
+      `${PREFIX}-draft-chapter`,
     ]);
   });
 
@@ -215,6 +216,7 @@ describe.skipIf(!hasDatabase)("catalogue listing (PostgreSQL)", () => {
       sort: "recent",
     });
     expect(recent.stories.map((story) => story.slug)).toEqual([
+      `${PREFIX}-draft-chapter`,
       `${PREFIX}-beta`,
       `${PREFIX}-alpha`,
     ]);
@@ -225,6 +227,7 @@ describe.skipIf(!hasDatabase)("catalogue listing (PostgreSQL)", () => {
       sort: "popular",
     });
     expect(popular.stories.map((story) => story.slug)).toEqual([
+      `${PREFIX}-draft-chapter`,
       `${PREFIX}-beta`,
       `${PREFIX}-alpha`,
     ]);
@@ -232,7 +235,7 @@ describe.skipIf(!hasDatabase)("catalogue listing (PostgreSQL)", () => {
 
   it("filters by category and returns an empty result for an unknown one", async () => {
     const matched = await queryStoryList({ ...base, category: `${PREFIX}-a` });
-    expect(matched.total).toBe(2);
+    expect(matched.total).toBe(3);
 
     const missing = await queryStoryList({
       ...base,

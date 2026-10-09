@@ -289,7 +289,7 @@ function PublishingPanel({
 
       <p className="font-ui text-body-xs text-ink-muted text-pretty">
         {isNew
-          ? "New chapters are saved as a draft. Create it first, then publish when the text is ready. A story is only visible to readers once it has at least one published chapter."
+          ? "New chapters are saved as a draft. Create it first, then publish when the text is ready. A story is visible in the catalogue as soon as it is published; a published chapter is what lets readers start reading."
           : status === "DRAFT"
             ? "Draft. Publish to add it to the reader's chapter list and navigation."
             : status === "PUBLISHED"
