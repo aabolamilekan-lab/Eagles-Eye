@@ -267,9 +267,9 @@ export function FeaturedStory({
   const href = `/stories/${story.slug}`;
 
   return (
-    <article className="group relative overflow-hidden rounded-md border border-border bg-surface transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-lg">
+    <article className="group relative overflow-hidden rounded-md border border-border/80 bg-surface shadow-2xs transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
       <div className="grid md:grid-cols-[1.15fr_1fr]">
-        <div className="relative aspect-[4/3] overflow-hidden bg-surface-sunken md:aspect-auto md:min-h-80">
+        <div className="relative aspect-[16/10] sm:aspect-[4/3] md:aspect-auto md:min-h-80 overflow-hidden bg-surface-sunken">
           {story.coverImageUrl ? (
             <Image
               src={story.coverImageUrl}
@@ -284,33 +284,33 @@ export function FeaturedStory({
           )}
         </div>
 
-        <div className="flex flex-col justify-center gap-4 p-6 sm:p-8 lg:p-10">
+        <div className="flex flex-col justify-center gap-3.5 p-5 sm:p-7 lg:p-9">
           {eyebrow ? (
             <p className="label-micro text-primary font-semibold">{eyebrow}</p>
           ) : null}
 
-          <h3 className="font-display text-display-md text-ink text-balance transition-colors group-hover:text-primary">
+          <h3 className="font-display text-display-md sm:text-display-lg text-ink text-balance tracking-tight transition-colors group-hover:text-primary">
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-['']"
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
             >
               {story.title}
             </Link>
           </h3>
 
-          <p className="font-ui text-body text-ink-muted text-pretty">
+          <p className="font-ui text-body text-ink-muted text-pretty leading-relaxed line-clamp-3 sm:line-clamp-4">
             {story.shortDescription}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1">
             {story.category ? (
               <Badge tone="primary">{story.category.name}</Badge>
             ) : null}
             <StoryMeta story={story} />
           </div>
 
-          <span className="mt-2 inline-flex items-center gap-1.5 font-ui text-body-sm font-medium text-accent group-hover:text-accent-hover">
+          <span className="mt-2 inline-flex items-center gap-1.5 font-ui text-body-sm font-semibold text-primary group-hover:text-primary-hover">
             Begin reading
             <svg
               aria-hidden="true"

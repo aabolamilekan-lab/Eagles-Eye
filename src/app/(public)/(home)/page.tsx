@@ -60,9 +60,10 @@ export default async function HomePage() {
       <JsonLd data={buildWebSiteJsonLd()} />
       <section
         aria-labelledby="home-hero-heading"
-        className="shell grid gap-12 pt-(--spacing-section) pb-(--spacing-section-sm) lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16"
+        className="shell pt-8 sm:pt-12 pb-12 sm:pb-16 border-b border-border/70"
       >
-        <div className="flex flex-col justify-center">
+        {/* Editorial Front-Page Header */}
+        <div className="max-w-3xl">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
               <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
@@ -71,19 +72,19 @@ export default async function HomePage() {
           </div>
           <h1
             id="home-hero-heading"
-            className="mt-5 max-w-2xl font-display text-display-lg text-ink text-balance tracking-tight"
+            className="mt-4 font-display text-display-lg sm:text-display-xl text-ink text-balance tracking-tight"
           >
             {hasStories
               ? "Stories, published and read without the noise."
               : "A quiet catalogue for stories worth reading."}
           </h1>
-          <p className="mt-5 max-w-xl font-ui text-body text-ink-muted text-pretty leading-relaxed">
+          <p className="mt-4 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
             {hasStories
               ? "An independent catalogue for long-form fiction, gathered from writers around the world. Nothing stands between a story and the person reading it."
               : "The first story is on its way. Until then, browse the categories to see how the catalogue is organised."}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <ButtonLink href="/stories" variant="primary" size="md" className="sm:h-12 sm:px-7 sm:text-body">
               Browse stories
             </ButtonLink>
@@ -91,42 +92,76 @@ export default async function HomePage() {
               Browse categories
             </ButtonLink>
           </div>
-
         </div>
 
-        <div className="flex flex-col gap-6 lg:pt-4">
-          <div className="rounded-md border border-border bg-surface p-4 sm:p-6 shadow-xs transition-shadow hover:shadow-md">
-            <h2 className="font-display text-heading-md text-ink">Find a story</h2>
-            <p className="mt-1 font-ui text-body-sm text-ink-muted">
-              Search published stories by title, topic, or keyword.
-            </p>
-            <div className="mt-4">
-              <SearchBar />
+        {/* Lead Featured Story + Editorial Sidebar Grid */}
+        {hasStories && leadFeatured ? (
+          <div className="mt-10 sm:mt-14 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-12 items-start">
+            {/* Left: Lead Featured Story */}
+            <div className="flex flex-col gap-5">
+              <SectionHeading
+                id="home-featured-heading"
+                eyebrow="Lead Story"
+                title="Editor's Pick"
+                action={
+                  <ButtonLink href="/stories" variant="ghost" size="sm">
+                    View all stories
+                  </ButtonLink>
+                }
+              />
+              <FeaturedStory story={leadFeatured} priority />
+            </div>
+
+            {/* Right Column: Search & Popular Categories */}
+            <div className="flex flex-col gap-6 lg:pt-1">
+              <div className="rounded-md border border-border/80 bg-surface p-5 sm:p-6 shadow-2xs">
+                <h2 className="font-display text-heading-md text-ink">Find a story</h2>
+                <p className="mt-1 font-ui text-body-sm text-ink-muted">
+                  Search published stories by title, topic, or keyword.
+                </p>
+                <div className="mt-4">
+                  <SearchBar />
+                </div>
+              </div>
+
+              {hasCategories ? (
+                <nav aria-label="Popular categories" className="rounded-md border border-border/80 bg-surface/60 p-5 shadow-2xs">
+                  <p className="label-micro text-ink-subtle mb-3">Popular Categories</p>
+                  <ul className="flex flex-col divide-y divide-border/40">
+                    {categories.slice(0, 4).map((category) => (
+                      <li key={category.slug}>
+                        <Link
+                          href={`/categories/${category.slug}`}
+                          className="flex items-center justify-between py-2.5 px-2 font-ui text-body-sm text-ink-muted transition-colors rounded-sm hover:bg-surface-sunken hover:text-primary"
+                        >
+                          <span className="font-medium">{category.name}</span>
+                          <span className="font-ui text-body-xs text-primary font-semibold" aria-hidden="true">&rarr;</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              ) : null}
+
+              {restFeatured.length > 0 ? (
+                <div className="flex flex-col gap-3 rounded-md border border-border/80 bg-surface p-5 shadow-2xs">
+                  <p className="label-micro text-primary font-semibold">Also Featured</p>
+                  <ul className="flex flex-col divide-y divide-border/40">
+                    {restFeatured.slice(0, 2).map((story) => (
+                      <li key={story.slug} className="py-3 first:pt-1 last:pb-0">
+                        <StoryCard story={story} layout="row" size="compact" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           </div>
-
-          {hasCategories ? (
-            <nav aria-label="Popular categories" className="rounded-md border border-border/80 bg-surface/60 p-5">
-              <p className="label-micro text-ink-subtle mb-2">Popular Categories</p>
-              <ul className="flex flex-col divide-y divide-border/40">
-                {categories.slice(0, 4).map((category) => (
-                  <li key={category.slug}>
-                    <Link
-                      href={`/categories/${category.slug}`}
-                      className="flex items-center justify-between py-2.5 px-2 font-ui text-body-sm text-ink-muted transition-colors rounded-sm hover:bg-surface-sunken hover:text-ink"
-                    >
-                      <span className="font-medium">{category.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ) : null}
-        </div>
+        ) : null}
       </section>
 
       {!hasStories ? (
-        <section className="shell pb-(--spacing-section)">
+        <section className="shell py-12">
           <EmptyState
             title="No stories have been published yet"
             description="When the first story is published it will appear here, newest first. In the meantime, browse the categories to see how the catalogue is arranged."
@@ -136,31 +171,6 @@ export default async function HomePage() {
               </ButtonLink>
             }
           />
-        </section>
-      ) : null}
-
-      {leadFeatured ? (
-        <section
-          aria-labelledby="home-featured-heading"
-          className="shell pb-(--spacing-section)"
-        >
-          <SectionHeading
-            id="home-featured-heading"
-            eyebrow="Featured"
-            title="Featured stories"
-            action={
-              <ButtonLink href="/stories" variant="ghost" size="sm">
-                View all
-              </ButtonLink>
-            }
-          />
-          <FeaturedStory story={leadFeatured} priority />
-          {restFeatured.length > 0 ? (
-            <StoryGrid
-              stories={restFeatured.slice(0, 3)}
-              className="mt-6"
-            />
-          ) : null}
         </section>
       ) : null}
 
