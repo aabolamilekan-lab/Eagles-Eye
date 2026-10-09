@@ -41,7 +41,7 @@ export function SearchBar({
       aria-label="Site search"
       action="/search"
       method="get"
-      className={cn("flex w-full items-end gap-2", className)}
+      className={cn("flex w-full flex-col sm:flex-row items-stretch sm:items-center gap-2.5", className)}
     >
       {hiddenFields}
       <div className="relative flex-1 min-w-0">
@@ -50,7 +50,7 @@ export function SearchBar({
         </label>
         <Search
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-subtle"
+          className="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-ink-subtle"
         />
         <input
           id={id}
@@ -60,18 +60,18 @@ export function SearchBar({
           maxLength={maxLength}
           autoComplete="off"
           enterKeyHint="search"
-          placeholder="Search stories..."
+          placeholder="Search by title, author, topic..."
           aria-describedby={`${id}-hint`}
-          className="h-11 w-full rounded-md border border-border-strong bg-surface pl-10 pr-4 sm:pr-16 font-ui text-body-sm text-ink transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:ring-1 focus:ring-primary shadow-xs"
+          className="h-12 w-full rounded-lg border border-border-strong bg-surface pl-10.5 pr-4 sm:pr-14 font-ui text-body text-ink shadow-xs transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <kbd
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-3 hidden -translate-y-1/2 rounded-md border border-border bg-surface-sunken px-2 py-0.5 font-ui text-[11px] font-medium text-ink-subtle shadow-2xs sm:inline-block"
+          className="pointer-events-none absolute top-1/2 right-3.5 hidden -translate-y-1/2 rounded border border-border bg-surface-sunken px-2 py-0.5 font-mono text-[11px] font-medium text-ink-subtle shadow-2xs sm:inline-block"
         >
           /
         </kbd>
       </div>
-      <Button type="submit" variant="primary" className="shrink-0">
+      <Button type="submit" variant="primary" className="h-12 px-6 font-ui text-body-sm font-medium shrink-0">
         Search
       </Button>
       <span id={`${id}-hint`} className="sr-only">

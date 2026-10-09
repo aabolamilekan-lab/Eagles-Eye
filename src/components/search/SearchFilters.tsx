@@ -62,12 +62,12 @@ export function SearchFilters({
         {/* The term survives facet changes; the query bar carries the reverse. */}
         <input type="hidden" name="q" value={search.q} />
 
-        <details className="rounded-md border border-border bg-surface md:[&::details-content]:[content-visibility:visible]">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 font-ui text-body-sm font-medium text-ink [&::-webkit-details-marker]:hidden md:hidden">
-            <span className="inline-flex items-center gap-2">
+        <details className="rounded-lg border border-border bg-surface shadow-2xs overflow-hidden md:[&::details-content]:[content-visibility:visible]">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2 font-ui text-body-sm font-medium text-ink transition-colors hover:bg-surface-sunken/50 [&::-webkit-details-marker]:hidden md:hidden">
+            <span className="inline-flex items-center gap-2 text-ink">
               <SlidersHorizontal
                 aria-hidden="true"
-                className="size-4 text-ink-muted"
+                className="size-4 text-primary"
               />
               Filters
             </span>
@@ -76,16 +76,7 @@ export function SearchFilters({
             </span>
           </summary>
 
-          {/*
-            A closed `<details>` hides its non-summary children: the user-agent
-            rule sets `display: none`, which the authored `md:block` below
-            overrides, and newer engines additionally hide the subtree through
-            `content-visibility: hidden` on `::details-content`, which no child
-            rule can reach. The variant on the `<details>` re-enables that
-            pseudo-element at `md` and up, so the same markup is an accordion on
-            mobile and a static panel on desktop.
-          */}
-          <div className="space-y-4 border-t border-border p-4 md:block md:border-t-0 md:p-5">
+          <div className="space-y-4 border-t border-border/60 p-4 md:block md:border-t-0 md:p-5">
             <div className="grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
               <SelectField
                 label="Category"
@@ -95,7 +86,7 @@ export function SearchFilters({
               />
 
               <SelectField
-                label="Sort"
+                label="Sort by"
                 name="sort"
                 defaultValue={search.sort}
                 options={SORT_OPTIONS}
@@ -103,15 +94,14 @@ export function SearchFilters({
             </div>
 
             {tags.length > 0 ? (
-              <fieldset className="border-t border-border pt-4">
+              <fieldset className="border-t border-border/60 pt-4">
                 <legend className="font-ui text-body-sm font-medium text-ink">
                   Tags
                 </legend>
                 <p className="mt-1 font-ui text-body-xs text-ink-muted">
-                  Selecting more than one tag shows stories that match all of
-                  them.
+                  Selecting multiple tags shows stories matching all selected topics.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3">
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2.5">
                   {tags.map((tag) => (
                     <CheckboxField
                       key={tag.slug}
@@ -125,7 +115,7 @@ export function SearchFilters({
               </fieldset>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
+            <div className="flex flex-wrap items-center gap-3 border-t border-border/60 pt-4">
               <Button type="submit" variant="primary" size="sm">
                 Apply filters
               </Button>

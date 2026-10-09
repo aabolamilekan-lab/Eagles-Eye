@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { headers } from "next/headers";
+import { Search, AlertCircle, Clock, FileQuestion } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
@@ -74,6 +75,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return (
       <SearchLayout search={search}>
         <EmptyState
+          icon={<Clock className="size-8 text-primary/70" />}
           title="Too many searches"
           description="You have made a lot of searches in a short time. Please wait a moment, then try again."
           action={
@@ -115,6 +117,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     >
       {result.total === 0 ? (
         <EmptyState
+          icon={<FileQuestion className="size-8 text-ink-subtle" />}
           title={
             search.q
               ? `No results for “${search.q}”`
@@ -151,13 +154,18 @@ function SearchLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="shell py-(--spacing-section)">
+    <div className="shell py-8 sm:py-12 md:py-16">
       <header className="max-w-2xl">
-        <p className="label-micro text-primary">Search</p>
-        <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
+        <div className="flex items-center gap-2">
+          <span className="inline-block size-1.5 rounded-full bg-primary" />
+          <span className="label-micro text-primary uppercase font-medium tracking-wider">
+            Search Archive
+          </span>
+        </div>
+        <h1 className="mt-3 font-display text-display-lg sm:text-display-xl text-ink font-semibold tracking-tight text-balance">
           Search stories
         </h1>
-        <p className="mt-4 font-ui text-body text-ink-muted text-pretty">
+        <p className="mt-3 font-ui text-body text-ink-muted text-pretty max-w-xl leading-relaxed">
           Find a story by title, author, category, tag, or keyword. Results are
           drawn from published stories only.
         </p>
@@ -173,7 +181,7 @@ function SearchLayout({
 
       {filters}
 
-      <div className="mt-10">{children}</div>
+      <div className="mt-8 sm:mt-10">{children}</div>
     </div>
   );
 }
@@ -202,6 +210,7 @@ function renderIdleState(search: StorySearch): ReactNode {
   if (search.queryStatus === "too_short") {
     return (
       <EmptyState
+        icon={<AlertCircle className="size-8 text-primary/70" />}
         title="Keep typing"
         description={`Add a little more — search terms need at least ${SEARCH_QUERY_MIN_LENGTH} characters.`}
         action={
@@ -216,6 +225,7 @@ function renderIdleState(search: StorySearch): ReactNode {
   if (search.queryStatus === "too_long") {
     return (
       <EmptyState
+        icon={<AlertCircle className="size-8 text-error/70" />}
         title="That search is too long"
         description={`Search terms can be up to ${SEARCH_QUERY_MAX_LENGTH} characters. Shorten it and try again.`}
         action={
@@ -229,6 +239,7 @@ function renderIdleState(search: StorySearch): ReactNode {
 
   return (
     <EmptyState
+      icon={<Search className="size-8 text-ink-subtle/80" />}
       title="Search the catalogue"
       description={`Type at least ${SEARCH_QUERY_MIN_LENGTH} characters to search by title, author, category, tag, or keyword.`}
       action={

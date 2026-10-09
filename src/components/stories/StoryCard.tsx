@@ -44,25 +44,42 @@ export function StoryCard({
   size = "full",
   /** `cover` stacks image above text, `row` puts a small cover beside it. */
   layout = "cover",
+  /** Optional numerical rank for editorial lists (e.g. 1 -> 01). */
+  index,
   priority = false,
   className,
 }: {
   story: StoryCardData;
   size?: "compact" | "full";
   layout?: "cover" | "row";
+  index?: number;
   priority?: boolean;
   className?: string;
 }) {
   const href = `/stories/${story.slug}`;
 
   if (layout === "row") {
+    const formattedIndex = index !== undefined ? String(index).padStart(2, "0") : null;
+
     return (
       <article
         className={cn(
-          "group relative flex gap-4 rounded-md border border-transparent p-2 transition-colors hover:border-border hover:bg-surface-sunken/50",
+          "group relative flex items-center gap-3 sm:gap-4 rounded-md border border-border/80 bg-surface p-3 sm:p-4 shadow-2xs",
+          "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
+          "hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
+          "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
           className,
         )}
       >
+        {formattedIndex ? (
+          <span
+            className="font-display text-2xl sm:text-3xl font-bold text-primary shrink-0 w-7 sm:w-8 text-center select-none"
+            aria-hidden="true"
+          >
+            {formattedIndex}
+          </span>
+        ) : null}
+
         <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-surface-sunken sm:size-24">
           {story.coverImageUrl ? (
             <Image
@@ -77,22 +94,22 @@ export function StoryCard({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-1.5 justify-center">
+        <div className="flex min-w-0 flex-col gap-1.5 justify-center flex-1">
           {story.category ? (
             <div className="flex items-center gap-2">
               <Badge tone="primary">{story.category.name}</Badge>
             </div>
           ) : null}
-          <h3 className="font-display text-heading-sm text-ink text-balance">
+          <h3 className="font-display text-heading-sm sm:text-heading-md text-ink text-balance tracking-tight">
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-[''] group-hover:text-primary transition-colors"
+              className="after:absolute after:inset-0 after:content-[''] group-hover:text-primary transition-colors focus-visible:outline-none"
             >
               {story.title}
             </Link>
           </h3>
-          <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty">
+          <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty leading-relaxed">
             {story.shortDescription}
           </p>
           <StoryMeta story={story} />

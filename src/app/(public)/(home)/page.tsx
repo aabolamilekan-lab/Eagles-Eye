@@ -3,10 +3,11 @@ import Link from "next/link";
 import { SearchBar } from "@/components/search/SearchBar";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CategoryCard } from "@/components/stories/CategoryCard";
-import { FeaturedStory, StoryCard, StoryGrid } from "@/components/stories/StoryCard";
+import { FeaturedStory, StoryCard, type StoryCardData } from "@/components/stories/StoryCard";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/lib/cn";
 import { getPublishedCategories } from "@/lib/queries/public/categories";
 import {
   getFeaturedStories,
@@ -40,6 +41,55 @@ const FEATURED_LIMIT = 6;
 const RECENT_LIMIT = 12;
 const POPULAR_LIMIT = 4;
 const CATEGORY_LIMIT = 6;
+
+function RecentStoriesSection({ stories }: { stories: StoryCardData[] }) {
+  if (stories.length === 0) return null;
+
+  const [primary, ...others] = stories;
+  if (!primary) return null;
+
+  const featuredGroup = others.slice(0, 4);
+  const remaining = others.slice(4);
+
+  return (
+    <div className="flex flex-col gap-8 sm:gap-10">
+      {/* Primary Recent Spotlight + Sub-Grid */}
+      <div
+        className={cn(
+          "grid gap-6 sm:gap-8 items-start",
+          featuredGroup.length > 0 ? "lg:grid-cols-[1.15fr_1fr]" : "grid-cols-1",
+        )}
+      >
+        {/* Main Recent Spotlight Story */}
+        <StoryCard story={primary} priority className="w-full h-full" />
+
+        {/* Supporting 2x2 Grid */}
+        {featuredGroup.length > 0 ? (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 list-none">
+            {featuredGroup.map((story) => (
+              <li key={story.slug} className="flex">
+                <StoryCard story={story} size="compact" className="w-full" />
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+
+      {/* Remaining Recent Stories Grid */}
+      {remaining.length > 0 ? (
+        <div className="pt-8 border-t border-border/60">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 list-none">
+            {remaining.map((story) => (
+              <li key={story.slug} className="flex">
+                <StoryCard story={story} className="w-full" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export default async function HomePage() {
   const [featured, recent, popular, categories, storyCount] =
@@ -102,7 +152,7 @@ export default async function HomePage() {
               <SectionHeading
                 id="home-featured-heading"
                 eyebrow="Lead Story"
-                title="Editor's Pick"
+                title="Featured stories"
                 action={
                   <ButtonLink href="/stories" variant="ghost" size="sm">
                     View all stories
@@ -161,7 +211,7 @@ export default async function HomePage() {
       </section>
 
       {!hasStories ? (
-        <section className="shell py-12">
+        <section className="shell py-12 border-b border-border/70">
           <EmptyState
             title="No stories have been published yet"
             description="When the first story is published it will appear here, newest first. In the meantime, browse the categories to see how the catalogue is arranged."
@@ -177,7 +227,7 @@ export default async function HomePage() {
       {recent.length > 0 ? (
         <section
           aria-labelledby="home-recent-heading"
-          className="shell pb-(--spacing-section)"
+          className="shell py-12 sm:py-16 border-b border-border/70"
         >
           <SectionHeading
             id="home-recent-heading"
@@ -185,28 +235,33 @@ export default async function HomePage() {
             title="Recently published"
             action={
               <ButtonLink href="/stories" variant="ghost" size="sm">
-                View all
+                View all stories
               </ButtonLink>
             }
           />
-          <StoryGrid stories={recent} />
+          <RecentStoriesSection stories={recent} />
         </section>
       ) : null}
 
       {popular.length > 0 ? (
         <section
           aria-labelledby="home-popular-heading"
-          className="shell pb-(--spacing-section)"
+          className="shell py-12 sm:py-16 border-b border-border/70"
         >
           <SectionHeading
             id="home-popular-heading"
             eyebrow="Most read"
             title="Popular with readers"
+            action={
+              <ButtonLink href="/stories?sort=popular" variant="ghost" size="sm">
+                View all popular
+              </ButtonLink>
+            }
           />
-          <ul className="flex max-w-3xl list-none flex-col divide-y divide-border">
-            {popular.map((story) => (
-              <li key={story.slug} className="py-5 first:pt-0 last:pb-0">
-                <StoryCard story={story} layout="row" />
+          <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 list-none">
+            {popular.map((story, index) => (
+              <li key={story.slug} className="flex">
+                <StoryCard story={story} layout="row" index={index + 1} className="w-full" />
               </li>
             ))}
           </ul>
@@ -216,21 +271,21 @@ export default async function HomePage() {
       {hasCategories ? (
         <section
           aria-labelledby="home-categories-heading"
-          className="shell pb-(--spacing-section)"
+          className="shell py-12 sm:py-16 border-b border-border/70"
         >
           <SectionHeading
             id="home-categories-heading"
-            eyebrow="Browse"
-            title="Categories"
+            eyebrow="Discover"
+            title="Explore categories"
             action={
               <ButtonLink href="/categories" variant="ghost" size="sm">
-                View all
+                View all categories
               </ButtonLink>
             }
           />
           <ul className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((category) => (
-              <li key={category.slug}>
+              <li key={category.slug} className="flex">
                 <CategoryCard category={category} />
               </li>
             ))}

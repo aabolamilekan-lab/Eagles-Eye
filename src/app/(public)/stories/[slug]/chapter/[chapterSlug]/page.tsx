@@ -86,6 +86,8 @@ export default async function ChapterReaderPage({
   ];
 
   const plainText = toPlainText(chapter.content);
+  const wordCount = countWords(plainText);
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
   // An Article node with a Story parent — not a bare `Chapter` node, which
   // implies a book structure this platform does not model. Returns null when
@@ -103,7 +105,7 @@ export default async function ChapterReaderPage({
       updatedAt: chapter.updatedAt,
     },
     description: plainText,
-    wordCount: countWords(plainText),
+    wordCount,
   });
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", url: "/" },
@@ -124,11 +126,17 @@ export default async function ChapterReaderPage({
           <>
             {story.author ? <span>By {story.author}</span> : null}
             {published && chapter.publishedAt ? (
-              <time dateTime={chapter.publishedAt}>{published}</time>
+              <>
+                <span aria-hidden="true" className="text-ink-subtle/60">•</span>
+                <time dateTime={chapter.publishedAt}>{published}</time>
+              </>
             ) : null}
+            <span aria-hidden="true" className="text-ink-subtle/60">•</span>
             <span className="tabular-nums">
               Chapter {reader.currentNumber} of {reader.totalCount}
             </span>
+            <span aria-hidden="true" className="text-ink-subtle/60">•</span>
+            <span className="tabular-nums">{readingMinutes} min read</span>
           </>
         }
         footer={

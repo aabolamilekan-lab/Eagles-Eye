@@ -1,27 +1,33 @@
 import Link from "next/link";
 
+export interface CategoryCardData {
+  name: string;
+  slug: string;
+  description: string | null;
+  storyCount?: number;
+}
+
 /**
  * Category card.
  *
- * A quiet index entry. Categories are navigation, not content, so they get a
- * name and a short description, never an illustration or a volume count. The
- * whole card is clickable through a stretched link on the title — the link wraps
- * only the text, so the heading keeps a real focusable target.
+ * An editorial topic entry. Categories display a title, short description,
+ * accurate published story count, and explore indicator. The entire card is
+ * accessible via stretched link.
  */
 export function CategoryCard({
   category,
 }: {
-  category: { name: string; slug: string; description: string | null };
+  category: CategoryCardData;
 }) {
   return (
-    <article className="group relative flex flex-col justify-between gap-3 rounded-md border border-border bg-surface p-6 transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5">
-      <div className="flex flex-col gap-1.5">
+    <article className="group relative flex w-full flex-col justify-between gap-4 rounded-md border border-border/80 bg-surface p-5 sm:p-6 shadow-2xs transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2 min-w-0">
-          <h3 className="font-display text-heading-md text-ink transition-colors group-hover:text-primary min-w-0 break-words">
+          <h3 className="font-display text-heading-md text-ink tracking-tight transition-colors group-hover:text-primary min-w-0 break-words">
             <Link
               href={`/categories/${category.slug}`}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-['']"
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
             >
               {category.name}
             </Link>
@@ -40,14 +46,21 @@ export function CategoryCard({
           </svg>
         </div>
         {category.description ? (
-          <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty">
+          <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty leading-relaxed">
             {category.description}
           </p>
         ) : null}
       </div>
 
-      <div className="pt-2 border-t border-border/50 flex items-center justify-end">
-        <span className="font-ui text-body-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="pt-3 border-t border-border/60 flex items-center justify-between font-ui text-body-xs">
+        {category.storyCount !== undefined ? (
+          <span className="font-medium text-ink-subtle tabular-nums">
+            {category.storyCount} {category.storyCount === 1 ? "story" : "stories"}
+          </span>
+        ) : (
+          <span />
+        )}
+        <span className="font-semibold text-primary inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5">
           Explore &rarr;
         </span>
       </div>

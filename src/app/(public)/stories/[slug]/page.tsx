@@ -106,16 +106,16 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
         <Breadcrumbs items={breadcrumbs} className="pt-6" />
       </div>
 
-      <header className="shell pt-10">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-14">
-          <div className="relative aspect-[3/2] overflow-hidden rounded-md border border-border bg-surface-sunken lg:aspect-[4/5]">
+      <header className="shell pt-8 sm:pt-12">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-12 items-start">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-sunken shadow-xs lg:aspect-[4/5]">
             {story.coverImageUrl ? (
               <Image
                 src={story.coverImageUrl}
                 alt={story.coverAlt ?? ""}
                 fill
                 priority
-                sizes="(max-width: 1024px) 100vw, 288px"
+                sizes="(max-width: 1024px) 100vw, 320px"
                 className="object-cover"
               />
             ) : (
@@ -133,33 +133,28 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
               </Link>
             ) : null}
 
-            <h1 className="mt-4 font-display text-display-lg text-ink text-balance">
+            <h1 className="mt-4 font-display text-display-lg sm:text-display-xl text-ink font-semibold tracking-tight text-balance">
               {story.title}
             </h1>
 
-            {story.author ? (
-              <p className="mt-3 font-ui text-body text-ink-muted">
-                By {story.author}
-              </p>
-            ) : null}
-
-            {published && story.publishedAt ? (
-              <time
-                dateTime={story.publishedAt}
-                className="mt-5 block font-ui text-body-xs text-ink-subtle"
-              >
-                {published}
-              </time>
-            ) : null}
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-body-sm text-ink-muted">
+              {story.author ? <span className="font-medium text-ink">By {story.author}</span> : null}
+              {published && story.publishedAt ? (
+                <>
+                  {story.author ? <span aria-hidden="true" className="text-ink-subtle/60">•</span> : null}
+                  <time dateTime={story.publishedAt}>{published}</time>
+                </>
+              ) : null}
+            </div>
 
             {story.shortDescription ? (
-              <p className="mt-6 max-w-2xl font-ui text-body text-ink-muted text-pretty">
+              <p className="mt-6 max-w-2xl font-ui text-body text-ink-muted leading-relaxed text-pretty">
                 {story.shortDescription}
               </p>
             ) : null}
 
             {firstChapter ? (
-              <div className="mt-7">
+              <div className="mt-8">
                 <ButtonLink
                   href={`/stories/${story.slug}/chapter/${firstChapter.slug}`}
                   variant="primary"
@@ -172,7 +167,7 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
             ) : null}
 
             {story.tags.length > 0 ? (
-              <div className="mt-8 flex flex-wrap items-center gap-2">
+              <div className="mt-8 flex flex-wrap items-center gap-2 pt-6 border-t border-border/60">
                 <span className="label-micro text-ink-subtle">Tags</span>
                 {story.tags.map((tag) => (
                   <Link
@@ -189,25 +184,25 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
         </div>
       </header>
 
-      <div className="shell mt-(--spacing-section)">
+      <div className="shell mt-12 sm:mt-16">
         {story.description ? (
           <section aria-labelledby="story-about-heading">
             <h2
               id="story-about-heading"
-              className="font-display text-display-sm text-ink"
+              className="font-display text-heading-lg text-ink font-semibold border-b border-border pb-3"
             >
               About this story
             </h2>
             <RichText
               html={story.description}
               headingOffset={2}
-              className="mt-4 max-w-(--container-prose)"
+              className="mt-6 max-w-(--container-prose)"
             />
           </section>
         ) : null}
 
         {story.hasPublishedChapters ? (
-          <div className="mt-(--spacing-section) max-w-3xl">
+          <div className="mt-12 sm:mt-16 max-w-3xl">
             <ChapterList storySlug={story.slug} chapters={story.chapters} />
           </div>
         ) : null}

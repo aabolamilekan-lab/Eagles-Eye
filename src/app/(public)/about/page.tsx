@@ -16,7 +16,7 @@ export function generateMetadata(): Metadata {
 
 export default function AboutPage() {
   return (
-    <div className="shell py-(--spacing-section)">
+    <div className="shell py-8 sm:py-12 md:py-16">
       <JsonLd
         data={buildBreadcrumbJsonLd([
           { name: "Home", url: "/" },
@@ -24,8 +24,13 @@ export default function AboutPage() {
         ])}
       />
       <div className="reading-column">
-        <p className="label-micro text-primary">About</p>
-        <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
+        <div className="flex items-center gap-2">
+          <span className="inline-block size-1.5 rounded-full bg-primary" />
+          <span className="label-micro text-primary uppercase font-medium tracking-wider">
+            About Eagles Eye
+          </span>
+        </div>
+        <h1 className="mt-3 font-display text-display-lg sm:text-display-xl text-ink font-semibold tracking-tight text-balance">
           A calm home for long-form stories
         </h1>
 

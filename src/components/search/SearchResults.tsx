@@ -21,21 +21,32 @@ export function SearchResults({
   const { stories, total, page, pageCount, pageSize } = result;
 
   return (
-    <div>
-      <h2 className="font-display text-heading-sm text-ink">
-        {search.q ? `Results for “${search.q}”` : "Results"}
-      </h2>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+        <h2 className="font-display text-heading-md text-ink">
+          {search.q ? (
+            <>
+              Results for <span className="italic text-primary">“{search.q}”</span>
+            </>
+          ) : (
+            "Filtered Stories"
+          )}
+        </h2>
+        <span className="font-ui text-body-xs font-medium text-ink-muted bg-surface-sunken px-2.5 py-1 rounded-full border border-border">
+          {total} {total === 1 ? "story" : "stories"}
+        </span>
+      </div>
 
-      <ul className="mt-6 flex list-none flex-col divide-y divide-border">
+      <ul className="flex list-none flex-col divide-y divide-border/60">
         {stories.map((story) => (
-          <li key={story.slug} className="py-5 first:pt-0 last:pb-0">
+          <li key={story.slug} className="py-6 first:pt-0 last:pb-0">
             <StoryCard story={story} layout="row" />
           </li>
         ))}
       </ul>
 
       <Pagination
-        className="mt-8"
+        className="mt-8 pt-4 border-t border-border/60"
         page={page}
         pageCount={pageCount}
         totalItems={total}
