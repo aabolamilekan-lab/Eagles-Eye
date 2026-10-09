@@ -4,16 +4,14 @@ import Link from "next/link";
  * Category card.
  *
  * A quiet index entry. Categories are navigation, not content, so they get a
- * count and a name, never an illustration. The whole card is clickable through
- * a stretched link on the title — the link wraps only the text, so the heading
- * keeps a real focusable target.
+ * name and a short description, never an illustration or a volume count. The
+ * whole card is clickable through a stretched link on the title — the link wraps
+ * only the text, so the heading keeps a real focusable target.
  */
 export function CategoryCard({
   category,
-  storyCount,
 }: {
   category: { name: string; slug: string; description: string | null };
-  storyCount: number;
 }) {
   return (
     <article className="group relative flex flex-col justify-between gap-3 rounded-md border border-border bg-surface p-6 transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5">
@@ -48,10 +46,7 @@ export function CategoryCard({
         ) : null}
       </div>
 
-      <div className="pt-2 border-t border-border/50 flex items-center justify-between">
-        <span className="font-ui text-body-xs font-medium text-ink-subtle tabular-nums">
-          {storyCount === 1 ? "1 story" : `${storyCount} stories`}
-        </span>
+      <div className="pt-2 border-t border-border/50 flex items-center justify-end">
         <span className="font-ui text-body-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
           Explore &rarr;
         </span>

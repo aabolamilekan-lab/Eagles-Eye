@@ -82,11 +82,7 @@ export default async function CategoriesPage({
           <h2 className="sr-only">All categories</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {result.categories.map((category) => (
-              <CategoryCard
-                key={category.slug}
-                category={category}
-                storyCount={category.storyCount}
-              />
+              <CategoryCard key={category.slug} category={category} />
             ))}
           </div>
 
@@ -97,6 +93,7 @@ export default async function CategoriesPage({
             pageSize={result.pageSize}
             itemNoun="category"
             itemNounPlural="categories"
+            showSummary={false}
             buildHref={categoriesIndexHref}
             className="mt-12"
           />

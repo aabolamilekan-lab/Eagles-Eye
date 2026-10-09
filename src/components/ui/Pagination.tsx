@@ -15,6 +15,11 @@ export interface PaginationProps {
   itemNoun?: string;
   /** Plurals the noun. Defaults to `itemNoun + "s"`. */
   itemNounPlural?: string;
+  /**
+   * When false, the "Showing x–y of z" summary is omitted. Public read views
+   * hide result volume; admin views keep it.
+   */
+  showSummary?: boolean;
   className?: string;
 }
 
@@ -37,6 +42,7 @@ export function Pagination({
   buildHref,
   itemNoun = "result",
   itemNounPlural,
+  showSummary = true,
   className,
 }: PaginationProps) {
   const plural = itemNounPlural ?? `${itemNoun}s`;
@@ -46,16 +52,17 @@ export function Pagination({
   // Nothing at all: callers render an empty state instead of a range line.
   if (totalItems === 0) return null;
 
-  const summary = (
+  const summary = showSummary ? (
     <p className="font-ui text-body-xs text-ink-muted">
       Showing <span className="tabular-nums">{first}</span>–
       <span className="tabular-nums">{last}</span> of{" "}
       <span className="tabular-nums">{totalItems}</span>{" "}
       {totalItems === 1 ? itemNoun : plural}
     </p>
-  );
+  ) : null;
 
   if (pageCount <= 1) {
+    if (!summary) return null;
     return (
       <div
         className={cn(

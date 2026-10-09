@@ -132,12 +132,7 @@ export default async function CategoryPage({
         </div>
       ) : (
         <div className="mt-10">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <p className="font-ui text-body-sm text-ink-muted">
-              <span className="tabular-nums">{result.total}</span>{" "}
-              {result.total === 1 ? "story" : "stories"}
-            </p>
-
+          <div className="flex flex-wrap items-end justify-end gap-4">
             <form
               method="get"
               action={`/categories/${category.slug}`}
@@ -166,6 +161,7 @@ export default async function CategoryPage({
             pageSize={result.pageSize}
             itemNoun="story"
             itemNounPlural="stories"
+            showSummary={false}
             buildHref={(target) =>
               categoryStoryHref(category.slug, {
                 sort: search.sort,

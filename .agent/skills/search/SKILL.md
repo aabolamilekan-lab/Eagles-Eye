@@ -114,7 +114,7 @@ CREATE INDEX "Story_searchVector_idx" ON "Story" USING GIN ("searchVector");
 - `status = PUBLISHED` is applied **inside** `src/lib/queries/public/search.ts`, to the story row and the joined chapter row. The page never adds it and no parameter disables it.
 - Counts come from the same filtered query via `COUNT(*) OVER ()`, never an unfiltered `story.count()`, so total and rows cannot disagree. A count including drafts reveals unpublished volume; that is a disclosure, not rounding.
 - Page size 10, hard maximum 25, offset pagination with `LIMIT`/`OFFSET`. An unbounded match set is never fetched to paginate in the browser.
-- Pagination preserves `q` on every link, page numbers are real links, and the range ("Showing 11–20 of 34") is server-derived.
+- Pagination preserves `q` on every link and page numbers are real links. Public search hides the range line; the total stays server-derived and drives page count only.
 - Results carry a cache tag revalidated by the admin publish and unpublish actions, so newly published stories become findable without waiting out the revalidation window.
 - Four distinct states: **no query** (form plus browse links, no database call), **no results** (name the term, suggest broadening, keep the typed value), **loading** (a `loading.tsx` skeleton mirroring the result list, so a reader never reads "nothing found" while results load), **error** (a safe message in the route's error boundary with a retry affordance; detail to the project logger under a request id, never the Prisma message, the SQL, or the raw term).
 

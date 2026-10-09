@@ -109,16 +109,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
         </div>
       ) : (
         <div className="mt-12">
-          {result.pageCount <= 1 ? (
-            <p className="font-ui text-body-sm text-ink-muted">
-              <span className="tabular-nums">{result.total}</span>{" "}
-              {result.total === 1 ? "story" : "stories"}
-            </p>
-          ) : null}
-
-          <div className={result.pageCount <= 1 ? "mt-6" : undefined}>
-            <StoryGrid stories={result.stories} />
-          </div>
+          <StoryGrid stories={result.stories} />
 
           <Pagination
             page={result.page}
@@ -127,6 +118,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
             pageSize={result.pageSize}
             itemNoun="story"
             itemNounPlural="stories"
+            showSummary={false}
             buildHref={(target) => storyListHref(search, { page: target })}
             className="mt-12"
           />

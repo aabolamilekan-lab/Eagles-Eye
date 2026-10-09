@@ -27,16 +27,6 @@ export default function PublicLoading() {
             <Skeleton className="h-12 w-40 rounded-md" />
             <Skeleton className="h-12 w-44 rounded-md" />
           </div>
-          <div className="mt-10 flex gap-12 border-t border-border pt-6">
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-7 w-16" />
-              <Skeleton className="h-3 w-28" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-7 w-12" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-          </div>
         </div>
 
         <div className="flex flex-col gap-6 lg:pt-4">

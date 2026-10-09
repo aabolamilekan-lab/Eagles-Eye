@@ -143,23 +143,14 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
               </p>
             ) : null}
 
-            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-ui text-body-xs text-ink-subtle">
-              {published && story.publishedAt ? (
-                <time dateTime={story.publishedAt}>{published}</time>
-              ) : null}
-              <span className="tabular-nums">
-                {story.chapterCount === 1
-                  ? "1 chapter"
-                  : `${story.chapterCount} chapters`}
-              </span>
-              {story.views > 0 ? (
-                <span className="tabular-nums">
-                  {story.views === 1
-                    ? "1 read"
-                    : `${story.views.toLocaleString("en-GB")} reads`}
-                </span>
-              ) : null}
-            </div>
+            {published && story.publishedAt ? (
+              <time
+                dateTime={story.publishedAt}
+                className="mt-5 block font-ui text-body-xs text-ink-subtle"
+              >
+                {published}
+              </time>
+            ) : null}
 
             {story.shortDescription ? (
               <p className="mt-6 max-w-2xl font-ui text-body text-ink-muted text-pretty">

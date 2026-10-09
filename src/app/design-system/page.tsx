@@ -668,15 +668,12 @@ export default function DesignSystemPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <CategoryCard
                   category={{ name: "Fiction", slug: "fiction", description: "Short and long form." }}
-                  storyCount={18}
                 />
                 <CategoryCard
                   category={{ name: "Travel", slug: "travel", description: "Journeys, on foot and otherwise." }}
-                  storyCount={7}
                 />
                 <CategoryCard
                   category={{ name: "Essays", slug: "essays", description: null }}
-                  storyCount={12}
                 />
               </div>
             </div>

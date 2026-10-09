@@ -180,7 +180,6 @@ export function StoryCard({
 }
 
 function StoryMeta({ story }: { story: StoryCardData }) {
-  const hasChapterCount = story.chapterCount !== null;
   const published = formatPublishedDate(story.publishedAt);
 
   return (
@@ -188,11 +187,6 @@ function StoryMeta({ story }: { story: StoryCardData }) {
       {story.author ? <span className="text-ink-muted font-medium">{story.author}</span> : null}
       {published && story.publishedAt ? (
         <time dateTime={story.publishedAt}>{published}</time>
-      ) : null}
-      {hasChapterCount ? (
-        <span className="tabular-nums">
-          {story.chapterCount === 1 ? "1 chapter" : `${story.chapterCount} chapters`}
-        </span>
       ) : null}
       {story.readingMinutes ? (
         <span className="inline-flex items-center gap-1 tabular-nums">

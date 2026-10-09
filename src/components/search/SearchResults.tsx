@@ -6,9 +6,10 @@ import type { StorySearchResult } from "@/lib/queries/public/search";
 /**
  * Search results.
  *
- * A count line, then the matching stories as row cards, then pagination. Row
- * layout keeps the result list scannable; the count is an `<h2>` so the page
- * still has a clear outline under its `h1`.
+ * A heading naming the search, then the matching stories as row cards, then
+ * pagination. Row layout keeps the result list scannable; the heading is an
+ * `<h2>` so the page still has a clear outline under its `h1`. Result volume is
+ * never stated publicly.
  */
 export function SearchResults({
   search,
@@ -22,7 +23,7 @@ export function SearchResults({
   return (
     <div>
       <h2 className="font-display text-heading-sm text-ink">
-        {summary(search, total)}
+        {search.q ? `Results for “${search.q}”` : "Results"}
       </h2>
 
       <ul className="mt-6 flex list-none flex-col divide-y divide-border">
@@ -41,12 +42,8 @@ export function SearchResults({
         pageSize={pageSize}
         buildHref={(target) => searchHref(search, { page: target })}
         itemNoun="result"
+        showSummary={false}
       />
     </div>
   );
-}
-
-function summary(search: StorySearch, total: number): string {
-  const noun = total === 1 ? "result" : "results";
-  return search.q ? `${total} ${noun} for “${search.q}”` : `${total} ${noun}`;
 }

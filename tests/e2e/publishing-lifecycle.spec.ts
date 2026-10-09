@@ -116,7 +116,8 @@ test.describe("publishing lifecycle", () => {
     await expect(chapterRows).toHaveCount(2);
     await expect(chapterRows.nth(0)).toContainText(FIRST_CHAPTER);
     await expect(chapterRows.nth(1)).toContainText(SECOND_CHAPTER);
-    await expect(reader.getByText("2 chapters")).toBeVisible();
+    // Public story detail never states a chapter or read volume.
+    await expect(reader.getByText("2 chapters")).toHaveCount(0);
 
     // Search reaches the same story from a different entry point.
     await reader.goto("/search?q=Tide-Table");

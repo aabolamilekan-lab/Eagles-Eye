@@ -185,7 +185,8 @@ Non-negotiable, and part of the Definition of Done:
 - Reused everywhere it appears: home, listing, category, search results, related stories.
   One component, one implementation.
 - Cover image, title, short description (clamped to a fixed line count so cards align), category badge,
-  and chapter count when known. Author is not a field in this data model — do not invent one.
+  and metadata when known. Public cards never render volume counts (chapter or read totals); those are
+  admin-only. Author is not a field in this data model — do not invent one.
 - Whole card is not a bare link. Title is the link; the stretched-link pattern keeps one
   accessible name per card.
 - Fixed aspect ratio on covers with `next/image` and explicit dimensions.
@@ -259,8 +260,9 @@ Non-negotiable, and part of the Definition of Done:
 
 ### Pagination
 
-- One shared component driven by the public query layer's page and total count.
-- Show a real range ("Showing 21–40 of 137"), not just arrows.
+- One shared component driven by the query layer's page and total count.
+- Admin shows a real range ("Showing 21–40 of 137"). Public read views pass `showSummary={false}` and
+  render controls only: page numbers and prev/next. Public volume is never stated.
 - Prev/next disabled at boundaries with `aria-disabled` and an accessible reason.
 - Page numbers are links so they are crawlable, shareable, and middle-clickable.
 - Preserve the current search query and filters across pages; drop them when the term is

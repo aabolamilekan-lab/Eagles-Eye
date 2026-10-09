@@ -7,10 +7,7 @@ import { FeaturedStory, StoryCard, StoryGrid } from "@/components/stories/StoryC
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import {
-  getPublishedCategories,
-  getPublishedCategoryCount,
-} from "@/lib/queries/public/categories";
+import { getPublishedCategories } from "@/lib/queries/public/categories";
 import {
   getFeaturedStories,
   getPopularStories,
@@ -45,14 +42,13 @@ const POPULAR_LIMIT = 4;
 const CATEGORY_LIMIT = 6;
 
 export default async function HomePage() {
-  const [featured, recent, popular, categories, storyCount, categoryCount] =
+  const [featured, recent, popular, categories, storyCount] =
     await Promise.all([
       getFeaturedStories(FEATURED_LIMIT),
       getRecentStories(RECENT_LIMIT),
       getPopularStories(POPULAR_LIMIT),
       getPublishedCategories(CATEGORY_LIMIT),
       getPublishedStoryCount(),
-      getPublishedCategoryCount(),
     ]);
 
   const [leadFeatured, ...restFeatured] = featured;
@@ -96,20 +92,6 @@ export default async function HomePage() {
             </ButtonLink>
           </div>
 
-          {hasStories ? (
-            <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-5 border-t border-border pt-6">
-              <Stat
-                value={storyCount}
-                label={storyCount === 1 ? "story published" : "stories published"}
-              />
-              {categoryCount > 0 ? (
-                <Stat
-                  value={categoryCount}
-                  label={categoryCount === 1 ? "category" : "categories"}
-                />
-              ) : null}
-            </dl>
-          ) : null}
         </div>
 
         <div className="flex flex-col gap-6 lg:pt-4">
@@ -134,9 +116,6 @@ export default async function HomePage() {
                       className="flex items-center justify-between py-2.5 px-2 font-ui text-body-sm text-ink-muted transition-colors rounded-sm hover:bg-surface-sunken hover:text-ink"
                     >
                       <span className="font-medium">{category.name}</span>
-                      <span className="tabular-nums rounded-full bg-surface-sunken px-2 py-0.5 text-body-xs font-semibold text-ink-subtle">
-                        {category.storyCount}
-                      </span>
                     </Link>
                   </li>
                 ))}
@@ -242,7 +221,7 @@ export default async function HomePage() {
           <ul className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((category) => (
               <li key={category.slug}>
-                <CategoryCard category={category} storyCount={category.storyCount} />
+                <CategoryCard category={category} />
               </li>
             ))}
           </ul>
@@ -276,17 +255,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="flex flex-col gap-0.5 rounded-md border border-border/60 bg-surface/50 px-4 py-2 shadow-2xs">
-      <dt className="font-display text-display-sm font-semibold text-ink tabular-nums">
-        {value.toLocaleString("en-GB")}
-      </dt>
-      <dd className="font-ui text-body-xs font-medium text-ink-subtle">{label}</dd>
     </div>
   );
 }

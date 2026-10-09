@@ -61,7 +61,7 @@ Not for `/admin/**`, storage internals, or authentication.
 - Fixed, server-derived order: featured (`featured = true`, `PUBLISHED`), then recently published by `publishedAt` descending, then categories holding at least one published story.
 - Cap at 6 featured and 12 recent. Both are capped queries, never a `findMany` trimmed in JavaScript.
 - A section with nothing to show is omitted entirely, heading included. No "coming soon" panel.
-- The hero states something true from the catalog: published story count, latest title, or a featured story. Never invented reader counts.
+- The hero states something true from the catalog without volume counts: the catalogue framing, a featured story, or a section heading. Never invented reader counts, and never a published story or category total.
 - The first above-the-fold cover is the LCP candidate and the only `priority` image on the page.
 
 ### Listing and grid
@@ -102,7 +102,7 @@ Not for `/admin/**`, storage internals, or authentication.
 ### Pagination, covers, determinism
 
 - Paginate in the query layer: default 12 per page, hard maximum 48, `page` clamped to a positive integer. Page numbers are real `<a>` links, so they are crawlable and shareable.
-- Show a real range ("Showing 13–24 of 57"), previous and next with `aria-disabled` plus an accessible reason at the boundaries, inside `<nav aria-label="Pagination">`. Page query and total count run concurrently.
+- Public read views show controls only (page numbers, previous/next); the range line is admin-only via `Pagination`'s `showSummary` prop. Previous and next use `aria-disabled` plus an accessible reason at the boundaries, inside `<nav aria-label="Pagination">`. Page query and total count run concurrently.
 - Preserve route context across pages: on `/search` both `q` and `page` carry over; on `/stories` every filter (`q`, `category`, `tag`, `sort`) carries over and only `page` changes. Never render an unbounded list and paginate in the browser.
 - Covers come only from the image route or a CDN URL. `next/image` with explicit `width` and `height` matching the enforced aspect ratio, plus a `sizes` value reflecting the real grid slot. Never `unoptimized`.
 - `alt` is the story title where the cover carries meaning, `alt=""` where the adjacent title already names the story. A missing `coverImage` renders the shared placeholder at fixed dimensions, never a broken image.
@@ -114,7 +114,7 @@ Not for `/admin/**`, storage internals, or authentication.
 - The renderer re-sanitizes on output as defence in depth for rows predating write-time sanitization, stripping `javascript:`, `data:`, and `on*` attributes.
 - The cover route verifies the key belongs to a `PUBLISHED` story before streaming bytes; a `DRAFT` story's key returns the same 404 as an unknown key.
 - `UPLOAD_MAX_BYTES` and the format allowlist are enforced on write. The reader surface trusts none of that data, and `next/image` is the only public image renderer.
-- Reader pages render no draft title, short description, chapter count, category count, or cover. The public query is the enforcement point; components are not a second line of defence.
+- Reader pages render no draft title, short description, or cover, and never any volume count (published story, category, chapter, or read totals). The public query is the enforcement point; components are not a second line of defence.
 - No `console.log`. Failures render a safe message in the route's error boundary; detail goes to the project logger under a request id.
 - No Prisma messages, bucket keys, env values, or stack traces reach a reader page. `notFound()` for absent and non-published content, generic error boundary for the rest.
 
