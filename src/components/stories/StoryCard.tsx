@@ -104,10 +104,10 @@ export function StoryCard({
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md border border-border bg-surface",
+        "group relative flex flex-col overflow-hidden rounded-md border border-border/80 bg-surface shadow-2xs",
         "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
         "hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
-        "focus-within:border-border-strong focus-within:shadow-md",
+        "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
         className,
       )}
     >
@@ -149,14 +149,14 @@ export function StoryCard({
 
         <h3
           className={cn(
-            "font-display text-ink text-balance transition-colors group-hover:text-primary",
+            "font-display text-ink text-balance tracking-tight transition-colors group-hover:text-primary",
             size === "compact" ? "text-heading-xs" : "text-heading-md",
           )}
         >
           <Link
             href={href}
             prefetch={false}
-            className="after:absolute after:inset-0 after:content-['']"
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
           >
             {story.title}
           </Link>
@@ -164,14 +164,14 @@ export function StoryCard({
 
         <p
           className={cn(
-            "font-ui text-ink-muted text-pretty",
+            "font-ui text-ink-muted text-pretty leading-relaxed",
             size === "compact" ? "line-clamp-2 text-body-xs" : "line-clamp-3 text-body-sm",
           )}
         >
           {story.shortDescription}
         </p>
 
-        <div className="mt-auto pt-2 border-t border-border/50">
+        <div className="mt-auto pt-3 border-t border-border/60">
           <StoryMeta story={story} />
         </div>
       </div>
@@ -183,14 +183,20 @@ function StoryMeta({ story }: { story: StoryCardData }) {
   const published = formatPublishedDate(story.publishedAt);
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-body-xs text-ink-subtle">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-ui text-body-xs text-ink-subtle">
       {story.author ? <span className="text-ink-muted font-medium">{story.author}</span> : null}
+      {story.author && (published || story.readingMinutes) ? (
+        <span aria-hidden="true" className="text-border-strong/70">·</span>
+      ) : null}
       {published && story.publishedAt ? (
         <time dateTime={story.publishedAt}>{published}</time>
       ) : null}
+      {published && story.readingMinutes ? (
+        <span aria-hidden="true" className="text-border-strong/70">·</span>
+      ) : null}
       {story.readingMinutes ? (
         <span className="inline-flex items-center gap-1 tabular-nums">
-          <Clock aria-hidden="true" className="size-3" />
+          <Clock aria-hidden="true" className="size-3 text-accent" />
           {story.readingMinutes} min read
         </span>
       ) : null}

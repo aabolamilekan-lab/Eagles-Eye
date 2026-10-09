@@ -93,7 +93,7 @@ export default async function CategoryPage({
   ];
 
   return (
-    <div className="shell py-(--spacing-section)">
+    <div className="shell py-8 sm:py-12">
       <JsonLd
         data={buildCollectionPageJsonLd({
           name: category.name,
@@ -111,40 +111,50 @@ export default async function CategoryPage({
 
       <Breadcrumbs items={breadcrumbs} />
 
-      <header className="mt-6 max-w-2xl">
-        <p className="label-micro text-primary">Category</p>
-        <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
+      <header className="mt-6 border-b border-border/70 pb-8">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+            Category Archive
+          </span>
+        </div>
+        <h1 className="mt-4 font-display text-display-lg sm:text-display-xl text-ink tracking-tight text-balance">
           {category.name}
         </h1>
         {category.description ? (
-          <p className="mt-4 font-ui text-body text-ink-muted text-pretty">
+          <p className="mt-3 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
             {category.description}
           </p>
         ) : null}
       </header>
 
       {result.total === 0 ? (
-        <div className="mt-12">
+        <div className="mt-10 sm:mt-12">
           <EmptyState
             title="No published stories yet"
             description="No stories in this category are published. Check back soon."
           />
         </div>
       ) : (
-        <div className="mt-10">
-          <div className="flex flex-wrap items-end justify-end gap-4">
+        <div className="mt-8 sm:mt-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/50 pb-5">
+            <p className="font-ui text-body-sm text-ink-muted">
+              Showing <span className="font-semibold text-ink">{result.total}</span> {result.total === 1 ? "story" : "stories"}
+            </p>
             <form
               method="get"
               action={`/categories/${category.slug}`}
-              className="flex items-end gap-3"
+              className="flex items-end gap-2.5 sm:gap-3"
             >
-              <SelectField
-                label="Sort"
-                name="sort"
-                defaultValue={search.sort}
-                options={SORT_OPTIONS}
-              />
-              <Button type="submit" variant="secondary" size="sm">
+              <div className="min-w-[140px] sm:min-w-[160px]">
+                <SelectField
+                  label="Sort by"
+                  name="sort"
+                  defaultValue={search.sort}
+                  options={SORT_OPTIONS}
+                />
+              </div>
+              <Button type="submit" variant="secondary" size="md" className="h-11 shrink-0">
                 Apply
               </Button>
             </form>
@@ -168,7 +178,7 @@ export default async function CategoryPage({
                 page: target,
               })
             }
-            className="mt-12"
+            className="mt-10 sm:mt-14"
           />
         </div>
       )}

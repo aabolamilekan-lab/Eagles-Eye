@@ -48,19 +48,24 @@ export default async function CategoriesPage({
   const result = await getPublishedCategoryPage(page);
 
   return (
-    <div className="shell py-(--spacing-section)">
+    <div className="shell py-8 sm:py-12">
       <JsonLd
         data={buildBreadcrumbJsonLd([
           { name: "Home", url: "/" },
           { name: "Categories" },
         ])}
       />
-      <header className="max-w-2xl">
-        <p className="label-micro text-primary">Browse</p>
-        <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
+      <header className="border-b border-border/70 pb-8">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+            Categories Index
+          </span>
+        </div>
+        <h1 className="mt-4 font-display text-display-lg sm:text-display-xl text-ink tracking-tight text-balance">
           Categories
         </h1>
-        <p className="mt-4 font-ui text-body text-ink-muted text-pretty">
+        <p className="mt-3 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
           Stories grouped by category, so readers can follow a subject.
         </p>
       </header>
