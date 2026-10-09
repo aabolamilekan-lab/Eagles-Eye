@@ -799,7 +799,7 @@ export default function DesignSystemPage() {
           <div className="flex flex-col gap-6">
             <SiteHeader
               navLabel="Preview navigation"
-              brand={<Wordmark href="#" tone="on-primary" />}
+              brand={<Wordmark href="#" tone="ink" />}
               nav={[
                 { label: "Stories", href: "#" },
                 { label: "Categories", href: "#" },

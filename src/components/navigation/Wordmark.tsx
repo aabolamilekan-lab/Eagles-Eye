@@ -1,30 +1,42 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-/** The wordmark. Serif, tight tracking: the one place the display face is tiny. */
+/**
+ * The Wordmark.
+ *
+ * Rendered using Newsreader serif display typography with tight tracking
+ * and an editorial brand dot accent.
+ */
 export function Wordmark({
   href = "/",
   tone = "ink",
+  className,
 }: {
   href?: string;
-  /** `on-primary` for placement on the primary-coloured header and footer bands. */
-  tone?: "ink" | "on-primary";
+  /** `on-primary` for placement on dark surfaces like the oxblood footer. */
+  tone?: "ink" | "on-primary" | "primary";
+  className?: string;
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center gap-2 rounded-md transition-opacity hover:opacity-95",
+        "group inline-flex items-center gap-2 rounded-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
         tone === "on-primary" && "inverted-focus",
+        className,
       )}
     >
       <span
         className={cn(
-          "font-display text-heading-lg font-bold tracking-[-0.025em]",
-          tone === "on-primary" ? "text-on-primary" : "text-ink",
+          "font-display text-heading-lg sm:text-display-sm font-bold tracking-tight text-balance",
+          tone === "on-primary"
+            ? "text-on-primary"
+            : tone === "primary"
+              ? "text-primary"
+              : "text-ink",
         )}
       >
-        Eagles&nbsp;Eye
+        Eagles&nbsp;<span className={tone === "on-primary" ? "text-on-primary" : "text-primary"}>Eye</span>
       </span>
       <span
         aria-hidden="true"
@@ -36,3 +48,4 @@ export function Wordmark({
     </Link>
   );
 }
+

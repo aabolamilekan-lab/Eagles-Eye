@@ -37,7 +37,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <KeyboardShortcuts />
-      <SiteHeader brand={<Wordmark tone="on-primary" />} nav={NAV} />
+      <SiteHeader brand={<Wordmark tone="ink" />} nav={NAV} />
       <main id="main" className="flex-1">
         {children}
       </main>

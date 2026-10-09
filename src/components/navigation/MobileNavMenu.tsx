@@ -139,14 +139,14 @@ export function MobileNavMenu({
         aria-controls={PANEL_ID}
         aria-expanded={open}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="inverted-focus inline-flex size-11 cursor-pointer list-none items-center justify-center rounded-md text-on-primary transition-colors hover:bg-primary-hover"
+        className="inline-flex size-10 cursor-pointer list-none items-center justify-center rounded-md border border-border bg-surface text-ink transition-colors hover:bg-surface-sunken hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 shadow-2xs"
       >
         <Menu aria-hidden="true" className="size-5" />
       </summary>
       <nav
         id={PANEL_ID}
         aria-label={navLabel}
-        className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-border bg-surface p-1.5 shadow-lg"
+        className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-border bg-surface p-2 shadow-lg"
         onClick={(event) => {
           // A chosen destination dismisses the panel.
           if ((event.target as HTMLElement).closest("a")) {
@@ -154,16 +154,16 @@ export function MobileNavMenu({
           }
         }}
       >
-        <ul className="flex flex-col">
+        <ul className="flex flex-col gap-1">
           {nav.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
                 aria-current={item.current ? "page" : undefined}
                 className={cn(
-                  "flex h-11 items-center rounded-md px-3 font-ui text-body-sm transition-colors",
+                  "flex h-11 items-center rounded-md px-3.5 font-ui text-body-sm transition-colors",
                   item.current
-                    ? "bg-surface-sunken font-medium text-ink"
+                    ? "bg-primary-surface font-semibold text-primary"
                     : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
                 )}
               >
