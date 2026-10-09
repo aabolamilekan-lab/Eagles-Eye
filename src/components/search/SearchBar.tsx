@@ -44,7 +44,7 @@ export function SearchBar({
       className={cn("flex w-full items-end gap-2", className)}
     >
       {hiddenFields}
-      <div className="relative flex-1">
+      <div className="relative flex-1 min-w-0">
         <label htmlFor={id} className="sr-only">
           Search stories
         </label>
@@ -62,7 +62,7 @@ export function SearchBar({
           enterKeyHint="search"
           placeholder="Search stories..."
           aria-describedby={`${id}-hint`}
-          className="h-11 w-full rounded-md border border-border-strong bg-surface pr-16 pl-10 font-ui text-body-sm text-ink transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:ring-1 focus:ring-primary shadow-xs"
+          className="h-11 w-full rounded-md border border-border-strong bg-surface pl-10 pr-4 sm:pr-16 font-ui text-body-sm text-ink transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:ring-1 focus:ring-primary shadow-xs"
         />
         <kbd
           aria-hidden="true"
@@ -71,7 +71,7 @@ export function SearchBar({
           /
         </kbd>
       </div>
-      <Button type="submit" variant="primary">
+      <Button type="submit" variant="primary" className="shrink-0">
         Search
       </Button>
       <span id={`${id}-hint`} className="sr-only">

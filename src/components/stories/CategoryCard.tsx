@@ -16,8 +16,8 @@ export function CategoryCard({
   return (
     <article className="group relative flex flex-col justify-between gap-3 rounded-md border border-border bg-surface p-6 transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5">
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <h3 className="font-display text-heading-md text-ink transition-colors group-hover:text-primary">
+        <div className="flex items-center justify-between gap-2 min-w-0">
+          <h3 className="font-display text-heading-md text-ink transition-colors group-hover:text-primary min-w-0 break-words">
             <Link
               href={`/categories/${category.slug}`}
               prefetch={false}
@@ -29,7 +29,7 @@ export function CategoryCard({
           <svg
             aria-hidden="true"
             viewBox="0 0 16 16"
-            className="size-4 text-ink-subtle transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-primary"
+            className="size-4 shrink-0 text-ink-subtle transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-primary"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"

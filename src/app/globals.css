@@ -397,15 +397,23 @@
 @utility shell {
   width: 100%;
   margin-inline: auto;
-  padding-inline: var(--spacing-gutter);
+  padding-inline: 1rem;
   max-width: var(--container-content);
+
+  @media (min-width: 640px) {
+    padding-inline: var(--spacing-gutter);
+  }
 }
 
 @utility shell-admin {
   width: 100%;
   margin-inline: auto;
-  padding-inline: var(--spacing-gutter);
+  padding-inline: 1rem;
   max-width: var(--container-admin);
+
+  @media (min-width: 640px) {
+    padding-inline: var(--spacing-gutter);
+  }
 }
 
 @utility reading-column {

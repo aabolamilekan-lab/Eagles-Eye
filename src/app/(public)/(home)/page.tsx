@@ -84,10 +84,10 @@ export default async function HomePage() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <ButtonLink href="/stories" variant="primary" size="lg">
+            <ButtonLink href="/stories" variant="primary" size="md" className="sm:h-12 sm:px-7 sm:text-body">
               Browse stories
             </ButtonLink>
-            <ButtonLink href="/categories" variant="secondary" size="lg">
+            <ButtonLink href="/categories" variant="secondary" size="md" className="sm:h-12 sm:px-7 sm:text-body">
               Browse categories
             </ButtonLink>
           </div>
@@ -95,7 +95,7 @@ export default async function HomePage() {
         </div>
 
         <div className="flex flex-col gap-6 lg:pt-4">
-          <div className="rounded-md border border-border bg-surface p-6 shadow-xs transition-shadow hover:shadow-md">
+          <div className="rounded-md border border-border bg-surface p-4 sm:p-6 shadow-xs transition-shadow hover:shadow-md">
             <h2 className="font-display text-heading-md text-ink">Find a story</h2>
             <p className="mt-1 font-ui text-body-sm text-ink-muted">
               Search published stories by title, topic, or keyword.
