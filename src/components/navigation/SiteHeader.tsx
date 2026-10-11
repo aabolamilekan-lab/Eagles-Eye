@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, User } from "lucide-react";
+import { Search } from "lucide-react";
 import { MobileNavMenu } from "@/components/navigation/MobileNavMenu";
 import { cn } from "@/lib/cn";
 
@@ -44,13 +44,6 @@ export function SiteHeader({
         className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-all hover:border-ink hover:text-ink hover:scale-105"
       >
         <Search className="size-3.5 sm:size-4" />
-      </Link>
-      <Link
-        href="/admin"
-        aria-label="Admin sign-in"
-        className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-all hover:border-ink hover:text-ink hover:scale-105"
-      >
-        <User className="size-3.5 sm:size-4" />
       </Link>
     </div>
   );
