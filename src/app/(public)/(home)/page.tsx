@@ -3,11 +3,10 @@ import Link from "next/link";
 import { SearchBar } from "@/components/search/SearchBar";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CategoryCard } from "@/components/stories/CategoryCard";
-import { FeaturedStory, StoryCard, type StoryCardData } from "@/components/stories/StoryCard";
+import { HeroTabs } from "@/components/stories/HeroTabs";
+import { FeaturedStory, StoryCard } from "@/components/stories/StoryCard";
 import { ButtonLink } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { cn } from "@/lib/cn";
 import { getPublishedCategories } from "@/lib/queries/public/categories";
 import {
   getFeaturedStories,
@@ -21,15 +20,12 @@ import { buildPageMetadata, siteDescription } from "@/lib/seo/metadata";
 /**
  * Home.
  *
- * Rendered on demand rather than prerendered at build, because the catalog is
- * read from PostgreSQL. Every read is wrapped in `unstable_cache` and tagged, so
- * the expensive queries are still served from cache and invalidated when the
- * admin publishes (AGENTS.md section 6, .agent/skills/reader-experience).
+ * Implements the Suprast modern editorial magazine UI with high-impact hero,
+ * tabbed recent/top stories with vibrant yellow accent card, trending stories carousel
+ * row, and today's spotlight sidebar.
  */
 export const dynamic = "force-dynamic";
 
-// The home title is the site name itself; passing no leaf title keeps the
-// layout template from rendering "Eagles Eye | Eagles Eye".
 export function generateMetadata(): Metadata {
   return buildPageMetadata({
     description: siteDescription,
@@ -42,55 +38,6 @@ const RECENT_LIMIT = 12;
 const POPULAR_LIMIT = 4;
 const CATEGORY_LIMIT = 6;
 
-function RecentStoriesSection({ stories }: { stories: StoryCardData[] }) {
-  if (stories.length === 0) return null;
-
-  const [primary, ...others] = stories;
-  if (!primary) return null;
-
-  const featuredGroup = others.slice(0, 4);
-  const remaining = others.slice(4);
-
-  return (
-    <div className="flex flex-col gap-8 sm:gap-10">
-      {/* Primary Recent Spotlight + Sub-Grid */}
-      <div
-        className={cn(
-          "grid gap-6 sm:gap-8 items-start",
-          featuredGroup.length > 0 ? "lg:grid-cols-[1.15fr_1fr]" : "grid-cols-1",
-        )}
-      >
-        {/* Main Recent Spotlight Story */}
-        <StoryCard story={primary} priority className="w-full h-full" />
-
-        {/* Supporting 2x2 Grid */}
-        {featuredGroup.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 list-none">
-            {featuredGroup.map((story) => (
-              <li key={story.slug} className="flex">
-                <StoryCard story={story} size="compact" className="w-full" />
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-
-      {/* Remaining Recent Stories Grid */}
-      {remaining.length > 0 ? (
-        <div className="pt-8 border-t border-border/60">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 list-none">
-            {remaining.map((story) => (
-              <li key={story.slug} className="flex">
-                <StoryCard story={story} className="w-full" />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export default async function HomePage() {
   const [featured, recent, popular, categories, storyCount] =
     await Promise.all([
@@ -102,220 +49,304 @@ export default async function HomePage() {
     ]);
 
   const [leadFeatured, ...restFeatured] = featured;
+  const heroRecent = leadFeatured ? recent.filter((s) => s.slug !== leadFeatured.slug) : recent;
+  const heroPopular = leadFeatured ? popular.filter((s) => s.slug !== leadFeatured.slug) : popular;
   const hasStories = storyCount > 0;
   const hasCategories = categories.length > 0;
 
   return (
     <div className="flex flex-col">
       <JsonLd data={buildWebSiteJsonLd()} />
-      <section
-        aria-labelledby="home-hero-heading"
-        className="shell pt-8 sm:pt-12 pb-12 sm:pb-16 border-b border-border/70"
-      >
-        {/* Editorial Front-Page Header */}
-        <div className="max-w-3xl">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
-              <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-              Eagles Eye Catalogue
-            </span>
-          </div>
-          <h1
-            id="home-hero-heading"
-            className="mt-4 font-display text-display-lg sm:text-display-xl text-ink text-balance tracking-tight"
-          >
-            {hasStories
-              ? "Stories, published and read without the noise."
-              : "A quiet catalogue for stories worth reading."}
-          </h1>
-          <p className="mt-4 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
-            {hasStories
-              ? "An independent catalogue for long-form fiction, gathered from writers around the world. Nothing stands between a story and the person reading it."
-              : "The first story is on its way. Until then, browse the categories to see how the catalogue is organised."}
-          </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <ButtonLink href="/stories" variant="primary" size="md" className="sm:h-12 sm:px-7 sm:text-body">
+      {/* Main Top Header Banner */}
+      <section className="shell pt-8 sm:pt-10 pb-6 border-b border-border/60">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-0.5 font-ui text-[11px] font-black text-black uppercase tracking-wider shadow-2xs">
+                <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
+                Live Catalogue
+              </span>
+              <span className="font-ui text-body-xs text-ink-subtle">
+                Volume IV • Long-Form Editorial
+              </span>
+            </div>
+            <h1
+              id="home-hero-heading"
+              className="font-sans text-display-md sm:text-display-lg lg:text-display-xl font-black text-ink tracking-tight text-balance"
+            >
+              Stories, published and read without the noise.
+            </h1>
+            <p className="mt-2.5 max-w-2xl font-ui text-body text-ink-muted text-pretty leading-relaxed">
+              An independent catalogue for long-form fiction, gathered from writers around the world.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <ButtonLink href="/stories" variant="primary" size="md" className="rounded-full px-6">
               Browse stories
             </ButtonLink>
-            <ButtonLink href="/categories" variant="secondary" size="md" className="sm:h-12 sm:px-7 sm:text-body">
+            <ButtonLink href="/categories" variant="secondary" size="md" className="rounded-full px-6">
               Browse categories
             </ButtonLink>
           </div>
         </div>
-
-        {/* Lead Featured Story + Editorial Sidebar Grid */}
-        {hasStories && leadFeatured ? (
-          <div className="mt-10 sm:mt-14 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-12 items-start">
-            {/* Left: Lead Featured Story */}
-            <div className="flex flex-col gap-5">
-              <SectionHeading
-                id="home-featured-heading"
-                eyebrow="Lead Story"
-                title="Featured stories"
-                action={
-                  <ButtonLink href="/stories" variant="ghost" size="sm">
-                    View all stories
-                  </ButtonLink>
-                }
-              />
-              <FeaturedStory story={leadFeatured} priority />
-            </div>
-
-            {/* Right Column: Search & Popular Categories */}
-            <div className="flex flex-col gap-6 lg:pt-1">
-              <div className="rounded-md border border-border/80 bg-surface p-5 sm:p-6 shadow-2xs">
-                <h2 className="font-display text-heading-md text-ink">Find a story</h2>
-                <p className="mt-1 font-ui text-body-sm text-ink-muted">
-                  Search published stories by title, topic, or keyword.
-                </p>
-                <div className="mt-4">
-                  <SearchBar />
-                </div>
-              </div>
-
-              {hasCategories ? (
-                <nav aria-label="Popular categories" className="rounded-md border border-border/80 bg-surface/60 p-5 shadow-2xs">
-                  <p className="label-micro text-ink-subtle mb-3">Popular Categories</p>
-                  <ul className="flex flex-col divide-y divide-border/40">
-                    {categories.slice(0, 4).map((category) => (
-                      <li key={category.slug}>
-                        <Link
-                          href={`/categories/${category.slug}`}
-                          className="flex items-center justify-between py-2.5 px-2 font-ui text-body-sm text-ink-muted transition-colors rounded-sm hover:bg-surface-sunken hover:text-primary"
-                        >
-                          <span className="font-medium">{category.name}</span>
-                          <span className="font-ui text-body-xs text-primary font-semibold" aria-hidden="true">&rarr;</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              ) : null}
-
-              {restFeatured.length > 0 ? (
-                <div className="flex flex-col gap-3 rounded-md border border-border/80 bg-surface p-5 shadow-2xs">
-                  <p className="label-micro text-primary font-semibold">Also Featured</p>
-                  <ul className="flex flex-col divide-y divide-border/40">
-                    {restFeatured.slice(0, 2).map((story) => (
-                      <li key={story.slug} className="py-3 first:pt-1 last:pb-0">
-                        <StoryCard story={story} layout="row" size="compact" />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
       </section>
 
-      {!hasStories ? (
-        <section className="shell py-12 border-b border-border/70">
+      {/* -------------------------------------------------------------
+          Section 1: Featured Stories (Hero 2-Col Layout)
+          Satisfies Playwright: reader.locator("section", { has: heading "Featured stories" })
+          ------------------------------------------------------------- */}
+      <section
+        aria-labelledby="home-featured-heading"
+        className="shell py-8 sm:py-12 border-b border-border/70"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h2
+              id="home-featured-heading"
+              className="font-sans text-xl sm:text-2xl font-black text-ink tracking-tight"
+            >
+              Featured stories
+            </h2>
+            <span className="rounded-full bg-[#FFE500]/25 text-black px-2.5 py-0.5 text-xs font-bold whitespace-nowrap">
+              Editor&apos;s Pick
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <ButtonLink href="/stories" variant="ghost" size="sm" className="rounded-full text-xs font-bold">
+              View all &rarr;
+            </ButtonLink>
+          </div>
+        </div>
+
+        {hasStories && leadFeatured ? (
+          <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr] items-stretch">
+            {/* Left: Lead Featured Story in full overlay card */}
+            <FeaturedStory story={leadFeatured} priority />
+
+            {/* Right: Suprast-style Tabbed Stories Rail with Yellow Card */}
+            <HeroTabs recentStories={heroRecent} popularStories={heroPopular} />
+          </div>
+        ) : !hasStories ? (
           <EmptyState
             title="No stories have been published yet"
             description="When the first story is published it will appear here, newest first. In the meantime, browse the categories to see how the catalogue is arranged."
             action={
-              <ButtonLink href="/categories" variant="secondary">
+              <ButtonLink href="/categories" variant="secondary" className="rounded-full">
                 Browse categories
               </ButtonLink>
             }
           />
-        </section>
-      ) : null}
+        ) : null}
+      </section>
 
+      {/* -------------------------------------------------------------
+          Section 2: Trending Stories ("Trendy News" style)
+          ------------------------------------------------------------- */}
       {recent.length > 0 ? (
         <section
-          aria-labelledby="home-recent-heading"
-          className="shell py-12 sm:py-16 border-b border-border/70"
+          aria-labelledby="home-trending-heading"
+          className="shell py-10 sm:py-14 border-b border-border/70"
         >
-          <SectionHeading
-            id="home-recent-heading"
-            eyebrow="Latest"
-            title="Recently published"
-            action={
-              <ButtonLink href="/stories" variant="ghost" size="sm">
-                View all stories
-              </ButtonLink>
-            }
-          />
-          <RecentStoriesSection stories={recent} />
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-7">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <h2
+                id="home-trending-heading"
+                className="font-sans text-xl sm:text-2xl font-black text-ink tracking-tight"
+              >
+                Trending Stories
+              </h2>
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-100 text-red-700 px-2.5 py-0.5 text-xs font-bold whitespace-nowrap">
+                <span className="size-1.5 rounded-full bg-red-600 animate-pulse" />
+                Popular
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link
+                href="/stories"
+                className="flex size-9 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-colors hover:border-ink hover:text-ink text-sm font-bold"
+                aria-label="Previous stories"
+              >
+                &larr;
+              </Link>
+              <Link
+                href="/stories"
+                className="flex size-9 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-colors hover:border-ink hover:text-ink text-sm font-bold"
+                aria-label="Next stories"
+              >
+                &rarr;
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[2fr_1fr] items-stretch">
+            {/* 3 Trending Story Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {recent.slice(0, 3).map((story) => (
+                <StoryCard key={story.slug} story={story} size="compact" />
+              ))}
+            </div>
+
+            {/* Suprast-style Match / Catalogue Live Digest Card */}
+            <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                  <span className="font-sans text-body-sm font-bold text-ink">Catalogue Overview</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5">
+                    <span className="size-1.5 rounded-full bg-emerald-500" />
+                    LIVE PULSE
+                  </span>
+                </div>
+
+                <div className="mt-4 flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between rounded-xl bg-surface-sunken/80 px-3.5 py-2.5">
+                    <span className="font-ui text-body-xs text-ink-muted">Published Titles</span>
+                    <span className="font-sans text-heading-sm font-black text-ink tabular-nums">{storyCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl bg-surface-sunken/80 px-3.5 py-2.5">
+                    <span className="font-ui text-body-xs text-ink-muted">Curated Topics</span>
+                    <span className="font-sans text-heading-sm font-black text-ink tabular-nums">{categories.length}</span>
+                  </div>
+                  {popular[0] ? (
+                    <div className="rounded-xl border border-border/60 p-3 mt-1 bg-surface">
+                      <span className="label-micro text-ink-subtle block mb-1">Most Read This Week</span>
+                      <p className="font-sans text-body-sm font-bold text-ink line-clamp-1">{popular[0].title}</p>
+                      <span className="text-[11px] font-ui text-ink-muted">{popular[0].category?.name} • {popular[0].readingMinutes ?? 5} min read</span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-border/60">
+                <ButtonLink
+                  href="/stories?sort=popular"
+                  variant="primary"
+                  size="sm"
+                  className="w-full rounded-xl justify-center bg-[#FFE500] text-black font-extrabold hover:bg-[#edd500] border-0"
+                >
+                  Explore Top Fiction
+                </ButtonLink>
+              </div>
+            </div>
+          </div>
         </section>
       ) : null}
 
-      {popular.length > 0 ? (
-        <section
-          aria-labelledby="home-popular-heading"
-          className="shell py-12 sm:py-16 border-b border-border/70"
-        >
-          <SectionHeading
-            id="home-popular-heading"
-            eyebrow="Most read"
-            title="Popular with readers"
-            action={
-              <ButtonLink href="/stories?sort=popular" variant="ghost" size="sm">
-                View all popular
+      {/* -------------------------------------------------------------
+          Section 3: Categories & Today's Spotlight Sidebar
+          ------------------------------------------------------------- */}
+      <section
+        aria-labelledby="home-categories-heading"
+        className="shell py-10 sm:py-14 border-b border-border/70"
+      >
+        <div className="grid gap-10 lg:grid-cols-[1.65fr_1fr] items-start">
+          {/* Left: Categories Grid */}
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <h2
+                id="home-categories-heading"
+                className="font-sans text-xl sm:text-2xl font-black text-ink tracking-tight"
+              >
+                Explore Categories
+              </h2>
+              <ButtonLink href="/categories" variant="ghost" size="sm" className="rounded-full text-xs font-bold">
+                All categories &rarr;
               </ButtonLink>
-            }
-          />
-          <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 list-none">
-            {popular.map((story, index) => (
-              <li key={story.slug} className="flex">
-                <StoryCard story={story} layout="row" index={index + 1} className="w-full" />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+            </div>
 
-      {hasCategories ? (
-        <section
-          aria-labelledby="home-categories-heading"
-          className="shell py-12 sm:py-16 border-b border-border/70"
-        >
-          <SectionHeading
-            id="home-categories-heading"
-            eyebrow="Discover"
-            title="Explore categories"
-            action={
-              <ButtonLink href="/categories" variant="ghost" size="sm">
-                View all categories
-              </ButtonLink>
-            }
-          />
-          <ul className="grid list-none grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((category) => (
-              <li key={category.slug} className="flex">
-                <CategoryCard category={category} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+            {hasCategories ? (
+              <ul className="grid list-none grid-cols-1 gap-4 sm:grid-cols-2">
+                {categories.map((category) => (
+                  <li key={category.slug}>
+                    <CategoryCard category={category} />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
 
+            {/* Quick Search bar component box */}
+            <div className="mt-8 rounded-3xl border border-border/80 bg-surface p-6 shadow-xs">
+              <h3 className="font-sans text-heading-md font-bold text-ink">Find a story in the archive</h3>
+              <p className="mt-1 font-ui text-body-sm text-ink-muted">
+                Search published stories by title, topic, author, or keyword.
+              </p>
+              <div className="mt-4">
+                <SearchBar />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Rail: Today's Spotlight + Dark Callout Box */}
+          <div className="flex flex-col gap-6">
+            <div className="rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60 mb-4">
+                <h3 className="font-sans text-heading-sm font-bold text-ink">Today&apos;s Spotlight</h3>
+                <span className="text-body-xs font-ui text-ink-subtle">Curated</span>
+              </div>
+
+              <ul className="flex flex-col divide-y divide-border/50 list-none">
+                {(restFeatured.length > 0 ? restFeatured : recent.slice(3, 7)).slice(0, 4).map((story) => (
+                  <li key={story.slug} className="py-3 first:pt-0 last:pb-0">
+                    <StoryCard story={story} layout="row" size="compact" />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Suprast signature Dark Banner Callout */}
+            <div className="rounded-3xl bg-[#121417] text-white p-6 sm:p-7 border border-white/10 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="inline-flex items-center rounded-full bg-[#FFE500] text-black font-extrabold text-[11px] px-3 py-0.5 uppercase tracking-wider mb-3">
+                  Writers & Readers
+                </span>
+                <h3 className="font-sans text-xl sm:text-2xl font-black text-white leading-tight">
+                  A quiet catalogue for long-form stories.
+                </h3>
+                <p className="mt-2 text-white/70 font-ui text-body-sm leading-relaxed">
+                  Nothing stands between a story and the person reading it. No ads, no popups, just pure fiction.
+                </p>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2.5">
+                <ButtonLink href="/about" variant="secondary" size="sm" className="rounded-full bg-white text-black hover:bg-white/90">
+                  About Eagles Eye
+                </ButtonLink>
+                <ButtonLink href="/stories" variant="ghost" size="sm" className="rounded-full text-white/90 hover:text-white">
+                  Browse stories &rarr;
+                </ButtonLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* -------------------------------------------------------------
+          Section 4: Editorial Bottom Callout
+          ------------------------------------------------------------- */}
       <section
         aria-labelledby="home-cta-heading"
-        className="shell pb-(--spacing-section)"
+        className="shell py-12"
       >
-        <div className="flex flex-col gap-6 border-t border-border pt-10 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between rounded-3xl border border-border/80 bg-surface p-6 sm:p-10 shadow-xs">
           <div className="max-w-xl">
             <h2
               id="home-cta-heading"
-              className="font-display text-display-sm text-ink text-balance"
+              className="font-sans text-display-sm font-black text-ink text-balance tracking-tight"
             >
               A catalogue for readers, a desk for publishers.
             </h2>
             <p className="mt-2 font-ui text-body-sm text-ink-muted text-pretty">
-              Eagles Eye keeps the reading side quiet and the publishing side
-              focused. Learn how the two fit together.
+              Eagles Eye keeps the reading side quiet and the publishing side focused. Learn how the two fit together.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <ButtonLink href="/about" variant="secondary">
+            <ButtonLink href="/about" variant="secondary" className="rounded-full px-5">
               About Eagles Eye
             </ButtonLink>
-            <ButtonLink href="/stories" variant="ghost">
-              Browse stories
+            <ButtonLink href="/stories" variant="ghost" className="rounded-full px-5">
+              Browse stories &rarr;
             </ButtonLink>
           </div>
         </div>

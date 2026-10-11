@@ -62,7 +62,7 @@ export function SearchBar({
           enterKeyHint="search"
           placeholder="Search by title, author, topic..."
           aria-describedby={`${id}-hint`}
-          className="h-12 w-full rounded-lg border border-border-strong bg-surface pl-10.5 pr-4 sm:pr-14 font-ui text-body text-ink shadow-xs transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="h-12 w-full rounded-xl border border-border-strong bg-surface pl-10.5 pr-4 sm:pr-14 font-ui text-body text-ink shadow-xs transition-all duration-(--duration-fast) placeholder:text-ink-subtle hover:border-ink-subtle focus:border-[#FFE500] focus:outline-none focus:ring-2 focus:ring-[#FFE500]/40"
         />
         <kbd
           aria-hidden="true"

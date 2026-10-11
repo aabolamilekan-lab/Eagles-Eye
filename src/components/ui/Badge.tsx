@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 export type BadgeTone =
   | "neutral"
   | "primary"
+  | "yellow"
   | "accent"
   | "success"
   | "warning"
@@ -21,7 +22,8 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const TONE: Record<BadgeTone, string> = {
   neutral: "bg-surface-sunken text-ink-muted ring-border",
-  primary: "bg-primary-surface text-primary ring-primary/20",
+  primary: "bg-[#FFE500] text-black ring-black/10 font-bold",
+  yellow: "bg-[#FFE500] text-black ring-black/10 font-bold",
   accent: "bg-accent-surface text-accent ring-accent/20",
   success: "bg-success-surface text-success ring-success/20",
   warning: "bg-warning-surface text-warning ring-warning/20",
@@ -30,7 +32,8 @@ const TONE: Record<BadgeTone, string> = {
 
 const DOT: Record<BadgeTone, string> = {
   neutral: "bg-ink-subtle",
-  primary: "bg-primary",
+  primary: "bg-black",
+  yellow: "bg-black",
   accent: "bg-accent",
   success: "bg-success",
   warning: "bg-warning",

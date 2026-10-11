@@ -71,7 +71,7 @@ export function ChapterRows({
             aria-current={chapter.isCurrent ? "page" : undefined}
             className={cn(
               "flex items-baseline gap-4 py-4 transition-colors",
-              chapter.isCurrent ? "text-ink" : "text-ink hover:text-primary",
+              chapter.isCurrent ? "text-ink font-bold" : "text-ink hover:text-black hover:underline",
             )}
           >
             <span className="w-6 shrink-0 text-right font-ui text-body-xs tabular-nums text-ink-subtle">

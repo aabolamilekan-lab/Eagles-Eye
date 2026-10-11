@@ -90,7 +90,7 @@ export function ReadingProgress() {
           ref={fillRef}
           data-reading-progress=""
           data-reading-percent="0"
-          className="h-full bg-primary"
+          className="h-full bg-[#FFE500]"
           style={{ width: "0%" }}
         />
       </div>

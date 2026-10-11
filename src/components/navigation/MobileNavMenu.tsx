@@ -139,14 +139,14 @@ export function MobileNavMenu({
         aria-controls={PANEL_ID}
         aria-expanded={open}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="inline-flex size-10 cursor-pointer list-none items-center justify-center rounded-md border border-border bg-surface text-ink transition-colors hover:bg-surface-sunken hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 shadow-2xs"
+        className="inline-flex size-8 sm:size-10 cursor-pointer list-none items-center justify-center rounded-lg sm:rounded-xl border border-border/80 bg-surface text-ink transition-colors hover:bg-surface-sunken hover:text-black focus-visible:outline-2 focus-visible:outline-[#FFE500] focus-visible:outline-offset-2 shadow-2xs"
       >
-        <Menu aria-hidden="true" className="size-5" />
+        <Menu aria-hidden="true" className="size-4 sm:size-5" />
       </summary>
       <nav
         id={PANEL_ID}
         aria-label={navLabel}
-        className="absolute right-0 z-50 mt-2 w-64 rounded-md border border-border bg-surface p-2 shadow-lg"
+        className="absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-2rem))] rounded-2xl border border-border/80 bg-surface/95 backdrop-blur-md p-2 shadow-xl"
         onClick={(event) => {
           // A chosen destination dismisses the panel.
           if ((event.target as HTMLElement).closest("a")) {
@@ -161,10 +161,10 @@ export function MobileNavMenu({
                 href={item.href}
                 aria-current={item.current ? "page" : undefined}
                 className={cn(
-                  "flex h-11 items-center rounded-md px-3.5 font-ui text-body-sm transition-colors",
+                  "flex h-11 items-center rounded-xl px-3.5 font-ui text-body-sm transition-colors",
                   item.current
-                    ? "bg-primary-surface font-semibold text-primary"
-                    : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
+                    ? "bg-[#FFE500] font-bold text-black shadow-xs"
+                    : "text-ink-muted hover:bg-surface-sunken hover:text-black",
                 )}
               >
                 {item.label}

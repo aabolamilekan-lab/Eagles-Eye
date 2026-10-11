@@ -21,30 +21,36 @@ export function Wordmark({
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center gap-2 rounded-sm transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
+        "group inline-flex items-center gap-2 sm:gap-2.5 rounded-lg transition-opacity hover:opacity-95 focus-visible:outline-2 focus-visible:outline-[#FFE500] focus-visible:outline-offset-2 min-w-0",
         tone === "on-primary" && "inverted-focus",
         className,
       )}
     >
       <span
-        className={cn(
-          "font-display text-heading-lg sm:text-display-sm font-bold tracking-tight text-balance",
-          tone === "on-primary"
-            ? "text-on-primary"
-            : tone === "primary"
-              ? "text-primary"
-              : "text-ink",
-        )}
+        aria-hidden="true"
+        className="size-7 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 bg-[#FFE500] text-black shadow-2xs transition-transform duration-300 ease-out group-hover:scale-105"
       >
-        Eagles&nbsp;<span className={tone === "on-primary" ? "text-on-primary" : "text-primary"}>Eye</span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-3.5 sm:size-5"
+        >
+          <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z" />
+          <circle cx="12" cy="12" r="3" fill="currentColor" />
+        </svg>
       </span>
       <span
-        aria-hidden="true"
         className={cn(
-          "size-2 rounded-full transition-transform duration-300 ease-out group-hover:scale-125",
-          tone === "on-primary" ? "bg-on-primary shadow-xs" : "bg-primary",
+          "font-sans text-lg sm:text-heading-xl font-black tracking-tight whitespace-nowrap",
+          tone === "on-primary" ? "text-on-primary" : "text-ink",
         )}
-      />
+      >
+        Eagles Eye
+      </span>
     </Link>
   );
 }

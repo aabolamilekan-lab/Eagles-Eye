@@ -3,19 +3,15 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Search, User } from "lucide-react";
 import { MobileNavMenu } from "@/components/navigation/MobileNavMenu";
 import { cn } from "@/lib/cn";
 
 /**
  * Site header with responsive navigation.
  *
- * Designed with a clean, light, editorial-magazine aesthetic.
- * Background uses a warm paper tone with subtle backdrop blur and hairline border.
- * Navigation links use Archivo sans-serif typography with distinct active and hover states.
- *
- * Client-side only for `usePathname`: the current page must be marked with
- * `aria-current` in both nav renderings, and the server has no request path.
- * Everything else stays a plain render.
+ * Implements the Suprast modern editorial news magazine aesthetic with a top
+ * utility meta strip, clean brand badge, horizontal category links, and quick actions.
  */
 export function SiteHeader({
   brand,
@@ -40,46 +36,79 @@ export function SiteHeader({
       pathname === item.href || pathname.startsWith(`${item.href}/`),
   }));
 
+  const defaultActions = (
+    <div className="flex items-center gap-1 sm:gap-2">
+      <Link
+        href="/search"
+        aria-label="Search"
+        className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-all hover:border-ink hover:text-ink hover:scale-105"
+      >
+        <Search className="size-3.5 sm:size-4" />
+      </Link>
+      <Link
+        href="/admin"
+        aria-label="Admin sign-in"
+        className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-all hover:border-ink hover:text-ink hover:scale-105"
+      >
+        <User className="size-3.5 sm:size-4" />
+      </Link>
+    </div>
+  );
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-paper/95 backdrop-blur-md shadow-2xs transition-colors">
-      <div className="shell flex h-16 sm:h-20 items-center justify-between gap-4 sm:gap-6">
-        <div className="flex items-center gap-3.5">
+      {/* Suprast Top Utility Meta Strip */}
+      <div className="hidden sm:block border-b border-border/60 bg-surface/80 py-1.5 font-ui text-[12px] text-ink-subtle">
+        <div className="shell flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              Live Catalogue
+            </span>
+            <span className="h-3 w-px bg-border" />
+            <span className="tabular-nums">Sunday, 11 October 2026</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="hidden lg:inline text-ink-subtle">Volume IV • Long-Form Fiction</span>
+            <span className="h-3 w-px bg-border hidden lg:inline" />
+            <a
+              href="mailto:hello@eagleseye.com"
+              className="hover:text-ink transition-colors font-medium"
+            >
+              hello@eagleseye.com
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="shell flex h-16 sm:h-20 items-center justify-between gap-2.5 sm:gap-6">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
           <div className="shrink-0">{brand}</div>
-          <span className="hidden md:inline-block h-4 w-px bg-border-strong/40" aria-hidden="true" />
-          <span className="hidden md:inline-block font-ui text-[11px] font-semibold text-ink-subtle uppercase tracking-widest">
-            Catalogue
-          </span>
         </div>
 
         <nav aria-label={navLabel} className="hidden lg:block">
-          <ul className="flex items-center gap-1.5 sm:gap-2">
+          <ul className="flex items-center gap-1 sm:gap-1.5">
             {items.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   aria-current={item.current ? "page" : undefined}
                   className={cn(
-                    "relative inline-flex h-10 items-center rounded-md px-3.5 font-ui text-body-sm font-medium transition-all duration-(--duration-fast)",
+                    "relative inline-flex h-9 sm:h-10 items-center rounded-full px-4 font-ui text-body-sm font-semibold transition-all duration-150",
                     item.current
-                      ? "bg-primary-surface text-primary font-semibold shadow-2xs"
-                      : "text-ink-muted hover:bg-surface-sunken/80 hover:text-ink",
+                      ? "bg-ink text-surface shadow-xs"
+                      : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
                   )}
                 >
                   {item.label}
-                  {item.current ? (
-                    <span
-                      className="absolute bottom-1 left-1/2 -translate-x-1/2 size-1 rounded-full bg-primary"
-                      aria-hidden="true"
-                    />
-                  ) : null}
                 </Link>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          {actions}
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {actions ?? defaultActions}
 
           <MobileNavMenu nav={items} navLabel={navLabel} />
         </div>

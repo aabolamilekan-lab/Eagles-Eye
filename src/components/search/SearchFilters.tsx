@@ -67,7 +67,7 @@ export function SearchFilters({
             <span className="inline-flex items-center gap-2 text-ink">
               <SlidersHorizontal
                 aria-hidden="true"
-                className="size-4 text-primary"
+                className="size-4 text-ink"
               />
               Filters
             </span>

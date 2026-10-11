@@ -20,10 +20,10 @@ export function CategoryCard({
   category: CategoryCardData;
 }) {
   return (
-    <article className="group relative flex w-full flex-col justify-between gap-4 rounded-md border border-border/80 bg-surface p-5 sm:p-6 shadow-2xs transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+    <article className="group relative flex w-full flex-col justify-between gap-4 rounded-2xl border border-border/80 bg-surface p-4 sm:p-6 shadow-2xs transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md hover:-translate-y-0.5 focus-within:border-[#FFE500] focus-within:ring-2 focus-within:ring-[#FFE500]/40">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2 min-w-0">
-          <h3 className="font-display text-heading-md text-ink tracking-tight transition-colors group-hover:text-primary min-w-0 break-words">
+          <h3 className="font-sans text-heading-md font-bold text-ink tracking-tight transition-colors group-hover:text-black group-hover:underline min-w-0 break-words">
             <Link
               href={`/categories/${category.slug}`}
               prefetch={false}
@@ -35,7 +35,7 @@ export function CategoryCard({
           <svg
             aria-hidden="true"
             viewBox="0 0 16 16"
-            className="size-4 shrink-0 text-ink-subtle transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-primary"
+            className="size-4 shrink-0 text-ink-subtle transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-black"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
@@ -60,7 +60,7 @@ export function CategoryCard({
         ) : (
           <span />
         )}
-        <span className="font-semibold text-primary inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5">
+        <span className="font-bold text-ink inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5 group-hover:text-black">
           Explore &rarr;
         </span>
       </div>

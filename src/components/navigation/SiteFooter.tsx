@@ -9,12 +9,12 @@ export function SiteFooter({
   note?: string;
 }) {
   return (
-    <footer className="mt-16 sm:mt-24 border-t border-primary-hover bg-primary text-on-primary">
+    <footer className="mt-16 sm:mt-24 border-t border-white/10 bg-[#121417] text-white">
       <div className="shell py-12 sm:py-16 md:py-20">
         <div className="flex flex-col gap-10 md:flex-row md:justify-between md:items-start">
           <div className="flex max-w-sm flex-col gap-3">
             <Wordmark tone="on-primary" />
-            <p className="font-ui text-body-sm text-on-primary/85 leading-relaxed">
+            <p className="font-ui text-body-sm text-white/70 leading-relaxed">
               {note ?? "Stories worth reading, and a place to publish them."}
             </p>
           </div>
@@ -22,7 +22,7 @@ export function SiteFooter({
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {sections.map((section) => (
               <nav key={section.heading} aria-label={section.heading}>
-                <h2 className="label-micro text-on-primary/75 tracking-wider uppercase font-medium">
+                <h2 className="label-micro text-white/50 tracking-wider uppercase font-semibold">
                   {section.heading}
                 </h2>
                 <ul className="mt-4 flex flex-col gap-2">
@@ -30,7 +30,7 @@ export function SiteFooter({
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="inverted-focus inline-flex min-h-11 items-center font-ui text-body-sm text-on-primary/85 underline-offset-4 transition-colors hover:text-on-primary hover:underline"
+                        className="inverted-focus inline-flex min-h-11 items-center font-ui text-body-sm text-white/80 underline-offset-4 transition-colors hover:text-[#FFE500] hover:underline"
                       >
                         {link.label}
                       </Link>
@@ -42,11 +42,11 @@ export function SiteFooter({
           </div>
         </div>
 
-        <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-on-primary/15 pt-6 text-on-primary/75 font-ui text-body-xs">
+        <div className="mt-12 sm:mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6 text-white/60 font-ui text-body-xs">
           <p>© {new Date().getFullYear()} Eagles Eye. All rights reserved.</p>
           <a
             href="#main"
-            className="inverted-focus inline-flex items-center gap-1.5 text-on-primary/80 transition-colors hover:text-on-primary hover:underline underline-offset-4"
+            className="inverted-focus inline-flex items-center gap-1.5 text-white/75 transition-colors hover:text-[#FFE500] hover:underline underline-offset-4"
           >
             Back to top ↑
           </a>

@@ -27,9 +27,9 @@ export function Card({
   return (
     <Tag
       className={cn(
-        "relative rounded-md bg-surface",
+        "relative rounded-2xl bg-surface",
         variant === "raised"
-          ? "border border-border shadow-sm"
+          ? "border border-border/80 shadow-xs"
           : "border border-transparent",
         interactive &&
           "transition-[border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md",
@@ -118,7 +118,7 @@ export function StretchedLink({
     <a
       className={cn(
         "after:absolute after:inset-0 after:content-['']",
-        "focus-visible:outline-offset-4",
+        "focus-visible:outline-offset-4 focus-visible:outline-2 focus-visible:outline-[#FFE500]",
         className,
       )}
       {...rest}
@@ -148,9 +148,11 @@ export function SectionHeading({
         className,
       )}
     >
-      <div className="flex flex-col gap-1 min-w-0">
+      <div className="flex flex-col gap-2 min-w-0">
         {eyebrow ? (
-          <p className="label-micro font-semibold tracking-wider text-primary">{eyebrow}</p>
+          <span className="inline-flex w-fit items-center rounded-full bg-[#FFE500] px-2.5 py-0.5 font-ui text-[10px] font-black uppercase tracking-wider text-black">
+            {eyebrow}
+          </span>
         ) : null}
         <h2 id={id} className="font-display text-display-sm font-bold text-ink tracking-tight break-words">
           {title}

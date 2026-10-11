@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { formatPublishedDate } from "@/lib/format";
-import { Badge } from "@/components/ui/Badge";
 
 /**
  * The data a story card renders.
@@ -46,6 +45,7 @@ export function StoryCard({
   layout = "cover",
   /** Optional numerical rank for editorial lists (e.g. 1 -> 01). */
   index,
+  variant = "default",
   priority = false,
   className,
 }: {
@@ -53,6 +53,7 @@ export function StoryCard({
   size?: "compact" | "full";
   layout?: "cover" | "row";
   index?: number;
+  variant?: "default" | "yellow";
   priority?: boolean;
   className?: string;
 }) {
@@ -60,33 +61,38 @@ export function StoryCard({
 
   if (layout === "row") {
     const formattedIndex = index !== undefined ? String(index).padStart(2, "0") : null;
+    const isYellow = variant === "yellow";
 
     return (
       <article
         className={cn(
-          "group relative flex items-center gap-3 sm:gap-4 rounded-md border border-border/80 bg-surface p-3 sm:p-4 shadow-2xs",
-          "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
-          "hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
-          "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+          "group relative flex items-center gap-2.5 sm:gap-4 rounded-2xl p-2.5 sm:p-4 transition-all duration-200",
+          isYellow
+            ? "bg-[#FFE500] text-black shadow-xs hover:-translate-y-0.5"
+            : "border border-border/80 bg-surface shadow-2xs hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
+          "focus-within:ring-2 focus-within:ring-[#FFE500]/40",
           className,
         )}
       >
         {formattedIndex ? (
           <span
-            className="font-display text-2xl sm:text-3xl font-bold text-primary shrink-0 w-7 sm:w-8 text-center select-none"
+            className={cn(
+              "font-display text-xl sm:text-3xl font-black shrink-0 w-5 sm:w-8 text-center select-none",
+              isYellow ? "text-black/80" : "text-ink",
+            )}
             aria-hidden="true"
           >
             {formattedIndex}
           </span>
         ) : null}
 
-        <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-surface-sunken sm:size-24">
+        <div className="relative size-16 sm:size-20 shrink-0 overflow-hidden rounded-xl bg-surface-sunken">
           {story.coverImageUrl ? (
             <Image
               src={story.coverImageUrl}
               alt={story.coverAlt ?? ""}
               fill
-              sizes="96px"
+              sizes="80px"
               className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
           ) : (
@@ -94,25 +100,54 @@ export function StoryCard({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-1.5 justify-center flex-1">
-          {story.category ? (
-            <div className="flex items-center gap-2">
-              <Badge tone="primary">{story.category.name}</Badge>
-            </div>
-          ) : null}
-          <h3 className="font-display text-heading-sm sm:text-heading-md text-ink text-balance tracking-tight">
+        <div className="flex min-w-0 flex-col gap-1 justify-center flex-1">
+          <div className="flex items-center gap-2">
+            {story.category ? (
+              <span
+                className={cn(
+                  "font-ui text-[11px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5",
+                  isYellow
+                    ? "bg-black/15 text-black"
+                    : "bg-surface-sunken text-ink-subtle",
+                )}
+              >
+                {story.category.name}
+              </span>
+            ) : null}
+            {story.readingMinutes ? (
+              <span
+                className={cn(
+                  "font-ui text-[11px] font-medium",
+                  isYellow ? "text-black/70" : "text-ink-subtle",
+                )}
+              >
+                • {story.readingMinutes} min read
+              </span>
+            ) : null}
+          </div>
+
+          <h3
+            className={cn(
+              "font-sans text-body sm:text-heading-xs font-bold leading-snug tracking-tight text-balance line-clamp-2",
+              isYellow ? "text-black" : "text-ink group-hover:text-black group-hover:underline transition-colors",
+            )}
+          >
             <Link
               href={href}
               prefetch={false}
-              className="after:absolute after:inset-0 after:content-[''] group-hover:text-primary transition-colors focus-visible:outline-none"
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
             >
               {story.title}
             </Link>
           </h3>
-          <p className="line-clamp-2 font-ui text-body-sm text-ink-muted text-pretty leading-relaxed">
-            {story.shortDescription}
-          </p>
-          <StoryMeta story={story} />
+
+          <div className="flex items-center gap-2 font-ui text-[11px]">
+            {story.author ? (
+              <span className={cn("font-medium", isYellow ? "text-black/80" : "text-ink-muted")}>
+                {story.author}
+              </span>
+            ) : null}
+          </div>
         </div>
       </article>
     );
@@ -121,17 +156,17 @@ export function StoryCard({
   return (
     <article
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-md border border-border/80 bg-surface shadow-2xs",
+        "group relative flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-surface p-3.5 sm:p-4 shadow-2xs",
         "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
-        "hover:border-border-strong hover:shadow-md hover:-translate-y-0.5",
-        "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+        "hover:border-border-strong hover:shadow-md hover:-translate-y-1",
+        "focus-within:border-[#FFE500] focus-within:ring-2 focus-within:ring-[#FFE500]/40",
         className,
       )}
     >
       <div
         className={cn(
-          "relative overflow-hidden bg-surface-sunken",
-          size === "compact" ? "aspect-[16/10]" : "aspect-[3/2]",
+          "relative overflow-hidden rounded-xl bg-surface-sunken mb-3.5",
+          size === "compact" ? "aspect-[16/10]" : "aspect-[16/10] sm:aspect-[3/2]",
         )}
       >
         {story.coverImageUrl ? (
@@ -152,22 +187,24 @@ export function StoryCard({
         )}
       </div>
 
-      <div
-        className={cn(
-          "flex flex-1 flex-col gap-2.5",
-          size === "compact" ? "p-4" : "p-5",
-        )}
-      >
-        {story.category ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="primary">{story.category.name}</Badge>
-          </div>
-        ) : null}
+      <div className="flex flex-1 flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {story.category ? (
+            <span className="rounded-full bg-surface-sunken px-2.5 py-0.5 font-ui text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
+              {story.category.name}
+            </span>
+          ) : null}
+          {story.readingMinutes ? (
+            <span className="font-ui text-[11px] font-medium text-ink-subtle">
+              • {story.readingMinutes} min read
+            </span>
+          ) : null}
+        </div>
 
         <h3
           className={cn(
-            "font-display text-ink text-balance tracking-tight transition-colors group-hover:text-primary",
-            size === "compact" ? "text-heading-xs" : "text-heading-md",
+            "font-sans font-bold text-ink text-balance tracking-tight transition-colors group-hover:text-black group-hover:underline",
+            size === "compact" ? "text-body" : "text-heading-sm sm:text-heading-md",
           )}
         >
           <Link
@@ -182,7 +219,7 @@ export function StoryCard({
         <p
           className={cn(
             "font-ui text-ink-muted text-pretty leading-relaxed",
-            size === "compact" ? "line-clamp-2 text-body-xs" : "line-clamp-3 text-body-sm",
+            size === "compact" ? "line-clamp-2 text-body-xs" : "line-clamp-2 sm:line-clamp-3 text-body-sm",
           )}
         >
           {story.shortDescription}
@@ -213,7 +250,7 @@ function StoryMeta({ story }: { story: StoryCardData }) {
       ) : null}
       {story.readingMinutes ? (
         <span className="inline-flex items-center gap-1 tabular-nums">
-          <Clock aria-hidden="true" className="size-3 text-accent" />
+          <Clock aria-hidden="true" className="size-3 text-ink-subtle" />
           {story.readingMinutes} min read
         </span>
       ) : null}
@@ -225,11 +262,11 @@ export function StoryCoverFallback({ title }: { title: string }) {
   const letter = title.charAt(0).toUpperCase();
   const hash = Array.from(title).reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  // Editorial palettes using defined semantic tokens & styled layers
+  // Editorial palettes matching the modern Suprast dark and yellow aesthetic
   const palettes = [
-    { bg: "bg-surface-inverse text-paper", border: "border-border-strong/30" },
-    { bg: "bg-primary text-on-primary", border: "border-primary-hover" },
-    { bg: "bg-accent text-on-accent", border: "border-accent-hover" },
+    { bg: "bg-[#121417] text-white", border: "border-white/10" },
+    { bg: "bg-[#FFE500] text-black", border: "border-black/10" },
+    { bg: "bg-[#1e232a] text-white", border: "border-white/10" },
     { bg: "bg-surface-sunken text-ink", border: "border-border-strong" },
   ];
   
@@ -284,29 +321,46 @@ export function FeaturedStory({
   const href = `/stories/${story.slug}`;
 
   return (
-    <article className="group relative overflow-hidden rounded-md border border-border/80 bg-surface shadow-2xs transition-all duration-(--duration-base) ease-(--ease-out-quart) hover:border-border-strong hover:shadow-md focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-      <div className="grid md:grid-cols-[1.15fr_1fr]">
-        <div className="relative aspect-[16/10] sm:aspect-[4/3] md:aspect-auto md:min-h-80 overflow-hidden bg-surface-sunken">
-          {story.coverImageUrl ? (
-            <Image
-              src={story.coverImageUrl}
-              alt={story.coverAlt ?? ""}
-              fill
-              sizes="(max-width: 768px) 100vw, 55vw"
-              priority={priority}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
-            />
-          ) : (
-            <StoryCoverFallback title={story.title} />
-          )}
-        </div>
+    <article className="group relative overflow-hidden rounded-3xl border border-border/70 bg-[#121417] shadow-sm transition-all duration-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-[#FFE500]">
+      <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-[16/10] w-full min-h-[320px] sm:min-h-[460px] overflow-hidden bg-surface-sunken">
+        {story.coverImageUrl ? (
+          <Image
+            src={story.coverImageUrl}
+            alt={story.coverAlt ?? ""}
+            fill
+            sizes="(max-width: 768px) 100vw, 65vw"
+            priority={priority}
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+          />
+        ) : (
+          <StoryCoverFallback title={story.title} />
+        )}
 
-        <div className="flex flex-col justify-center gap-3.5 p-5 sm:p-7 lg:p-9">
-          {eyebrow ? (
-            <p className="label-micro text-primary font-semibold">{eyebrow}</p>
-          ) : null}
+        {/* Dark gradient overlay for crystal clear contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent pointer-events-none" />
 
-          <h3 className="font-display text-display-md sm:text-display-lg text-ink text-balance tracking-tight transition-colors group-hover:text-primary">
+        {/* Content pinned to bottom */}
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-7 lg:p-9 flex flex-col gap-2.5 sm:gap-3 z-10">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            {eyebrow ? (
+              <span className="inline-flex items-center rounded-full bg-white/20 backdrop-blur-xs px-2.5 sm:px-3 py-0.5 sm:py-1 font-ui text-[11px] sm:text-[12px] font-medium text-white uppercase tracking-wider">
+                {eyebrow}
+              </span>
+            ) : null}
+            {story.category ? (
+              <span className="inline-flex items-center rounded-full bg-[#FFE500] px-3 sm:px-3.5 py-0.5 sm:py-1 font-ui text-[11px] sm:text-[12px] font-bold text-black uppercase tracking-wider shadow-xs">
+                {story.category.name}
+              </span>
+            ) : null}
+            {story.readingMinutes ? (
+              <span className="inline-flex items-center gap-1 font-ui text-[11px] sm:text-[12px] font-semibold text-white/90">
+                <Clock className="size-3.5 text-[#FFE500]" />
+                {story.readingMinutes} min read
+              </span>
+            ) : null}
+          </div>
+
+          <h3 className="font-sans text-xl sm:text-3xl lg:text-4xl font-black text-white text-balance tracking-tight leading-tight transition-colors group-hover:text-[#FFE500] break-words">
             <Link
               href={href}
               prefetch={false}
@@ -316,32 +370,15 @@ export function FeaturedStory({
             </Link>
           </h3>
 
-          <p className="font-ui text-body text-ink-muted text-pretty leading-relaxed line-clamp-3 sm:line-clamp-4">
+          <p className="font-ui text-body-sm sm:text-body text-white/80 line-clamp-2 max-w-2xl leading-relaxed">
             {story.shortDescription}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1">
-            {story.category ? (
-              <Badge tone="primary">{story.category.name}</Badge>
-            ) : null}
-            <StoryMeta story={story} />
+          <div className="flex items-center gap-2 pt-1 font-ui text-body-xs text-white/70">
+            {story.author ? <span className="font-semibold text-white">{story.author}</span> : null}
+            {story.author && story.publishedAt ? <span>•</span> : null}
+            {story.publishedAt ? <span>{formatPublishedDate(story.publishedAt)}</span> : null}
           </div>
-
-          <span className="mt-2 inline-flex items-center gap-1.5 font-ui text-body-sm font-semibold text-primary group-hover:text-primary-hover">
-            Begin reading
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 16 16"
-              className="size-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 8h9m-3.5-3.5L12 8l-3.5 3.5" />
-            </svg>
-          </span>
         </div>
       </div>
     </article>

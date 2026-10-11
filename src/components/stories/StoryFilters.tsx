@@ -55,7 +55,7 @@ export function StoryFilters({
         action="/stories"
         method="get"
         aria-label="Filter and search stories"
-        className="rounded-md border border-border bg-surface p-4 sm:p-5"
+        className="rounded-2xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs"
       >
         <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-end">
           <TextField
@@ -89,7 +89,7 @@ export function StoryFilters({
             <summary className="inline-flex min-h-11 cursor-pointer items-center font-ui text-body-sm font-medium text-ink">
               Filter by tag
               {search.tags.length > 0 ? (
-                <span className="ml-2 rounded-full bg-primary px-2 py-0.5 font-ui text-body-xs text-on-primary tabular-nums">
+                <span className="ml-2 rounded-full bg-[#FFE500] px-2 py-0.5 font-ui text-body-xs font-bold text-black tabular-nums">
                   {search.tags.length} selected
                 </span>
               ) : null}

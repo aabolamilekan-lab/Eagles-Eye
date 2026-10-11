@@ -80,7 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             pinned to the top-left where it is expected. */}
         <a
           href="#main"
-          className="sr-only-focusable focus-visible:not-sr-only focus-visible:fixed focus-visible:top-3 focus-visible:left-3 focus-visible:z-100 focus-visible:rounded-md focus-visible:bg-primary focus-visible:px-4 focus-visible:py-2 focus-visible:font-ui focus-visible:text-body-sm focus-visible:text-on-primary"
+          className="sr-only-focusable focus-visible:not-sr-only focus-visible:fixed focus-visible:top-3 focus-visible:left-3 focus-visible:z-100 focus-visible:rounded-xl focus-visible:bg-[#FFE500] focus-visible:px-4 focus-visible:py-2 focus-visible:font-ui focus-visible:text-body-sm focus-visible:font-bold focus-visible:text-black focus-visible:ring-2 focus-visible:ring-black shadow-lg"
         >
           Skip to content
         </a>

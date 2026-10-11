@@ -75,7 +75,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return (
       <SearchLayout search={search}>
         <EmptyState
-          icon={<Clock className="size-8 text-primary/70" />}
+          icon={<Clock className="size-8 text-ink-subtle" />}
           title="Too many searches"
           description="You have made a lot of searches in a short time. Please wait a moment, then try again."
           action={
@@ -157,8 +157,8 @@ function SearchLayout({
     <div className="shell py-8 sm:py-12 md:py-16">
       <header className="max-w-2xl">
         <div className="flex items-center gap-2">
-          <span className="inline-block size-1.5 rounded-full bg-primary" />
-          <span className="label-micro text-primary uppercase font-medium tracking-wider">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-1 font-ui text-[11px] font-black uppercase tracking-wider text-black">
+            <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
             Search Archive
           </span>
         </div>
@@ -210,7 +210,7 @@ function renderIdleState(search: StorySearch): ReactNode {
   if (search.queryStatus === "too_short") {
     return (
       <EmptyState
-        icon={<AlertCircle className="size-8 text-primary/70" />}
+        icon={<AlertCircle className="size-8 text-ink-subtle" />}
         title="Keep typing"
         description={`Add a little more — search terms need at least ${SEARCH_QUERY_MIN_LENGTH} characters.`}
         action={

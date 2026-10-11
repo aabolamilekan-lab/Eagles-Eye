@@ -32,7 +32,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const VARIANT: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-on-primary border border-primary hover:bg-primary-hover hover:border-primary-hover active:bg-primary-active",
+    "bg-[#FFE500] text-black font-extrabold border border-[#FFE500] hover:bg-[#edd500] hover:border-[#edd500] active:bg-[#dbbf00] focus-visible:ring-2 focus-visible:ring-black shadow-xs",
   secondary:
     "bg-surface text-ink border border-border-strong hover:bg-surface-sunken",
   ghost: "bg-transparent text-ink border border-transparent hover:bg-surface-sunken",
@@ -65,7 +65,7 @@ export function buttonClasses({
   className?: string;
 } = {}) {
   return cn(
-    "inline-flex shrink-0 items-center justify-center rounded-md font-ui font-medium",
+    "inline-flex shrink-0 items-center justify-center rounded-xl font-ui font-medium",
     "transition-colors duration-(--duration-fast) ease-(--ease-out-quart)",
     "disabled:pointer-events-none disabled:opacity-50",
     VARIANT[variant],

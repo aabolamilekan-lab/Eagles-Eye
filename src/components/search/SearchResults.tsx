@@ -26,7 +26,7 @@ export function SearchResults({
         <h2 className="font-display text-heading-md text-ink">
           {search.q ? (
             <>
-              Results for <span className="italic text-primary">“{search.q}”</span>
+              Results for <span className="font-bold text-black bg-[#FFE500]/35 px-2 py-0.5 rounded-md">“{search.q}”</span>
             </>
           ) : (
             "Filtered Stories"

@@ -14,4 +14,7 @@ import { PROJECT_ROOT } from "./environment";
  * use and nothing from a build can leak in.
  */
 const buildDirectory = path.join(PROJECT_ROOT, ".next");
-fs.rmSync(buildDirectory, { recursive: true, force: true });
+if (fs.existsSync(buildDirectory)) {
+  fs.rmSync(buildDirectory, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+}
+

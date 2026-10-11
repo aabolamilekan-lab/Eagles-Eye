@@ -25,8 +25,8 @@ export default function AboutPage() {
       />
       <div className="reading-column">
         <div className="flex items-center gap-2">
-          <span className="inline-block size-1.5 rounded-full bg-primary" />
-          <span className="label-micro text-primary uppercase font-medium tracking-wider">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-1 font-ui text-[11px] font-black uppercase tracking-wider text-black">
+            <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
             About Eagles Eye
           </span>
         </div>

@@ -46,7 +46,7 @@ export function ReadingLayout({
         ) : null}
         {/* The rule under the heading is the page's one structural flourish. It
             gives the column a defined top edge without a card or a shadow. */}
-        <div aria-hidden="true" className="mt-8 h-0.5 w-16 bg-primary/80 rounded-full" />
+        <div aria-hidden="true" className="mt-8 h-1 w-16 bg-[#FFE500] rounded-full" />
       </header>
 
       {children}

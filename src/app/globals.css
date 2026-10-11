@@ -51,6 +51,12 @@
   --color-accent-surface: #e9f0ef;
   --color-primary-surface: #f6ecea;
 
+  /* --- Colour: vibrant magazine accents (Suprast editorial style) --- */
+  --color-brand-yellow: #ffe500;
+  --color-brand-yellow-hover: #edd500;
+  --color-on-brand-yellow: #111111;
+  --color-brand-dark: #121417;
+
   /* --- Typography ----------------------------------------------------- */
   --font-serif: var(--font-newsreader), "Iowan Old Style", "Palatino Linotype",
     Palatino, Georgia, serif;
@@ -422,7 +428,11 @@
      prose measure itself stays 70ch. */
   max-width: calc(var(--container-prose) + 2 * var(--spacing-gutter));
   margin-inline: auto;
-  padding-inline: var(--spacing-gutter);
+  padding-inline: 1rem;
+
+  @media (min-width: 640px) {
+    padding-inline: var(--spacing-gutter);
+  }
 }
 
 /* ==========================================================================

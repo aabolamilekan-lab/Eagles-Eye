@@ -81,9 +81,9 @@ function NavCard({
       href={href}
       rel={direction === "next" ? "next" : "prev"}
       className={cn(
-        "group flex flex-col gap-1.5 rounded-md border border-border bg-surface p-4",
-        "transition-[border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-quart)",
-        "hover:border-border-strong hover:shadow-sm",
+        "group flex flex-col gap-1.5 rounded-2xl border border-border/80 bg-surface p-5",
+        "transition-all duration-(--duration-base) ease-(--ease-out-quart)",
+        "hover:border-black/30 hover:shadow-xs",
         // "Next" aligns right on wide screens, which is the reading convention.
         direction === "next" && "sm:items-end sm:text-right",
       )}
@@ -93,7 +93,7 @@ function NavCard({
         {label}
         {direction === "next" ? <Arrow className="size-3 rotate-180" /> : null}
       </span>
-      <span className="font-display text-heading-xs text-ink text-balance group-hover:text-primary">
+      <span className="font-display text-heading-xs text-ink text-balance group-hover:text-black group-hover:underline">
         {title}
       </span>
       <span className="sr-only">in {storyTitle}</span>

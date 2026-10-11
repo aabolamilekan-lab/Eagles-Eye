@@ -16,7 +16,9 @@ import { expect, test } from "./support/fixtures";
 const VIEWPORTS = {
   desktop: { width: 1280, height: 800 },
   tablet: { width: 834, height: 1112 },
+  largeMobile: { width: 430, height: 932 },
   mobile: { width: 375, height: 667 },
+  smallMobile: { width: 320, height: 568 },
 } as const;
 
 const PUBLIC_ROUTES = [

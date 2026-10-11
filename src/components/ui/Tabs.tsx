@@ -114,7 +114,7 @@ function TabsInner({
                 "-mb-px shrink-0 border-b-2 px-3.5 py-2.5 font-ui text-body-sm font-medium",
                 "transition-colors duration-(--duration-fast) disabled:pointer-events-none disabled:opacity-50",
                 selected
-                  ? "border-primary text-ink"
+                  ? "border-[#FFE500] text-ink font-bold"
                   : "border-transparent text-ink-muted hover:border-border-strong hover:text-ink",
               )}
             >

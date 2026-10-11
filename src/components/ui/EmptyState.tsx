@@ -135,7 +135,7 @@ export function NotFoundState({
       {action ?? (
         <Link
           href="/"
-          className="font-ui text-body-sm text-accent underline underline-offset-4 hover:text-ink"
+          className="font-ui text-body-sm font-bold text-ink underline underline-offset-4 hover:text-black"
         >
           Return to the home page
         </Link>

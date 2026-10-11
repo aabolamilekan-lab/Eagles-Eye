@@ -113,8 +113,8 @@ export default async function CategoryPage({
 
       <header className="mt-6 border-b border-border/70 pb-8">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-surface px-3 py-1 font-ui text-body-xs font-semibold text-primary">
-            <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-1 font-ui text-[11px] font-black uppercase tracking-wider text-black">
+            <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
             Category Archive
           </span>
         </div>

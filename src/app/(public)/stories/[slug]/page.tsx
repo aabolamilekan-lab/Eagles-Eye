@@ -108,7 +108,7 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
 
       <header className="shell pt-8 sm:pt-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-12 items-start">
-          <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-sunken shadow-xs lg:aspect-[4/5]">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-border bg-surface-sunken shadow-xs lg:aspect-[4/5]">
             {story.coverImageUrl ? (
               <Image
                 src={story.coverImageUrl}
@@ -159,6 +159,7 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
                   href={`/stories/${story.slug}/chapter/${firstChapter.slug}`}
                   variant="primary"
                   size="lg"
+                  className="w-full sm:w-auto"
                   leadingIcon={<BookOpen className="size-4" />}
                 >
                   Start reading

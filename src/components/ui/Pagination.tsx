@@ -88,7 +88,7 @@ export function Pagination({
     >
       {summary}
 
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-center gap-1 max-w-full">
         <PageLink
           href={buildHref(page - 1)}
           disabled={page === 1}
@@ -113,10 +113,10 @@ export function Pagination({
               aria-current={entry === page ? "page" : undefined}
               aria-label={`Page ${entry}`}
               className={cn(
-                "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2",
+                "inline-flex min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 items-center justify-center rounded-xl px-2",
                 "font-ui text-body-sm tabular-nums transition-colors",
                 entry === page
-                  ? "bg-primary text-on-primary"
+                  ? "bg-[#FFE500] text-black font-extrabold shadow-xs"
                   : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
               )}
             >
@@ -149,7 +149,7 @@ function PageLink({
   children: ReactNode;
 }) {
   const base =
-    "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md font-ui text-body-sm transition-colors";
+    "inline-flex min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 items-center justify-center rounded-xl font-ui text-body-sm transition-colors";
 
   if (disabled) {
     const reason =

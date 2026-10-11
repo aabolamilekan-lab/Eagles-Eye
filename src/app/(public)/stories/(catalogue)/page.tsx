@@ -70,11 +70,14 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
         ])}
       />
       <header className="max-w-2xl">
-        <p className="label-micro text-primary">Read</p>
-        <h1 className="mt-3 font-display text-display-lg text-ink text-balance">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-1 font-ui text-[11px] font-black uppercase tracking-wider text-black">
+          <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
+          Catalogue
+        </span>
+        <h1 className="mt-4 font-display text-display-lg sm:text-display-xl text-ink text-balance font-bold tracking-tight">
           Stories
         </h1>
-        <p className="mt-4 font-ui text-body text-ink-muted text-pretty">
+        <p className="mt-3 font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
           Every published story in the catalogue. Search by title, author or
           description, then narrow the list by category or tag.
         </p>

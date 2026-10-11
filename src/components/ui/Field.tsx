@@ -8,9 +8,9 @@ import { useId } from "react";
 import { cn } from "@/lib/cn";
 
 const CONTROL_BASE =
-  "w-full rounded-sm border border-border-strong bg-surface px-3 text-ink " +
+  "w-full rounded-xl border border-border-strong bg-surface px-3 text-ink " +
   "placeholder:text-ink-subtle transition-colors duration-(--duration-fast) " +
-  "hover:border-ink-subtle disabled:cursor-not-allowed disabled:bg-surface-sunken " +
+  "hover:border-ink-subtle focus-visible:outline-2 focus-visible:outline-[#FFE500] disabled:cursor-not-allowed disabled:bg-surface-sunken " +
   "disabled:text-ink-subtle";
 
 const CONTROL_ERROR =
@@ -288,11 +288,11 @@ export function CheckboxField({
         type="checkbox"
         aria-describedby={hint ? `${id}-hint` : undefined}
         className={cn(
-          "mt-0.5 size-4.5 shrink-0 cursor-pointer appearance-none rounded-xs border border-border-strong bg-surface",
-          "checked:border-primary checked:bg-primary",
+          "mt-0.5 size-4.5 shrink-0 cursor-pointer appearance-none rounded-md border border-border-strong bg-surface",
+          "checked:border-black checked:bg-black",
           // The tick is a mask so it inherits the control's colour.
           "checked:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m3.5 8.5 3 3 6-7%22/></svg>')] checked:bg-contain checked:bg-center checked:bg-no-repeat",
-          "transition-colors duration-(--duration-fast) disabled:cursor-not-allowed disabled:opacity-50",
+          "transition-colors duration-(--duration-fast) focus-visible:outline-2 focus-visible:outline-[#FFE500] disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...rest}
