@@ -58,3 +58,6 @@ Thumbs.db
 
 # typescript
 *.tsbuildinfo
+
+# database backups
+*.dump

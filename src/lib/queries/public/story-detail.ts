@@ -55,11 +55,33 @@ export const STORY_DETAIL_SELECT = {
       publishedAt: true,
     },
   },
+  importedArticles: {
+    select: {
+      canonicalUrl: true,
+      title: true,
+      author: true,
+      source: {
+        select: {
+          name: true,
+          attributionPolicy: true,
+        },
+      },
+    },
+    take: 1,
+  },
 } satisfies Prisma.StorySelect;
 
 export type StoryDetailRow = Prisma.StoryGetPayload<{
   select: typeof STORY_DETAIL_SELECT;
 }>;
+
+export interface StorySourceAttribution {
+  publisher: string;
+  originalTitle: string;
+  canonicalUrl: string;
+  originalAuthor: string | null;
+  attributionPolicy: string | null;
+}
 
 export interface PublishedStoryDetail {
   id: string;
@@ -88,6 +110,8 @@ export interface PublishedStoryDetail {
   chapters: ChapterListItem[];
   chapterCount: number;
   hasPublishedChapters: boolean;
+  /** Source attribution for imported news stories. Null for original platform stories. */
+  sourceAttribution?: StorySourceAttribution | null;
 }
 
 export interface PublishedStoryPage {
@@ -117,6 +141,17 @@ export function toPublishedStoryDetail(
     isCurrent: false,
   }));
 
+  const imported = row.importedArticles?.[0];
+  const sourceAttribution: StorySourceAttribution | null = imported
+    ? {
+        publisher: imported.source.name,
+        originalTitle: imported.title,
+        canonicalUrl: imported.canonicalUrl,
+        originalAuthor: imported.author,
+        attributionPolicy: imported.source.attributionPolicy,
+      }
+    : null;
+
   return {
     id: row.id,
     slug: row.slug,
@@ -135,6 +170,7 @@ export function toPublishedStoryDetail(
     chapters,
     chapterCount: chapters.length,
     hasPublishedChapters: chapters.length > 0,
+    sourceAttribution,
   };
 }
 

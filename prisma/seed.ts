@@ -1,5 +1,6 @@
 import { ContentStatus, PrismaClient, UserRole } from "@prisma/client";
 import { hashPassword, verifyPassword } from "../src/lib/auth/password";
+import { seedNewsCategoriesAndSources } from "../src/lib/news/seed";
 
 /**
  * Development seed.
@@ -513,6 +514,9 @@ async function seed(): Promise<void> {
       ],
     });
   }
+
+  // Seed verified news categories and provisionally approved news sources
+  await seedNewsCategoriesAndSources(prisma);
 
   process.stderr.write("Seed complete.\n");
 }

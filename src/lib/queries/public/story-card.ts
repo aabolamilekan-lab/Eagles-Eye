@@ -19,6 +19,16 @@ export const STORY_CARD_SELECT = {
   coverImage: true,
   publishedAt: true,
   category: { select: { name: true, slug: true } },
+  importedArticles: {
+    take: 1,
+    select: {
+      source: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
   _count: {
     select: { chapters: { where: { status: ContentStatus.PUBLISHED } } },
   },
@@ -33,6 +43,7 @@ export function toStoryCard(row: StoryCardRow): StoryCardData {
   // an unservable value produces the no-cover placeholder instead of alt text
   // for an image that is not there.
   const cover = coverUrl(row.coverImage);
+  const sourceName = row.importedArticles?.[0]?.source?.name ?? null;
 
   return {
     slug: row.slug,
@@ -42,6 +53,7 @@ export function toStoryCard(row: StoryCardRow): StoryCardData {
     coverImageUrl: cover,
     coverAlt: cover ? row.title : null,
     category: row.category,
+    sourceName,
     chapterCount: row._count.chapters,
     // Reading time is not stored and is not derived here: pulling every
     // chapter body into a listing query would defeat the point of the cap.

@@ -22,11 +22,12 @@ describe("story status transitions", () => {
     expect(statusAfter(PUBLISHED, "unpublish")).toBe(DRAFT);
   });
 
-  it("archives only a published story", () => {
+  it("archives a published story or draft", () => {
     expect(isStatusTransitionAllowed(PUBLISHED, "archive")).toBe(true);
-    expect(isStatusTransitionAllowed(DRAFT, "archive")).toBe(false);
+    expect(isStatusTransitionAllowed(DRAFT, "archive")).toBe(true);
     expect(isStatusTransitionAllowed(ARCHIVED, "archive")).toBe(false);
     expect(statusAfter(PUBLISHED, "archive")).toBe(ARCHIVED);
+    expect(statusAfter(DRAFT, "archive")).toBe(ARCHIVED);
   });
 
   it("restores an archived story to draft", () => {

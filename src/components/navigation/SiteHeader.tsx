@@ -1,11 +1,30 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { MobileNavMenu } from "@/components/navigation/MobileNavMenu";
 import { cn } from "@/lib/cn";
+
+const emptySubscribe = () => () => {};
+
+function getTodaySnapshot(): string {
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date());
+  } catch {
+    return "Sunday, 11 October 2026";
+  }
+}
+
+function getTodayServerSnapshot(): string {
+  return "Sunday, 11 October 2026";
+}
 
 /**
  * Site header with responsive navigation.
@@ -29,6 +48,11 @@ export function SiteHeader({
   navLabel?: string;
 }) {
   const pathname = usePathname();
+  const todayFormatted = useSyncExternalStore(
+    emptySubscribe,
+    getTodaySnapshot,
+    getTodayServerSnapshot,
+  );
 
   const items = nav.map((item) => ({
     ...item,
@@ -59,10 +83,12 @@ export function SiteHeader({
               Live Catalogue
             </span>
             <span className="h-3 w-px bg-border" />
-            <span className="tabular-nums">Sunday, 11 October 2026</span>
+            <span className="tabular-nums" suppressHydrationWarning>
+              {todayFormatted}
+            </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden lg:inline text-ink-subtle">Volume IV • Long-Form Fiction</span>
+            <span className="hidden lg:inline text-ink-subtle">Editorial Stories &amp; Syndicated News</span>
             <span className="h-3 w-px bg-border hidden lg:inline" />
             <a
               href="mailto:hello@eagleseye.com"

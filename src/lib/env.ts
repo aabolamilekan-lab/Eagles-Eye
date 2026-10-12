@@ -66,6 +66,24 @@ const envSchema = z.object({
   // --- Seed (local development only) --------------------------------------
   SEED_ADMIN_EMAIL: z.string().email().optional(),
   SEED_ADMIN_PASSWORD: z.string().min(1).optional(),
+
+  // --- News Aggregation (Phase 3.2) ---------------------------------------
+  // Secret token required to authenticate cron triggers against /api/cron/aggregate.
+  // When supplied, it must have at least 16 characters.
+  CRON_SECRET: z
+    .string()
+    .min(16, "CRON_SECRET must be at least 16 characters")
+    .optional(),
+
+  // Google Gemini API key for server-side factual summarization. Never public.
+  GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY must not be empty").optional(),
+
+  // Configured Gemini model identifier. Default: "gemini-2.5-flash".
+  GEMINI_MODEL: z.string().min(1).default("gemini-2.5-flash"),
+
+  // Automated publishing toggle.
+  // Defaults strictly to "false" so imported articles remain drafts for review.
+  NEWS_AUTO_PUBLISH: z.enum(["true", "false"]).default("false"),
 }).superRefine((env, ctx) => {
   if (env.NODE_ENV !== "production") {
     return;

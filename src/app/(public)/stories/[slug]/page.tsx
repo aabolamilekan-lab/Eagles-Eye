@@ -8,12 +8,15 @@ import { RichText } from "@/components/chapters/RichText";
 import { Breadcrumbs, type Crumb } from "@/components/navigation/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { StoryCoverFallback, StoryGrid } from "@/components/stories/StoryCard";
+import { SourceAttributionCard } from "@/components/stories/SourceAttributionCard";
+import { ShareActions } from "@/components/stories/ShareActions";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Card";
 import { formatPublishedDate } from "@/lib/format";
 import { getPublishedStoryDetail } from "@/lib/queries/public/stories";
 import { parseContentSlug } from "@/lib/validation/story";
+import { absoluteUrl } from "@/lib/seo/canonical";
 import { buildBreadcrumbJsonLd, buildStoryJsonLd } from "@/lib/seo/jsonld";
 import { buildStoryPageMetadata } from "@/lib/seo/metadata";
 
@@ -181,18 +184,29 @@ export default async function StoryDetailPage({ params }: StoryDetailProps) {
                 ))}
               </div>
             ) : null}
+
+            <ShareActions
+              title={story.title}
+              url={absoluteUrl(`/stories/${story.slug}`)}
+            />
           </div>
         </div>
       </header>
 
       <div className="shell mt-12 sm:mt-16">
+        {story.sourceAttribution ? (
+          <div className="mb-8 max-w-(--container-prose)">
+            <SourceAttributionCard attribution={story.sourceAttribution} />
+          </div>
+        ) : null}
+
         {story.description ? (
           <section aria-labelledby="story-about-heading">
             <h2
               id="story-about-heading"
               className="font-display text-heading-lg text-ink font-semibold border-b border-border pb-3"
             >
-              About this story
+              {story.sourceAttribution ? "Article Coverage" : "About this story"}
             </h2>
             <RichText
               html={story.description}

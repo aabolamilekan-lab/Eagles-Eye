@@ -27,6 +27,8 @@ export interface StoryCardData {
   readingMinutes: number | null;
   /** ISO 8601 publication date, or null when the story is not published. */
   publishedAt: string | null;
+  /** Verified syndicated news source name when imported. */
+  sourceName?: string | null;
 }
 
 /**
@@ -114,6 +116,16 @@ export function StoryCard({
                 {story.category.name}
               </span>
             ) : null}
+            {story.sourceName ? (
+              <span
+                className={cn(
+                  "font-ui text-[11px] font-semibold truncate max-w-[120px]",
+                  isYellow ? "text-black/80" : "text-ink-muted",
+                )}
+              >
+                {story.sourceName}
+              </span>
+            ) : null}
             {story.readingMinutes ? (
               <span
                 className={cn(
@@ -192,6 +204,11 @@ export function StoryCard({
           {story.category ? (
             <span className="rounded-full bg-surface-sunken px-2.5 py-0.5 font-ui text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
               {story.category.name}
+            </span>
+          ) : null}
+          {story.sourceName ? (
+            <span className="font-ui text-[11px] font-semibold text-ink-muted">
+              {story.sourceName}
             </span>
           ) : null}
           {story.readingMinutes ? (
@@ -350,6 +367,11 @@ export function FeaturedStory({
             {story.category ? (
               <span className="inline-flex items-center rounded-full bg-[#FFE500] px-3 sm:px-3.5 py-0.5 sm:py-1 font-ui text-[11px] sm:text-[12px] font-bold text-black uppercase tracking-wider shadow-xs">
                 {story.category.name}
+              </span>
+            ) : null}
+            {story.sourceName ? (
+              <span className="inline-flex items-center rounded-full bg-white/15 px-2.5 sm:px-3 py-0.5 sm:py-1 font-ui text-[11px] sm:text-[12px] font-medium text-white/90">
+                {story.sourceName}
               </span>
             ) : null}
             {story.readingMinutes ? (

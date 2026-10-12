@@ -20,9 +20,13 @@
     "e2e:serve": "next dev",
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "db:seed": "prisma db seed",
+    "prisma:migrate": "tsx scripts/db-guard.ts migrate dev",
+    "prisma:deploy": "tsx scripts/db-guard.ts migrate deploy",
+    "prisma:reset": "tsx scripts/db-guard.ts migrate reset",
+    "prisma:push": "tsx scripts/db-guard.ts db push",
+    "db:seed": "tsx scripts/db-guard.ts db seed",
     "admin:create": "tsx scripts/create-admin.ts",
+    "bootstrap:news": "tsx scripts/bootstrap-news-sources.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
@@ -36,6 +40,7 @@
     "@tiptap/pm": "^3.31.4",
     "@tiptap/react": "^3.31.4",
     "@tiptap/starter-kit": "^3.31.4",
+    "fast-xml-parser": "^5.11.2",
     "lucide-react": "^1.50.0",
     "next": "16.3.8",
     "react": "19.2.8",

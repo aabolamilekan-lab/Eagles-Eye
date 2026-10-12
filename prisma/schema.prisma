@@ -91,10 +91,11 @@ model Story {
   updatedAt        DateTime      @updatedAt
   publishedAt      DateTime?
 
-  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  chapters   Chapter[]
-  storyTags  StoryTag[]
-  storyViews StoryView[]
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  chapters         Chapter[]
+  storyTags        StoryTag[]
+  storyViews       StoryView[]
+  importedArticles ImportedArticle[]
 
   // Public listing, featured rail and sitemap ordering.
   @@index([status, publishedAt(sort: Desc)])
@@ -148,7 +149,8 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  stories Story[]
+  stories     Story[]
+  newsSources NewsSource[]
 
   // Search matches a story by its category name.
   @@index([name(ops: raw("gin_trgm_ops"))], type: Gin)
@@ -195,4 +197,122 @@ model StoryView {
   @@index([viewedAt])
   @@index([chapterId])
   @@index([sessionId])
+}
+
+// ---------------------------------------------------------------------------
+// News Aggregation & Ingestion Models (Phase 3.1)
+// ---------------------------------------------------------------------------
+
+enum NewsFeedType {
+  RSS
+  ATOM
+  JSON_API
+}
+
+enum ArticleSyncStatus {
+  DISCOVERED
+  IMPORTED
+  DUPLICATE
+  FILTERED
+  FAILED
+  WITHDRAWN
+}
+
+enum WithdrawalStatus {
+  ACTIVE
+  SUSPECTED_REMOVED
+  CONFIRMED_WITHDRAWN
+}
+
+enum SyncJobStatus {
+  SUCCESS
+  PARTIAL_SUCCESS
+  FAILED
+}
+
+model NewsSource {
+  id                  String       @id @default(cuid())
+  name                String
+  slug                String       @unique
+  feedUrl             String       @unique
+  feedType            NewsFeedType @default(RSS)
+  isActive            Boolean      @default(true)
+  defaultCategoryId   String?
+  pollIntervalMinutes Int          @default(30)
+  lastFetchedAt       DateTime?
+  lastSuccessAt       DateTime?
+  lastErrorAt         DateTime?
+  lastErrorMessage    String?
+  consecutiveFailures Int          @default(0)
+  etag                String?
+  lastModified        String?
+  attributionPolicy   String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  defaultCategory  Category?         @relation(fields: [defaultCategoryId], references: [id], onDelete: SetNull)
+  importedArticles ImportedArticle[]
+  syncLogs         NewsSyncLog[]
+
+  @@index([isActive, lastFetchedAt])
+  @@index([defaultCategoryId])
+}
+
+model ImportedArticle {
+  id                 String            @id @default(cuid())
+  sourceId           String
+  externalId         String?
+  canonicalUrl       String            @unique
+  title              String
+  author             String?
+  rawPublishedAt     DateTime?
+  summary            String?
+  contentHash        String
+  syncStatus         ArticleSyncStatus @default(DISCOVERED)
+  withdrawalStatus   WithdrawalStatus  @default(ACTIVE)
+  withdrawalEvidence String?
+  lastCheckedAt      DateTime          @default(now())
+  failedAttempts     Int               @default(0)
+  lastError          String?
+  storyId            String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  source NewsSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  story  Story?      @relation(fields: [storyId], references: [id], onDelete: SetNull)
+
+  @@index([sourceId, syncStatus])
+  @@index([withdrawalStatus])
+  @@index([storyId])
+  @@index([rawPublishedAt(sort: Desc)])
+  @@unique([sourceId, externalId])
+}
+
+model NewsSyncLog {
+  id                 String        @id @default(cuid())
+  sourceId           String?
+  jobId              String
+  status             SyncJobStatus
+  articlesDiscovered Int           @default(0)
+  articlesImported   Int           @default(0)
+  articlesSkipped    Int           @default(0)
+  articlesUpdated    Int           @default(0)
+  articlesWithdrawn  Int           @default(0)
+  errorMessage       String?
+  durationMs         Int
+  startedAt          DateTime      @default(now())
+  completedAt        DateTime?
+
+  source NewsSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([startedAt(sort: Desc)])
+  @@index([sourceId, startedAt])
+  @@index([jobId])
+}
+
+model NewsSyncLock {
+  id          String    @id @default("global_news_sync")
+  lockedUntil DateTime?
+  lockedBy    String?
+  updatedAt   DateTime  @updatedAt
 }

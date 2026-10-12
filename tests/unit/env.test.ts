@@ -11,6 +11,10 @@ const MANAGED_KEYS = [
   "STORAGE_BUCKET",
   "STORAGE_ACCESS_KEY_ID",
   "STORAGE_SECRET_ACCESS_KEY",
+  "CRON_SECRET",
+  "GEMINI_API_KEY",
+  "GEMINI_MODEL",
+  "NEWS_AUTO_PUBLISH",
 ];
 
 function setEnvironment(values: Record<string, string>): void {
@@ -84,5 +88,59 @@ describe("environment contract", () => {
       STORAGE_SECRET_ACCESS_KEY: "secret",
     });
     expect(() => getEnv()).not.toThrow();
+  });
+
+  it("defaults GEMINI_MODEL to gemini-2.5-flash and NEWS_AUTO_PUBLISH to false", () => {
+    setEnvironment({
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
+      AUTH_SECRET: "x".repeat(32),
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+    });
+    const env = getEnv();
+    expect(env.GEMINI_MODEL).toBe("gemini-2.5-flash");
+    expect(env.NEWS_AUTO_PUBLISH).toBe("false");
+    expect(env.CRON_SECRET).toBeUndefined();
+    expect(env.GEMINI_API_KEY).toBeUndefined();
+  });
+
+  it("rejects a CRON_SECRET shorter than 16 characters", () => {
+    setEnvironment({
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
+      AUTH_SECRET: "x".repeat(32),
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      CRON_SECRET: "too-short",
+    });
+    expect(() => getEnv()).toThrow(/CRON_SECRET/);
+  });
+
+  it("rejects invalid NEWS_AUTO_PUBLISH values", () => {
+    setEnvironment({
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
+      AUTH_SECRET: "x".repeat(32),
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      NEWS_AUTO_PUBLISH: "yes",
+    });
+    expect(() => getEnv()).toThrow(/NEWS_AUTO_PUBLISH/);
+  });
+
+  it("accepts valid news aggregation settings", () => {
+    setEnvironment({
+      NODE_ENV: "development",
+      DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
+      AUTH_SECRET: "x".repeat(32),
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      CRON_SECRET: "a-valid-cron-secret-with-plenty-of-entropy",
+      GEMINI_API_KEY: "valid-gemini-key",
+      GEMINI_MODEL: "gemini-3.6-flash",
+      NEWS_AUTO_PUBLISH: "false",
+    });
+    const env = getEnv();
+    expect(env.CRON_SECRET).toBe("a-valid-cron-secret-with-plenty-of-entropy");
+    expect(env.GEMINI_API_KEY).toBe("valid-gemini-key");
+    expect(env.GEMINI_MODEL).toBe("gemini-3.6-flash");
+    expect(env.NEWS_AUTO_PUBLISH).toBe("false");
   });
 });

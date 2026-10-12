@@ -31,7 +31,7 @@ const RULES: Record<StoryStatusAction, TransitionRule> = {
     to: ContentStatus.DRAFT,
   },
   archive: {
-    from: [ContentStatus.PUBLISHED],
+    from: [ContentStatus.PUBLISHED, ContentStatus.DRAFT],
     to: ContentStatus.ARCHIVED,
   },
   restore: {
