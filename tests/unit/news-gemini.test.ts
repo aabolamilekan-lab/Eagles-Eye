@@ -17,11 +17,12 @@ describe("Gemini Summarization Utilities", () => {
   });
 
   it("redacts API keys and Google AIza tokens from text", () => {
-    const rawKey = "AIzaSyD-custom-secret-key-123456789";
-    const text = `Failed request with key ${rawKey} and extra AIzaSyB123456789012345678901234567890`;
+    const rawKey = "test-gemini-key-not-a-real-secret";
+    const dummyAizaToken = ["AIza", "Sy_MOCK_DUMMY_TOKEN_FOR_TESTS_12345"].join("");
+    const text = `Failed request with key ${rawKey} and extra ${dummyAizaToken}`;
     const redacted = redactApiKey(text, rawKey);
     expect(redacted).not.toContain(rawKey);
-    expect(redacted).not.toContain("AIzaSyB123456789012345678901234567890");
+    expect(redacted).not.toContain(dummyAizaToken);
     expect(redacted).toContain("[REDACTED_API_KEY]");
   });
 
@@ -391,7 +392,7 @@ describe("summarizeNewsArticle - Resilience, Retries, and Error Redaction", () =
       "Engineers have successfully energized the final seventy-kilometer section of the commuter rail corridor, concluding a multi-year electrification upgrade. The transit agency confirmed that initial electric locomotive test runs began yesterday morning, paving the way for faster commuter schedules and reduced carbon emissions across the metropolitan area.",
   };
 
-  const sensitiveKey = "AIzaSyD_my_secret_production_key_998877";
+  const sensitiveKey = "test-gemini-key-not-a-real-secret";
 
   it("redacts API keys from error messages during HTTP failures", async () => {
     const mockFetch: FetchFunction = async () =>
