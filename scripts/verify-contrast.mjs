@@ -17,12 +17,25 @@ import { dirname, join } from "node:path";
 const here = dirname(fileURLToPath(import.meta.url));
 const defaultCssPath = join(here, "..", "src", "app", "globals.css");
 
-/** Parse `--color-<name>: #hex` declarations out of a stylesheet string. */
-export function parseColorTokens(css) {
+/**
+ * Parse `--color-<name>: #hex` declarations out of a stylesheet string.
+ * @param {string} css
+ * @param {"light" | "dark"} [theme="light"]
+ * @returns {Record<string, string>}
+ */
+export function parseColorTokens(css, theme = "light") {
   const tokens = {};
+  let targetSlice = css;
+  if (theme === "dark") {
+    const darkMatch = css.match(/(?:\.dark|\[data-theme=["']dark["']\])[^{]*\{([^}]+)\}/);
+    targetSlice = darkMatch ? darkMatch[1] : "";
+  } else {
+    const themeMatch = css.match(/@theme[^{]*\{([^}]+)\}/);
+    targetSlice = themeMatch ? themeMatch[1] : css.split(/(?:\.dark|\[data-theme=["']dark["']\])/)[0];
+  }
   const pattern = /--color-([a-z0-9-]+):\s*(#[0-9a-fA-F]{3,8})/g;
   let match;
-  while ((match = pattern.exec(css)) !== null) {
+  while ((match = pattern.exec(targetSlice)) !== null) {
     tokens[match[1]] = match[2];
   }
   return tokens;
@@ -112,19 +125,27 @@ function formatResult(result) {
 
 function main() {
   const css = readFileSync(defaultCssPath, "utf8");
-  const results = evaluateContrast(parseColorTokens(css));
-  const failures = results.filter((result) => !result.pass);
-
-  for (const result of results) {
+  process.stdout.write("--- Light Palette ---\n");
+  const lightResults = evaluateContrast(parseColorTokens(css, "light"));
+  for (const result of lightResults) {
     process.stdout.write(`${formatResult(result)}\n`);
   }
+
+  process.stdout.write("\n--- Dark Palette ---\n");
+  const darkResults = evaluateContrast(parseColorTokens(css, "dark"));
+  for (const result of darkResults) {
+    process.stdout.write(`${formatResult(result)}\n`);
+  }
+
+  const allResults = [...lightResults, ...darkResults];
+  const failures = allResults.filter((result) => !result.pass);
 
   if (failures.length > 0) {
     console.error(`\n${failures.length} contrast pairing(s) below WCAG AA.`);
     process.exit(1);
   }
 
-  process.stdout.write(`\nAll ${results.length} pairings meet WCAG AA.\n`);
+  process.stdout.write(`\nAll ${allResults.length} pairings (light & dark) meet WCAG AA.\n`);
 }
 
 if (

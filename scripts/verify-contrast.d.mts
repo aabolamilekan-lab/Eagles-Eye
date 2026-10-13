@@ -12,7 +12,7 @@ export interface ContrastResult extends ContrastPairing {
   pass: boolean;
 }
 
-export function parseColorTokens(css: string): ColorTokens;
+export function parseColorTokens(css: string, theme?: "light" | "dark"): ColorTokens;
 export function toRgb(hex: string): [number, number, number];
 export function relativeLuminance(hex: string): number;
 export function contrast(a: string, b: string): number;

@@ -68,13 +68,19 @@ export const metadata: Metadata = {
   },
 };
 
+const themeScript = `(function(){try{var t=localStorage.getItem('eagles-eye-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d)){document.documentElement.classList.add('dark');document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.classList.remove('dark');document.documentElement.setAttribute('data-theme','light');}}catch(e){}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${newsreader.variable} ${archivo.variable} h-full`}
     >
+      <head>
+        <script id="theme-init">{themeScript}</script>
+      </head>
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {/* First focusable element on every page. Hidden until focused, then
             pinned to the top-left where it is expected. */}

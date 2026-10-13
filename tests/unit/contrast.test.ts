@@ -77,3 +77,23 @@ describe("design tokens", () => {
     ).toThrow(/Missing token/);
   });
 });
+
+describe("dark design tokens", () => {
+  const darkTokens = parseColorTokens(css, "dark");
+
+  it("parses every colour token referenced by a pairing for dark theme", () => {
+    for (const { fg, bg } of pairings) {
+      expect(darkTokens[fg], `missing dark --color-${fg}`).toBeDefined();
+      expect(darkTokens[bg], `missing dark --color-${bg}`).toBeDefined();
+    }
+  });
+
+  it("meets WCAG AA for every pairing in dark theme", () => {
+    const results = evaluateContrast(darkTokens);
+    const failures = results.filter((result) => !result.pass);
+    expect(
+      failures.map((failure) => failure.label),
+      "dark pairings below threshold",
+    ).toEqual([]);
+  });
+});

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 import { MobileNavMenu } from "@/components/navigation/MobileNavMenu";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
 
 const emptySubscribe = () => () => {};
@@ -69,6 +70,7 @@ export function SiteHeader({
       >
         <Search className="size-3.5 sm:size-4" />
       </Link>
+      <ThemeToggle />
     </div>
   );
 

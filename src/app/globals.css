@@ -127,6 +127,60 @@
 }
 
 /* ==========================================================================
+   Dark theme tokens (Mood toggle)
+   ========================================================================== */
+
+.dark,
+[data-theme="dark"] {
+  /* --- Colour: surfaces ---------------------------------------------- */
+  --color-paper: #121417;
+  --color-surface: #1a1d22;
+  --color-surface-sunken: #15171b;
+  --color-surface-inverse: #faf8f5;
+
+  /* --- Colour: foreground -------------------------------------------- */
+  --color-ink: #f5f3ef;
+  --color-ink-muted: #aba59b;
+  --color-ink-subtle: #948e84;
+
+  /* --- Colour: lines -------------------------------------------------- */
+  --color-border: #282c33;
+  --color-border-strong: #686e7c;
+
+  /* --- Colour: intent ------------------------------------------------- */
+  --color-primary: #f07567;
+  --color-primary-hover: #f7887b;
+  --color-primary-active: #e26253;
+  --color-on-primary: #121417;
+
+  --color-accent: #38b2ac;
+  --color-accent-hover: #4fd1c5;
+  --color-on-accent: #121417;
+
+  --color-success: #48bb78;
+  --color-warning: #ecc94b;
+  --color-error: #f56565;
+
+  /* Tinted backgrounds for dark badges and alerts */
+  --color-success-surface: #152b1e;
+  --color-warning-surface: #2e2614;
+  --color-error-surface: #2d1818;
+  --color-accent-surface: #132829;
+  --color-primary-surface: #2d1715;
+
+  /* --- Colour: vibrant magazine accents --- */
+  --color-brand-yellow: #ffe500;
+  --color-brand-yellow-hover: #edd500;
+  --color-on-brand-yellow: #111111;
+  --color-brand-dark: #121417;
+
+  /* --- Elevation: dark shadows --- */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.25);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.35), 0 4px 12px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 8px 16px rgb(0 0 0 / 0.45), 0 24px 48px rgb(0 0 0 / 0.35);
+}
+
+/* ==========================================================================
    Base
    ========================================================================== */
 

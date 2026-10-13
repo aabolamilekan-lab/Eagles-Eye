@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
 
 export interface MobileNavItem {
@@ -164,7 +165,7 @@ export function MobileNavMenu({
                   "flex h-11 items-center rounded-xl px-3.5 font-ui text-body-sm transition-colors",
                   item.current
                     ? "bg-[#FFE500] font-bold text-black shadow-xs"
-                    : "text-ink-muted hover:bg-surface-sunken hover:text-black",
+                    : "text-ink-muted hover:bg-surface-sunken hover:text-ink",
                 )}
               >
                 {item.label}
@@ -172,6 +173,10 @@ export function MobileNavMenu({
             </li>
           ))}
         </ul>
+
+        <div className="mt-2 pt-2 border-t border-border/70">
+          <ThemeToggle variant="row" />
+        </div>
       </nav>
     </details>
   );
