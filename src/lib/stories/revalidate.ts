@@ -23,3 +23,4 @@ export function revalidatePublicStoryCaches(): void {
   revalidatePath("/");
   revalidatePath("/stories");
 }
+

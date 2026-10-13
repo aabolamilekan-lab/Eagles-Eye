@@ -78,7 +78,7 @@ export async function saveNewsDraftAction(
   const sanitizedDescription = description ? sanitizeRichText(description).trim() : null;
 
   try {
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 5. Concurrency & draft eligibility check inside transaction
       const existing = await tx.story.findUnique({
         where: { id: storyId },
@@ -126,6 +126,15 @@ export async function saveNewsDraftAction(
         message: "Draft saved successfully.",
       };
     });
+
+    if (result.ok) {
+      revalidatePath("/admin");
+      revalidatePath("/admin/stories");
+      revalidatePath("/admin/news");
+      revalidatePath(`/admin/news/${storyId}`);
+    }
+
+    return result;
   } catch (_err) {
     return {
       ok: false,
@@ -274,9 +283,11 @@ export async function approveAndPublishNewsAction(
       return result;
     }
 
-    // 8. Invalidate public caches after successful transaction
+    // 8. Invalidate public caches and admin views after successful transaction
     revalidatePublicStoryCaches();
     revalidatePath(`/stories/${publishedSlug}`);
+    revalidatePath("/admin");
+    revalidatePath("/admin/stories");
     revalidatePath("/admin/news");
     revalidatePath(`/admin/news/${storyId}`);
 
@@ -383,6 +394,8 @@ export async function rejectNewsDraftAction(
     });
 
     if (result.ok) {
+      revalidatePath("/admin");
+      revalidatePath("/admin/stories");
       revalidatePath("/admin/news");
     }
 

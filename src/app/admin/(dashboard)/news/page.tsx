@@ -104,11 +104,31 @@ export default async function NewsQueuePage({ searchParams }: NewsQueuePageProps
       {result.items.length === 0 ? (
         <EmptyState
           icon={<Newspaper className="size-8" />}
-          title="No articles in this queue"
+          title={
+            currentStatus === "DRAFT"
+              ? "No pending articles in review queue"
+              : "No articles found in this queue"
+          }
           description={
             currentStatus === "DRAFT"
-              ? "There are currently no imported news drafts waiting for review."
-              : "No news articles match the selected filter."
+              ? "There are currently no imported news drafts waiting for review. All imported drafts may have been published or rejected."
+              : `No news articles match the ${currentStatus.toLowerCase()} filter.`
+          }
+          action={
+            currentStatus === "DRAFT" ? (
+              <ButtonLink href="/admin/news?status=PUBLISHED" variant="primary" size="sm">
+                View Published News
+              </ButtonLink>
+            ) : (
+              <ButtonLink href="/admin/news?status=ALL" variant="secondary" size="sm">
+                View All Articles
+              </ButtonLink>
+            )
+          }
+          secondaryAction={
+            <ButtonLink href="/admin/news/sync" variant="secondary" size="sm">
+              Sync Monitor
+            </ButtonLink>
           }
         />
       ) : (

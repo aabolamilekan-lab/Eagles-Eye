@@ -68,6 +68,8 @@ export async function triggerManualSyncAction(): Promise<SyncActionResult> {
     revalidatePath("/admin/news/sync");
     revalidatePath("/admin/news/sources");
     revalidatePath("/admin/news");
+    revalidatePath("/admin");
+    revalidatePath("/admin/stories");
 
     if (result.status === "FAILED") {
       return {
