@@ -3,11 +3,14 @@ import { querySitemap } from "@/lib/queries/public/sitemap";
 import { PUBLIC_CATEGORIES_TAG } from "@/lib/queries/public/categories";
 import { PUBLIC_STORIES_TAG } from "@/lib/queries/public/stories";
 import { siteBaseUrl } from "@/lib/seo/canonical";
+import { buildStaticEntries } from "@/lib/seo/sitemap";
+import { logger } from "@/lib/logger";
 
 // Validated once: a missing or malformed NEXT_PUBLIC_APP_URL fails the build
 // rather than emitting a sitemap full of wrong origins.
 const baseUrl = siteBaseUrl();
 
+export const dynamic = "force-dynamic";
 export const revalidate = 300;
 
 /**
@@ -29,5 +32,12 @@ const getSitemap = unstable_cache(async () => querySitemap(baseUrl), [
 });
 
 export default async function sitemap() {
-  return getSitemap();
+  try {
+    return await getSitemap();
+  } catch (error) {
+    logger.error("sitemap.generate_failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return buildStaticEntries(baseUrl, []);
+  }
 }
