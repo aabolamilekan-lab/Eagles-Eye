@@ -148,13 +148,13 @@ export async function summarizeNewsArticle(
       model = env.GEMINI_MODEL;
     } catch {
       // Default model fallback
-      model = "gemini-3.5-flash-lite";
+      model = "gemini-1.5-flash";
     }
   }
 
-  // Gracefully remap deprecated sunset models that return 404
-  if (model === "gemini-2.5-flash") {
-    model = "gemini-3.5-flash-lite";
+  // Gracefully remap sunset or hypothetical models to official production model
+  if (model === "gemini-2.5-flash" || model === "gemini-3.5-flash-lite") {
+    model = "gemini-1.5-flash";
   }
 
   if (!apiKey || apiKey.trim().length === 0) {
@@ -164,7 +164,7 @@ export async function summarizeNewsArticle(
     });
   }
 
-  const configuredModel = model || "gemini-3.5-flash-lite";
+  const configuredModel = model || "gemini-1.5-flash";
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
   const baseRetryDelayMs = options.baseRetryDelayMs ?? DEFAULT_BASE_RETRY_DELAY_MS;
