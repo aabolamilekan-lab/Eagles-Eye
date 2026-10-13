@@ -298,6 +298,8 @@ export async function executeNewsAggregationJob(
                   : String(persistErr),
             });
           }
+        } else if (res.status === "AI_FAILED") {
+          sourceFailed += 1;
         } else {
           sourceSkipped += 1;
         }
@@ -321,6 +323,10 @@ export async function executeNewsAggregationJob(
         },
       });
 
+      const firstAiError = runSummary.results.find(
+        (r) => r.status === "AI_FAILED" && r.rejectionOrErrorReason,
+      )?.rejectionOrErrorReason;
+
       await recordSyncLogEntry(
         {
           sourceId: source.id,
@@ -330,6 +336,7 @@ export async function executeNewsAggregationJob(
           importedCount: sourceImported,
           skippedCount: sourceSkipped,
           failedCount: sourceFailed,
+          errorMessage: firstAiError ? sanitizeSyncErrorMessage(firstAiError) : undefined,
           durationMs: Date.now() - sourceStart,
         },
         client,

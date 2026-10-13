@@ -98,7 +98,7 @@ describe("environment contract", () => {
       NEXT_PUBLIC_APP_URL: "http://localhost:3000",
     });
     const env = getEnv();
-    expect(env.GEMINI_MODEL).toBe("gemini-2.5-flash");
+    expect(env.GEMINI_MODEL).toBe("gemini-3.5-flash-lite");
     expect(env.NEWS_AUTO_PUBLISH).toBe("false");
     expect(env.CRON_SECRET).toBeUndefined();
     expect(env.GEMINI_API_KEY).toBeUndefined();

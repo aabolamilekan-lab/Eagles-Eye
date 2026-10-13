@@ -78,8 +78,8 @@ const envSchema = z.object({
   // Google Gemini API key for server-side factual summarization. Never public.
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY must not be empty").optional(),
 
-  // Configured Gemini model identifier. Default: "gemini-2.5-flash".
-  GEMINI_MODEL: z.string().min(1).default("gemini-2.5-flash"),
+  // Configured Gemini model identifier. Default: "gemini-3.5-flash-lite".
+  GEMINI_MODEL: z.string().min(1).default("gemini-3.5-flash-lite"),
 
   // Automated publishing toggle.
   // Defaults strictly to "false" so imported articles remain drafts for review.
