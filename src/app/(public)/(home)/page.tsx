@@ -63,10 +63,6 @@ export default async function HomePage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-2.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFE500] px-3 py-0.5 font-ui text-[11px] font-black text-black uppercase tracking-wider shadow-2xs">
-                <span className="size-1.5 rounded-full bg-black" aria-hidden="true" />
-                Live Catalogue
-              </span>
               <span className="font-ui text-body-xs text-ink-subtle">
                 Volume IV • Long-Form Editorial
               </span>

@@ -78,18 +78,11 @@ export function SiteHeader({
       <div className="hidden sm:block border-b border-border/60 bg-surface/80 py-1.5 font-ui text-[12px] text-ink-subtle">
         <div className="shell flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
-              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              Live Catalogue
-            </span>
-            <span className="h-3 w-px bg-border" />
             <span className="tabular-nums" suppressHydrationWarning>
               {todayFormatted}
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden lg:inline text-ink-subtle">Editorial Stories &amp; Syndicated News</span>
-            <span className="h-3 w-px bg-border hidden lg:inline" />
             <a
               href="mailto:hello@eagleseye.com"
               className="hover:text-ink transition-colors font-medium"
