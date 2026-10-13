@@ -62,11 +62,6 @@ export default async function HomePage() {
       <section className="shell pt-8 sm:pt-10 pb-6 border-b border-border/60">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="font-ui text-body-xs text-ink-subtle">
-                Volume IV • Long-Form Editorial
-              </span>
-            </div>
             <h1
               id="home-hero-heading"
               className="font-sans text-display-md sm:text-display-lg lg:text-display-xl font-black text-ink tracking-tight text-balance"
