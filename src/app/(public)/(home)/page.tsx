@@ -49,8 +49,9 @@ export default async function HomePage() {
     ]);
 
   const [leadFeatured, ...restFeatured] = featured;
-  const heroRecent = leadFeatured ? recent.filter((s) => s.slug !== leadFeatured.slug) : recent;
-  const heroPopular = leadFeatured ? popular.filter((s) => s.slug !== leadFeatured.slug) : popular;
+  const leadStory = recent[0] ?? leadFeatured;
+  const heroRecent = leadStory ? recent.filter((s) => s.slug !== leadStory.slug) : recent;
+  const heroPopular = leadStory ? popular.filter((s) => s.slug !== leadStory.slug) : popular;
   const hasStories = storyCount > 0;
   const hasCategories = categories.length > 0;
 
@@ -134,10 +135,10 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {hasStories && leadFeatured ? (
+        {hasStories && leadStory ? (
           <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr] items-stretch">
-            {/* Left: Lead Featured Story in full overlay card */}
-            <FeaturedStory story={leadFeatured} priority />
+            {/* Left: Lead Story (Latest published) in full overlay card */}
+            <FeaturedStory story={leadStory} priority />
 
             {/* Right: Suprast-style Tabbed Stories Rail with Yellow Card */}
             <HeroTabs recentStories={heroRecent} popularStories={heroPopular} />
