@@ -32,9 +32,6 @@ export function SearchResults({
             "Filtered Stories"
           )}
         </h2>
-        <span className="font-ui text-body-xs font-medium text-ink-muted bg-surface-sunken px-2.5 py-1 rounded-full border border-border">
-          {total} {total === 1 ? "story" : "stories"}
-        </span>
       </div>
 
       <ul className="flex list-none flex-col divide-y divide-border/60">

@@ -52,14 +52,7 @@ export function CategoryCard({
         ) : null}
       </div>
 
-      <div className="pt-3 border-t border-border/60 flex items-center justify-between font-ui text-body-xs">
-        {category.storyCount !== undefined ? (
-          <span className="font-medium text-ink-subtle tabular-nums">
-            {category.storyCount} {category.storyCount === 1 ? "story" : "stories"}
-          </span>
-        ) : (
-          <span />
-        )}
+      <div className="pt-3 border-t border-border/60 flex items-center justify-end font-ui text-body-xs">
         <span className="font-bold text-ink inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5 group-hover:text-black">
           Explore &rarr;
         </span>

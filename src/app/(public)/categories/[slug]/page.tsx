@@ -139,7 +139,7 @@ export default async function CategoryPage({
         <div className="mt-8 sm:mt-10">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/50 pb-5">
             <p className="font-ui text-body-sm text-ink-muted">
-              Showing <span className="font-semibold text-ink">{result.total}</span> {result.total === 1 ? "story" : "stories"}
+              Published stories
             </p>
             <form
               method="get"

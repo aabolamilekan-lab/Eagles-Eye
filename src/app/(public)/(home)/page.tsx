@@ -96,7 +96,7 @@ export default async function HomePage() {
           <p className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-ui text-body-xs text-ink-subtle">
             <span className="inline-flex items-center gap-1.5 font-medium">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              150+ global authors
+              Independent global authors
             </span>
             <span className="text-border-strong/40" aria-hidden="true">•</span>
             <span>No algorithms</span>
@@ -216,12 +216,12 @@ export default async function HomePage() {
 
                 <div className="mt-4 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between rounded-xl bg-surface-sunken/80 px-3.5 py-2.5">
-                    <span className="font-ui text-body-xs text-ink-muted">Published Titles</span>
-                    <span className="font-sans text-heading-sm font-black text-ink tabular-nums">{storyCount}</span>
+                    <span className="font-ui text-body-xs text-ink-muted">Catalogue Access</span>
+                    <span className="font-sans text-body-xs font-bold text-ink">Free &amp; Open</span>
                   </div>
                   <div className="flex items-center justify-between rounded-xl bg-surface-sunken/80 px-3.5 py-2.5">
-                    <span className="font-ui text-body-xs text-ink-muted">Curated Topics</span>
-                    <span className="font-sans text-heading-sm font-black text-ink tabular-nums">{categories.length}</span>
+                    <span className="font-ui text-body-xs text-ink-muted">Editorial Standard</span>
+                    <span className="font-sans text-body-xs font-bold text-ink">Curated Fiction</span>
                   </div>
                   {popular[0] ? (
                     <div className="rounded-xl border border-border/60 p-3 mt-1 bg-surface">
