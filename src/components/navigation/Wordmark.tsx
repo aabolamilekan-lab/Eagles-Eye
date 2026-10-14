@@ -10,11 +10,13 @@ import { cn } from "@/lib/cn";
 export function Wordmark({
   href = "/",
   tone = "ink",
+  size = "md",
   className,
 }: {
   href?: string;
   /** `on-primary` for placement on dark surfaces like the oxblood footer. */
   tone?: "ink" | "on-primary" | "primary";
+  size?: "sm" | "md" | "lg";
   className?: string;
 }) {
   return (
@@ -28,7 +30,14 @@ export function Wordmark({
     >
       <span
         aria-hidden="true"
-        className="size-7 sm:size-9 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 bg-[#FFE500] text-black shadow-2xs transition-transform duration-300 ease-out group-hover:scale-105"
+        className={cn(
+          "rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 bg-[#FFE500] text-black shadow-2xs transition-transform duration-300 ease-out group-hover:scale-105",
+          size === "lg"
+            ? "size-8 sm:size-10"
+            : size === "sm"
+              ? "size-6 sm:size-7"
+              : "size-7 sm:size-9",
+        )}
       >
         <svg
           viewBox="0 0 24 24"
@@ -37,7 +46,13 @@ export function Wordmark({
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="size-3.5 sm:size-5"
+          className={cn(
+            size === "lg"
+              ? "size-4 sm:size-5.5"
+              : size === "sm"
+                ? "size-3 sm:size-3.5"
+                : "size-3.5 sm:size-5",
+          )}
         >
           <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z" />
           <circle cx="12" cy="12" r="3" fill="currentColor" />
@@ -45,7 +60,12 @@ export function Wordmark({
       </span>
       <span
         className={cn(
-          "font-sans text-lg sm:text-heading-xl font-black tracking-tight whitespace-nowrap",
+          "font-sans font-black tracking-tight whitespace-nowrap",
+          size === "lg"
+            ? "text-xl sm:text-2xl md:text-3xl"
+            : size === "sm"
+              ? "text-base"
+              : "text-lg sm:text-heading-xl",
           tone === "on-primary" ? "text-on-primary" : "text-ink",
         )}
       >

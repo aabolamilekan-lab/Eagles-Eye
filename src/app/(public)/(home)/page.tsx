@@ -60,22 +60,22 @@ export default async function HomePage() {
       <JsonLd data={buildWebSiteJsonLd()} />
 
       {/* Main Top Header Banner */}
-      <section className="shell pt-8 sm:pt-12 pb-8 sm:pb-10 border-b border-border/60">
+      <section className="shell pt-6 sm:pt-8 pb-6 sm:pb-8 border-b border-border/60">
         <div className="max-w-3xl">
           <h1
             id="home-hero-heading"
-            className="font-sans text-display-md sm:text-display-lg lg:text-display-xl font-black text-ink tracking-tight text-balance leading-[1.08]"
+            className="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight text-balance leading-tight"
           >
             Pure fiction.{" "}
-            <span className="relative inline-block text-amber-600 dark:text-[#FFE500] underline decoration-[#FFE500] decoration-[4px] sm:decoration-[6px] underline-offset-4 sm:underline-offset-8">
+            <span className="relative inline-block text-amber-600 dark:text-[#FFE500] underline decoration-[#FFE500] decoration-[3px] sm:decoration-[4px] underline-offset-4 sm:underline-offset-6">
               Zero noise.
             </span>
           </h1>
-          <p className="mt-3.5 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
+          <p className="mt-2.5 max-w-2xl font-ui text-body sm:text-body-read text-ink-muted text-pretty leading-relaxed">
             Long-form stories from global independent writers, delivered in a reading experience stripped of everything that gets in the way.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <ButtonLink
               href="/stories"
               variant="primary"
@@ -94,7 +94,7 @@ export default async function HomePage() {
             </ButtonLink>
           </div>
 
-          <p className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-ui text-body-xs text-ink-subtle">
+          <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-ui text-body-xs text-ink-subtle">
             <span className="inline-flex items-center gap-1.5 font-medium">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
               Independent global authors
