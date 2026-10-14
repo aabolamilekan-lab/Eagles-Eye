@@ -93,17 +93,6 @@ export default async function HomePage() {
               Browse categories
             </ButtonLink>
           </div>
-
-          <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-ui text-body-xs text-ink-subtle">
-            <span className="inline-flex items-center gap-1.5 font-medium">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              Independent global authors
-            </span>
-            <span className="text-border-strong/40" aria-hidden="true">•</span>
-            <span>No algorithms</span>
-            <span className="text-border-strong/40" aria-hidden="true">•</span>
-            <span>100% reader-first</span>
-          </p>
         </div>
       </section>
 
