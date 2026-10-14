@@ -128,53 +128,19 @@ export default async function HomePage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <ButtonLink href="/featured" variant="ghost" size="sm" className="rounded-full text-xs font-bold">
+            <ButtonLink href="/stories" variant="ghost" size="sm" className="rounded-full text-xs font-bold">
               View all &rarr;
             </ButtonLink>
           </div>
         </div>
 
         {hasStories && leadFeatured ? (
-          <div className="space-y-8">
-            <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr] items-stretch">
-              {/* Left: Lead Featured Story in full overlay card */}
-              <FeaturedStory story={leadFeatured} priority />
+          <div className="grid gap-6 lg:grid-cols-[1.45fr_1fr] items-stretch">
+            {/* Left: Lead Featured Story in full overlay card */}
+            <FeaturedStory story={leadFeatured} priority />
 
-              {/* Right: Suprast-style Tabbed Stories Rail with Yellow Card */}
-              <HeroTabs recentStories={heroRecent} popularStories={heroPopular} />
-            </div>
-
-            {restFeatured.length > 0 ? (
-              <div className="pt-6 border-t border-border/60">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-sans text-heading-xs font-bold text-ink uppercase tracking-wider text-ink-subtle">
-                    More Featured Stories
-                  </h3>
-                  <ButtonLink href="/featured" variant="ghost" size="sm" className="text-xs font-semibold">
-                    All featured stories &rarr;
-                  </ButtonLink>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {restFeatured.slice(0, 3).map((story) => (
-                    <StoryCard key={story.slug} story={story} size="compact" />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : hasStories && !leadFeatured ? (
-          <div className="rounded-3xl border border-dashed border-border/80 p-8 sm:p-10 text-center bg-surface-sunken/40">
-            <h3 className="font-sans text-heading-sm font-bold text-ink">
-              Editor&apos;s Picks coming soon
-            </h3>
-            <p className="mt-1 font-ui text-body-sm text-ink-muted max-w-md mx-auto">
-              Curated stories will appear here once selected by our editorial team.
-            </p>
-            <div className="mt-4">
-              <ButtonLink href="/stories" variant="secondary" size="sm" className="rounded-full">
-                Explore published catalogue
-              </ButtonLink>
-            </div>
+            {/* Right: Suprast-style Tabbed Stories Rail with Yellow Card */}
+            <HeroTabs recentStories={heroRecent} popularStories={heroPopular} />
           </div>
         ) : !hasStories ? (
           <EmptyState

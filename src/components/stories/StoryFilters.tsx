@@ -1,7 +1,7 @@
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { CheckboxField, SelectField, TextField } from "@/components/ui/Field";
 import { ActiveFilterChips } from "@/components/search/ActiveFilterChips";
-import { storyListHref, type StoryListOverrides, type StoryListSearch } from "@/lib/validation/story";
+import { storyListHref, type StoryListSearch } from "@/lib/validation/story";
 import { buildActiveFilters } from "@/lib/filters/active-filters";
 import type { CategorySummary } from "@/lib/queries/public/categories";
 import type { TagOption } from "@/lib/queries/public/tags";
@@ -24,14 +24,10 @@ export function StoryFilters({
   search,
   categories,
   tags,
-  action = "/stories",
-  buildHref = (changes) => storyListHref(search, changes),
 }: {
   search: StoryListSearch;
   categories: CategorySummary[];
   tags: TagOption[];
-  action?: string;
-  buildHref?: (changes: StoryListOverrides) => string;
 }) {
   const categoryOptions = [
     { value: "", label: "All categories" },
@@ -45,7 +41,7 @@ export function StoryFilters({
     search,
     categories,
     tags,
-    buildHref,
+    (changes) => storyListHref(search, changes),
   );
 
   return (
@@ -56,7 +52,7 @@ export function StoryFilters({
 
       <form
         role="search"
-        action={action}
+        action="/stories"
         method="get"
         aria-label="Filter and search stories"
         className="rounded-2xl border border-border/80 bg-surface p-4 sm:p-5 shadow-xs"
@@ -121,7 +117,7 @@ export function StoryFilters({
             Apply filters
           </Button>
           {search.hasFilters ? (
-            <ButtonLink href={action} variant="ghost" size="sm">
+            <ButtonLink href="/stories" variant="ghost" size="sm">
               Clear all
             </ButtonLink>
           ) : null}

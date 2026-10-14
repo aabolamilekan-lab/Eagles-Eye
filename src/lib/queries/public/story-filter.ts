@@ -21,7 +21,6 @@ export interface StoryListFilters {
   q: string;
   category: string | null;
   tags: string[];
-  featured?: boolean;
 }
 
 /** Whitelisted sort keys. No user string ever reaches `orderBy`. */
@@ -59,13 +58,8 @@ export function buildStoryListWhere({
   q,
   category,
   tags,
-  featured,
 }: StoryListFilters): Prisma.StoryWhereInput {
   const where: Prisma.StoryWhereInput = { ...PUBLIC_STORY_WHERE };
-
-  if (featured !== undefined) {
-    where.featured = featured;
-  }
 
   if (q) {
     const term = escapeLikeTerm(q);
