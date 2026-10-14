@@ -1,4 +1,4 @@
-﻿import { unstable_cache } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { StoryCardData } from "@/components/stories/StoryCard";
@@ -130,6 +130,15 @@ export async function getPublishedStoryList(
     return queryStoryList(params);
   }
   return cachedStoryList(params);
+}
+
+export async function getPublishedFeaturedStoryList(
+  params: StoryListParams,
+): Promise<StoryListResult> {
+  return getPublishedStoryList({
+    ...params,
+    featured: true,
+  });
 }
 
 /**

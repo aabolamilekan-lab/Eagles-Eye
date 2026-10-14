@@ -13,6 +13,7 @@ import { Wordmark } from "@/components/navigation/Wordmark";
  */
 const NAV = [
   { label: "Stories", href: "/stories" },
+  { label: "Featured", href: "/featured" },
   { label: "Categories", href: "/categories" },
   { label: "Search", href: "/search" },
   { label: "About", href: "/about" },
@@ -23,6 +24,7 @@ const FOOTER_SECTIONS = [
     heading: "Read",
     links: [
       { label: "Stories", href: "/stories" },
+      { label: "Featured", href: "/featured" },
       { label: "Categories", href: "/categories" },
       { label: "Search", href: "/search" },
     ],

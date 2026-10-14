@@ -22,5 +22,6 @@ export function revalidatePublicStoryCaches(): void {
   updateTag(PUBLIC_TAGS_TAG);
   revalidatePath("/");
   revalidatePath("/stories");
+  revalidatePath("/featured");
 }
 

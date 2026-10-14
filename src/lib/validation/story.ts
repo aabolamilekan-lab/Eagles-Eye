@@ -219,6 +219,41 @@ export function storyListHref(
   return query ? `/stories?${query}` : "/stories";
 }
 
+/**
+ * Build a `/featured` URL from the current search with optional overrides.
+ */
+export function featuredListHref(
+  base: StoryListSearch,
+  overrides: StoryListOverrides = {},
+): string {
+  const q = (overrides.q ?? base.q).trim();
+  const category =
+    overrides.category === undefined ? base.category : overrides.category;
+  const tags = overrides.tags ?? base.tags;
+  const sort = overrides.sort ?? base.sort;
+  const page = overrides.page ?? 1;
+
+  const search = new URLSearchParams();
+  if (q) {
+    search.set("q", q);
+  }
+  if (category) {
+    search.set("category", category);
+  }
+  for (const tag of tags) {
+    search.append("tag", tag);
+  }
+  if (sort !== "recent") {
+    search.set("sort", sort);
+  }
+  if (page > 1) {
+    search.set("page", String(page));
+  }
+
+  const query = search.toString();
+  return query ? `/featured?${query}` : "/featured";
+}
+
 /* ------------------------------------------------------------------------- */
 /* Admin story management                                                     */
 /* ------------------------------------------------------------------------- */
