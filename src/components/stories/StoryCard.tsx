@@ -103,7 +103,7 @@ export function StoryCard({
         </div>
 
         <div className="flex min-w-0 flex-col gap-1 justify-center flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             {story.category ? (
               <span
                 className={cn(
@@ -339,7 +339,7 @@ export function FeaturedStory({
 
   return (
     <article className="group relative overflow-hidden rounded-3xl border border-border/70 bg-[#121417] shadow-sm transition-all duration-300 hover:shadow-lg focus-within:ring-2 focus-within:ring-[#FFE500]">
-      <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-[16/10] w-full min-h-[320px] sm:min-h-[460px] overflow-hidden bg-surface-sunken">
+      <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-[16/10] w-full min-h-[280px] sm:min-h-[460px] overflow-hidden bg-surface-sunken">
         {story.coverImageUrl ? (
           <Image
             src={story.coverImageUrl}

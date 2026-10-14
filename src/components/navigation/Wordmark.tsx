@@ -33,7 +33,7 @@ export function Wordmark({
         className={cn(
           "rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 bg-[#FFE500] text-black shadow-2xs transition-transform duration-300 ease-out group-hover:scale-105",
           size === "lg"
-            ? "size-8 sm:size-10"
+            ? "size-6.5 sm:size-9 lg:size-10"
             : size === "sm"
               ? "size-6 sm:size-7"
               : "size-7 sm:size-9",
@@ -48,7 +48,7 @@ export function Wordmark({
           strokeLinejoin="round"
           className={cn(
             size === "lg"
-              ? "size-4 sm:size-5.5"
+              ? "size-3.5 sm:size-5 lg:size-5.5"
               : size === "sm"
                 ? "size-3 sm:size-3.5"
                 : "size-3.5 sm:size-5",
@@ -62,7 +62,7 @@ export function Wordmark({
         className={cn(
           "font-sans font-black tracking-tight whitespace-nowrap",
           size === "lg"
-            ? "text-xl sm:text-2xl md:text-3xl"
+            ? "text-lg sm:text-2xl lg:text-3xl"
             : size === "sm"
               ? "text-base"
               : "text-lg sm:text-heading-xl",

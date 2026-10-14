@@ -64,7 +64,7 @@ export default async function HomePage() {
         <div className="max-w-3xl">
           <h1
             id="home-hero-heading"
-            className="font-sans text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight text-balance leading-tight"
+            className="font-sans text-xl min-[360px]:text-2xl sm:text-3xl lg:text-4xl font-extrabold text-ink tracking-tight text-balance leading-tight"
           >
             Pure fiction.{" "}
             <span className="relative inline-block text-amber-600 dark:text-[#FFE500] underline decoration-[#FFE500] decoration-[3px] sm:decoration-[4px] underline-offset-4 sm:underline-offset-6">
@@ -121,11 +121,9 @@ export default async function HomePage() {
               id="home-featured-heading"
               className="font-sans text-xl sm:text-2xl font-black text-ink tracking-tight"
             >
-              Featured stories
+              Lead stories
+              <span className="sr-only"> (Featured stories)</span>
             </h2>
-            <span className="rounded-full bg-[#FFE500]/25 text-black px-2.5 py-0.5 text-xs font-bold whitespace-nowrap">
-              Editor&apos;s Pick
-            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -178,7 +176,7 @@ export default async function HomePage() {
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/stories"
                 className="flex size-9 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-colors hover:border-ink hover:text-ink text-sm font-bold"
@@ -324,10 +322,10 @@ export default async function HomePage() {
                 </p>
               </div>
               <div className="mt-6 flex flex-wrap gap-2.5">
-                <ButtonLink href="/about" variant="secondary" size="sm" className="rounded-full bg-white text-black hover:bg-white/90">
+                <ButtonLink href="/about" variant="inverted" size="sm" className="rounded-full">
                   About Eagles Eye
                 </ButtonLink>
-                <ButtonLink href="/stories" variant="ghost" size="sm" className="rounded-full text-white/90 hover:text-white">
+                <ButtonLink href="/stories" variant="ghost" size="sm" className="rounded-full text-white/90 hover:text-white hover:bg-white/10">
                   Browse stories &rarr;
                 </ButtonLink>
               </div>

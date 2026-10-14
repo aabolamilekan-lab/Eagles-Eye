@@ -93,7 +93,7 @@ test.describe("publishing lifecycle", () => {
     // Home: the featured rail, not merely the recent list.
     await reader.goto("/");
     const featured = reader.locator("section", {
-      has: reader.getByRole("heading", { name: "Featured stories" }),
+      has: reader.getByRole("heading", { name: /Lead stories|Featured stories/ }),
     });
     await expect(featured.getByRole("link", { name: TITLE })).toBeVisible();
 

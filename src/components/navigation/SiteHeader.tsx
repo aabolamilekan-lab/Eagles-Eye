@@ -3,7 +3,6 @@
 import { useSyncExternalStore, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search } from "lucide-react";
 import { MobileNavMenu } from "@/components/navigation/MobileNavMenu";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { cn } from "@/lib/cn";
@@ -63,13 +62,6 @@ export function SiteHeader({
 
   const defaultActions = (
     <div className="flex items-center gap-1 sm:gap-2">
-      <Link
-        href="/search"
-        aria-label="Search"
-        className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-surface text-ink-muted transition-all hover:border-ink hover:text-ink hover:scale-105"
-      >
-        <Search className="size-3.5 sm:size-4" />
-      </Link>
       <ThemeToggle />
     </div>
   );
@@ -96,19 +88,15 @@ export function SiteHeader({
       </div>
 
       {/* Masthead: Centered Logo like the newspaper header in screenshot */}
-      <div className="shell flex h-16 sm:h-20 items-center justify-between gap-2.5 sm:gap-6">
-        <div className="flex-1 hidden sm:flex items-center justify-start min-w-0">
-          <span className="text-[11px] font-ui text-ink-subtle tracking-widest uppercase font-semibold">
-            Independent Publishing
-          </span>
-        </div>
-        <div className="flex-1 sm:hidden" />
+      <div className="shell relative flex h-14 sm:h-20 items-center justify-between">
+        <div className="flex-1 min-w-0" />
 
-        <div className="shrink-0 flex items-center justify-center">
+        {/* Center: Brand Logo - strictly centered on all devices */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center shrink-0">
           {brand}
         </div>
 
-        <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-3 shrink-0 z-10">
           {actions ?? defaultActions}
 
           <MobileNavMenu nav={items} navLabel={navLabel} />

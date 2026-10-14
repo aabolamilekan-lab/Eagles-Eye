@@ -11,7 +11,8 @@ export type ButtonVariant =
   | "secondary"
   | "ghost"
   | "danger"
-  | "subtle";
+  | "subtle"
+  | "inverted";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -39,6 +40,8 @@ const VARIANT: Record<ButtonVariant, string> = {
   subtle: "bg-surface-sunken text-ink border border-transparent hover:bg-border",
   danger:
     "bg-error text-white border border-error hover:bg-error/90 active:bg-error",
+  inverted:
+    "bg-white text-black font-bold border border-white hover:bg-white/90 active:bg-white/80 focus-visible:ring-2 focus-visible:ring-white shadow-xs",
 };
 
 const SIZE: Record<ButtonSize, string> = {
